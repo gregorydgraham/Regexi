@@ -1026,9 +1026,9 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 		return new RegexGroup.Or<>(startingAnywhere());
 	}
 
-	public List<String> getAllMatches(String string) {
+	public List<Match> getAllMatches(String string) {
 		Matcher matcher = getMatcher(string);
-		List<String> matches = matcher.results().map(m -> m.group()).collect(Collectors.toList());
+		List<Match> matches = matcher.results().map(m -> Match.from(m.group())).collect(Collectors.toList());
 		return matches;
 	}
 

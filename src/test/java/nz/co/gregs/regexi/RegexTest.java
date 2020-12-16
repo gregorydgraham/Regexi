@@ -274,9 +274,9 @@ public class RegexTest {
 		assertThat(pattern.matchesWithinString("1.37e+15 after"), is(true));
 
 		assertThat(pattern.matchesWithinString("INTERVAL -1.999999999946489E-6 SECOND"), is(true));
-		final List<String> allMatches = pattern.getAllMatches("INTERVAL -1.999999999946489E-6 SECOND");
+		final List<Match> allMatches = pattern.getAllMatches("INTERVAL -1.999999999946489E-6 SECOND");
 		assertThat(allMatches.size(), is(1));
-		final Double value = Double.valueOf(allMatches.get(0));
+		final Double value = Double.valueOf(allMatches.get(0).getEntireMatch());
 		assertThat(value, is(Double.valueOf("-1.999999999946489E-6")));
 		assertThat(Math.round(value * 1000000), is(-2L));
 
@@ -309,6 +309,7 @@ public class RegexTest {
 		assertThat(Math.round(value * 1000000), is(-2L));
 
 	}
+	
 	@Test
 	public void testNamedGroups() {
 		// -2 days 00:00:00
@@ -381,9 +382,11 @@ public class RegexTest {
 						.numberLike().once();
 
 //		System.out.println("REGEX: " + pattern.getRegex());
-		List<String> matches = regex.getAllMatches("-1 2 -234 +4 -4 4.5 FAIL 02 -0234 004 _4 A4");
+		List<Match> matches = regex.getAllMatches("-1 2 -234 +4 -4 4.5 FAIL 02 -0234 004 _4 A4");
 		assertThat(matches.size(), is(11));
-		assertThat(matches, contains("-1", "2", "-234", "+4", "-4", "4.5", "02", "-0234", "004", "4", "4"));
+		for (Match match : matches) {
+			assertThat(match.getEntireMatch(), isOneOf("-1", "2", "-234", "+4", "-4", "4.5", "02", "-0234", "004", "4", "4"));
+		}
 
 		regex
 				= Regex.startingAnywhere()
@@ -392,7 +395,10 @@ public class RegexTest {
 //		System.out.println("REGEX: " + pattern.getRegex());
 		matches = regex.getAllMatches("-1 2 -234 +4 -4 4.5 FAIL 02 -0234 004 _4 A4");
 		assertThat(matches.size(), is(6));
-		assertThat(matches, contains("-1", "2", "-234", "+4", "-4", "4.5"));
+		for (Match match : matches) {
+			assertThat(match.getEntireMatch(), isOneOf("-1", "2", "-234", "+4", "-4", "4.5"));
+		}
+//		assertThat(matches, contains("-1", "2", "-234", "+4", "-4", "4.5"));
 	}
 
 	@Test
@@ -459,5 +465,39 @@ public class RegexTest {
 		assertThat(regex.matchesWithinString("day after"), is(false));
 		assertThat(regex.matchesWithinString("days after"), is(false));
 		assertThat(regex.matchesWithinString("before"), is(false));
+	}
+	
+	@Test
+	public void testLotsOfMatchesAndNamedGroups() {
+		System.out.println("nz.co.gregs.regexi.RegexTest.testLotsOfMatchesAndNamedGroups()");
+		// -2 days 00:00:00
+		// 1 days 00:00:5.5
+		// 0 days 00:00:-5.5
+		//
+		// ^(?<interval>((?i)interval(?-i)){1}) {1}(?<value>([-+]?\b[1-9]+\d*(\.{1}\d+)?(((?i)E(?-i)){1}[-+]?[1-9]+\d*(\.{1}\d+)?)?(?!\S)){1}) {1}(?<unit>\w+)$
+		Regex pattern
+				= Regex.startingAnywhere()
+						.namedCapture("interval").literalCaseInsensitive("interval").once().endCapture()
+						.space().once()
+						.namedCapture("value").numberIncludingScientificNotation().once().endCapture()
+						.space().once()
+						.namedCapture("unit").word().endCapture();
+
+		System.out.println("REGEX: " + pattern.getRegex());
+		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND, INTERVAL 2 DAY, interval 3 month, interval 3 minutes";
+		assertThat(pattern.matchesWithinString(intervalString), is(true));
+		
+		final List<Match> allMatches = pattern.getAllMatches(intervalString);
+		for (var entry : allMatches) {
+			System.out.println("MATCH: "+entry.getEntireMatch());
+		}
+		final HashMap<String, String> allGroups = pattern.getAllNamedGroups(intervalString);
+		for (var entry : allGroups.entrySet()) {
+			System.out.println("GROUP: "+entry.getKey()+"="+entry.getValue());
+		}
+		assertThat(allGroups.size(), is(3));
+		final Double value = Double.valueOf(allGroups.get("value"));
+		assertThat(value, is(Double.valueOf("-1.999999999946489E-6")));
+		assertThat(Math.round(value * 1000000), is(-2L));
 	}
 }
