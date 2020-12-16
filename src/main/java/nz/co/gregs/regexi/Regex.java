@@ -684,7 +684,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex negativeInteger() {
-		return extend(literal('-').anyBetween('1', '9').once().digit().zeroOrMore());
+		return extend(literal('-').anyCharacterBetween('1', '9').once().digit().zeroOrMore());
 	}
 
 	/**
@@ -702,7 +702,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 				startingAnywhere()
 						.notPrecededBy("-")
 						.plus().onceOrNotAtAll()
-						.anyBetween('1', '9').once()
+						.anyCharacterBetween('1', '9').once()
 						.digit().zeroOrMore()
 		);
 	}
@@ -718,8 +718,8 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * @return a new regexp
 	 */
 	@Override
-	public Regex anyBetween(Character lowest, Character highest) {
-		return extend(startingAnywhere().openRange(lowest, highest).closeRange());
+	public Regex anyCharacterBetween(Character lowest, Character highest) {
+		return extend(startingAnywhere().beginRange(lowest, highest).closeRange());
 	}
 
 	/**
@@ -733,8 +733,16 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * @return a new regexp
 	 */
 	@Override
-	public Regex anyOf(String literals) {
-		return extend(startingAnywhere().openRange(literals).closeRange());
+	public Regex anyCharacterIn(String literals) {
+		return extend(startingAnywhere().beginRange(literals).closeRange());
+	}
+
+	public Regex anyOf(String literal, String... literals) {
+		var temp = beginOrGroup().literal(literal);
+		for (String literal1 : literals) {
+			temp = temp.or().literal(literal1);
+		}
+		return temp.endOrGroup();
 	}
 
 	/**
@@ -749,8 +757,8 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * @return a new regexp
 	 */
 	@Override
-	public Regex nothingBetween(Character lowest, Character highest) {
-		return extend(startingAnywhere().openRange(lowest, highest).negated().closeRange());
+	public Regex noCharacterBetween(Character lowest, Character highest) {
+		return extend(startingAnywhere().beginRange(lowest, highest).negated().closeRange());
 	}
 
 	/**
@@ -765,8 +773,8 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * @return a new regexp
 	 */
 	@Override
-	public Regex noneOf(String literals) {
-		return extend(startingAnywhere().openRange(literals).negated().closeRange());
+	public Regex noneOfTheseCharacters(String literals) {
+		return extend(startingAnywhere().beginRange(literals).negated().closeRange());
 	}
 
 	/**
@@ -820,7 +828,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	}
 
 	@Override
-	public RegexGroup.NamedCapture<Regex> namedCapture(String name) {
+	public RegexGroup.NamedCapture<Regex> beginNamedCapture(String name) {
 		return new RegexGroup.NamedCapture<>(this, name);
 	}
 
@@ -872,7 +880,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 		return getMatcher(string).toMatchResult();
 	}
 
-	public Optional<String> getNamedMatch(String string, String name) {
+	public Optional<String> getNamedCapture(String name, String string) {
 		final String found = getMatcher(string).group(name);
 		if (found == null) {
 			return Optional.empty();
@@ -881,7 +889,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 		}
 	}
 
-	public HashMap<String, String> getAllNamedGroups(String string) {
+	public HashMap<String, String> getAllNamedCapturesOfFirstMatchWithinString(String string) {
 		HashMap<String, String> resultMap = new HashMap<String, String>(0);
 		try {
 			Matcher matcher = getMatcher(string);
@@ -992,20 +1000,21 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * return to the regex.
 	 *
 	 * <p>
-	 * This provides more options than the {@link #anyBetween(java.lang.Character, java.lang.Character)
-	 * } and {@link #anyOf(java.lang.String) } methods for creating ranges.
+	 * This provides more options than the {@link #anyCharacterBetween(java.lang.Character, java.lang.Character)
+	 * } and {@link #anyCharacterIn(java.lang.String) } methods for creating
+	 * ranges.
 	 *
 	 * @param lowest
 	 * @param highest
 	 * @return the start of a range.
 	 */
 	@Override
-	public RangeBuilder<Regex> openRange(char lowest, char highest) {
+	public RangeBuilder<Regex> beginRange(char lowest, char highest) {
 		return new RangeBuilder<>(this, lowest, highest);
 	}
 
 	@Override
-	public RangeBuilder<Regex> openRange(String literals) {
+	public RangeBuilder<Regex> beginRange(String literals) {
 		return new RangeBuilder<>(this, literals);
 	}
 
@@ -1017,18 +1026,18 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * for instance, use this to generate "(FRED|EMILY|GRETA|DONALD)".
 	 *
 	 * <p>
-	 * {@code Regex regex =  Regex.startGroup().literal("A").or().literal("B").closeGroup();
-	 * } produces "(A|B)".
+	 * {@code Regex regex =  Regex.startOrGroup().literal("A").or().literal("B").endGroup();
+ } produces "(A|B)".
 	 *
 	 * @return a new regular expression
 	 */
-	public static RegexGroup.Or<Regex> startGroup() {
-		return new RegexGroup.Or<>(startingAnywhere());
+	public static RegexGroup.Or<Regex> startOrGroup() {
+		return startingAnywhere().beginOrGroup();
 	}
 
 	public List<Match> getAllMatches(String string) {
 		Matcher matcher = getMatcher(string);
-		List<Match> matches = matcher.results().map(m -> Match.from(m.group())).collect(Collectors.toList());
+		List<Match> matches = matcher.results().map(m -> Match.from(this, m.group())).collect(Collectors.toList());
 		return matches;
 	}
 
@@ -1150,6 +1159,4 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 //			return "(" + regexp.getRegex() + ")";
 //		}
 //	}
-
-
 }

@@ -62,7 +62,7 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 		return origin;
 	}
 
-	public REGEX closeGroup() {
+	protected final REGEX endGroup() {
 		return getOrigin().unescaped(this.getRegex());
 	}
 
@@ -75,29 +75,36 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public THIS noneOf(String literals) {
-		current = getCurrent().noneOf(literals);
+	public THIS noneOfTheseCharacters(String literals) {
+		current = getCurrent().noneOfTheseCharacters(literals);
 		return (THIS) this;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public THIS nothingBetween(Character lowest, Character highest) {
-		current = getCurrent().nothingBetween(lowest, highest);
+	public THIS noCharacterBetween(Character lowest, Character highest) {
+		current = getCurrent().noCharacterBetween(lowest, highest);
 		return (THIS) this;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public THIS anyOf(String literals) {
-		current = getCurrent().anyOf(literals);
+	public THIS anyCharacterBetween(Character lowest, Character highest) {
+		current = getCurrent().anyCharacterBetween(lowest, highest);
 		return (THIS) this;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public THIS anyBetween(Character lowest, Character highest) {
-		current = getCurrent().anyBetween(lowest, highest);
+	public THIS anyCharacterIn(String literals) {
+		current = getCurrent().anyCharacterIn(literals);
+		return (THIS) this;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public THIS anyOf(String literal, String... literals) {
+		current = current.anyOf(literal, literals);
 		return (THIS) this;
 	}
 
@@ -327,6 +334,12 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 
 	@Override
 	@SuppressWarnings("unchecked")
+	public RegexGroup.CaseInsensitive<THIS> caseInsensitiveGroup() {
+		return new RegexGroup.CaseInsensitive<>((THIS) this);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
 	public THIS newline() {
 		current = getCurrent().newline();
 		return (THIS) this;
@@ -544,20 +557,20 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public RangeBuilder<THIS> openRange(char lowest, char highest) {
+	public RangeBuilder<THIS> beginRange(char lowest, char highest) {
 		return new RangeBuilder<THIS>((THIS) this, lowest, highest);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public RangeBuilder<THIS> openRange(String literals) {
+	public RangeBuilder<THIS> beginRange(String literals) {
 		return new RangeBuilder<THIS>((THIS) this, literals);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public NamedCapture<REGEX> namedCapture(String name) {
-		return new NamedCapture<>((REGEX)this, name);
+	public NamedCapture<REGEX> beginNamedCapture(String name) {
+		return new NamedCapture<>((REGEX) this, name);
 	}
 
 	public static class Or<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<Or<REGEX>, REGEX> {
@@ -578,6 +591,10 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 			return new Or<>(getOrigin(), ors);
 		}
 
+		public REGEX endOrGroup() {
+			return endGroup();
+		}
+
 		@Override
 		public String getRegex() {
 			final String regexp = getCurrent().getRegex();
@@ -589,7 +606,6 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 
 	public static class NamedCapture<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<NamedCapture<REGEX>, REGEX> {
 
-		private final List<String> ors = new ArrayList<>(0);
 		private final String name;
 
 		protected NamedCapture(REGEX original, String name) {
@@ -604,11 +620,11 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 		}
 
 		public REGEX endCapture() {
-			return closeGroup();
+			return endGroup();
 		}
 	}
 
-	public static class CaseInsensitive<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<CaseInsensitive<REGEX>,REGEX> {
+	public static class CaseInsensitive<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<CaseInsensitive<REGEX>, REGEX> {
 
 		public CaseInsensitive(REGEX original) {
 			super(original);
@@ -621,7 +637,7 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 		}
 
 		public REGEX caseInsensitiveEnd() {
-			return closeGroup();
+			return endGroup();
 		}
 	}
 

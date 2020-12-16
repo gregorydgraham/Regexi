@@ -1,4 +1,4 @@
-package nz.co.gregs.regexi;
+package nz.co.gregs.regexi.api;
 
 /*
  * Copyright 2019 Gregory Graham.
@@ -30,10 +30,12 @@ package nz.co.gregs.regexi;
  * 
  * Check the Creative Commons website for any details, legalese, and updates.
  */
-
 import java.util.HashMap;
 import java.util.List;
-import  static org.hamcrest.MatcherAssert.assertThat;
+import java.util.stream.Collectors;
+import nz.co.gregs.regexi.Match;
+import nz.co.gregs.regexi.Regex;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import org.junit.Assert;
 import org.junit.Test;
@@ -86,7 +88,7 @@ public class RegexTest {
 		final Regex allowedValue
 				= Regex.startingAnywhere()
 						.literal('-').onceOrNotAtAll()
-						.anyBetween('0', '9').atLeastOnce();
+						.anyCharacterBetween('0', '9').atLeastOnce();
 
 		final Regex allowedSeconds
 				= allowedValue.add(
@@ -94,11 +96,7 @@ public class RegexTest {
 				).onceOrNotAtAll();
 
 		final Regex separator
-				= Regex.startingAnywhere().openRange('0', '9').includeMinus().negated().closeRange().atLeastOnce();
-//				= new Regex.Range('0', '9')
-//						.includeMinus()
-//						.negated()
-//						.atLeastOnce();
+				= Regex.startingAnywhere().beginRange('0', '9').includeMinus().negated().closeRange().atLeastOnce();
 
 		Regex pattern
 				= Regex.startingAnywhere()
@@ -107,16 +105,6 @@ public class RegexTest {
 						.add(allowedValue).literal(':')
 						.add(allowedSeconds);
 
-//		System.out.println("PASS: " + pattern.matchesWithinString("-2 days 00:00:00"));
-//		System.out.println("PASS: " + pattern.matchesWithinString("2 days 00:00:00"));
-//		System.out.println("PASS: " + pattern.matchesWithinString("2 days 00:00:00.0"));
-//		System.out.println("PASS: " + pattern.matchesWithinString("1 days 00:00:5.5"));
-//		System.out.println("PASS: " + pattern.matchesWithinString("2 days 00:00:00"));
-//		System.out.println("PASS: " + pattern.matchesWithinString("1 days 00:00:5.5"));
-//		System.out.println("PASS: " + pattern.matchesWithinString("0 days 00:00:-5.5"));
-//		System.out.println("PASS: " + pattern.matchesWithinString("0 00:00:-5.5"));
-//		System.out.println("FAIL: " + pattern.matchesWithinString("00:00:-5.5"));
-//		System.out.println("FAIL: " + pattern.matchesWithinString("-2 days"));
 		assertThat(pattern.matchesWithinString("-2 days 00:00:00"), is(true));
 		assertThat(pattern.matchesWithinString("2 days 00:00:00"), is(true));
 		assertThat(pattern.matchesWithinString("2 days 00:00:00.0"), is(true));
@@ -140,32 +128,22 @@ public class RegexTest {
 		Regex pattern
 				= Regex.startingAnywhere()
 						.literal('-').onceOrNotAtAll()
-						.anyBetween('0', '9').atLeastOnce()
-						.openRange('0', '9')
+						.anyCharacterBetween('0', '9').atLeastOnce()
+						.beginRange('0', '9')
 						.includeMinus()
 						.negated()
 						.closeRange()
 						.atLeastOnce()
 						.literal('-').onceOrNotAtAll()
-						.anyBetween('0', '9').atLeastOnce()
+						.anyCharacterBetween('0', '9').atLeastOnce()
 						.literal(':').once()
 						.literal('-').onceOrNotAtAll()
-						.anyBetween('0', '9').atLeastOnce()
+						.anyCharacterBetween('0', '9').atLeastOnce()
 						.literal(':').once()
 						.literal('-').onceOrNotAtAll()
-						.anyBetween('0', '9').atLeastOnce().add(Regex.startingAnywhere().dot().digits()
+						.anyCharacterBetween('0', '9').atLeastOnce().add(Regex.startingAnywhere().dot().digits()
 				).onceOrNotAtAll();
 
-//		System.out.println("PASS: " + pattern.matchesWithinString("-2 days 00:00:00"));
-//		System.out.println("PASS: " + pattern.matchesWithinString("2 days 00:00:00"));
-//		System.out.println("PASS: " + pattern.matchesWithinString("2 days 00:00:00.0"));
-//		System.out.println("PASS: " + pattern.matchesWithinString("1 days 00:00:5.5"));
-//		System.out.println("PASS: " + pattern.matchesWithinString("2 days 00:00:00"));
-//		System.out.println("PASS: " + pattern.matchesWithinString("1 days 00:00:5.5"));
-//		System.out.println("PASS: " + pattern.matchesWithinString("0 days 00:00:-5.5"));
-//		System.out.println("PASS: " + pattern.matchesWithinString("0 00:00:-5.5"));
-//		System.out.println("FAIL: " + pattern.matchesWithinString("00:00:-5.5"));
-//		System.out.println("FAIL: " + pattern.matchesWithinString("-2 days"));
 		assertThat(pattern.matchesWithinString("-2 days 00:00:00"), is(true));
 		assertThat(pattern.matchesWithinString("2 days 00:00:00"), is(true));
 		assertThat(pattern.matchesWithinString("2 days 00:00:00.0"), is(true));
@@ -182,25 +160,45 @@ public class RegexTest {
 	@Test
 	public void testGroupBuilding() {
 
-		Regex pattern
-				= Regex.startGroup().literal("Amy").or().literal("Bob").or().literal("Charlie").closeGroup();
+		Regex regex
+				= Regex.startOrGroup().literal("Amy").or().literal("Bob").or().literal("Charlie").endOrGroup();
 
-		assertThat(pattern.matchesWithinString("Amy"), is(true));
-		assertThat(pattern.matchesWithinString("Bob"), is(true));
-		assertThat(pattern.matchesWithinString("Charlie"), is(true));
-		assertThat(pattern.matchesEntireString("Amy"), is(true));
-		assertThat(pattern.matchesEntireString("Bob"), is(true));
-		assertThat(pattern.matchesEntireString("Charlie"), is(true));
-		assertThat(pattern.matchesWithinString("David"), is(false));
-		assertThat(pattern.matchesWithinString("Emma"), is(false));
-		assertThat(pattern.matchesWithinString("Try with Amy in the middle"), is(true));
-		assertThat(pattern.matchesWithinString("End it with Bob"), is(true));
-		assertThat(pattern.matchesWithinString("Charlie at the start"), is(true));
-		assertThat(pattern.matchesEntireString("Try with Amy in the middle"), is(false));
-		assertThat(pattern.matchesEntireString("End it with Bob"), is(false));
-		assertThat(pattern.matchesEntireString("Charlie at the start"), is(false));
-		assertThat(pattern.matchesWithinString("Still can't find David"), is(false));
-		assertThat(pattern.matchesWithinString("Emma doesn't do any better"), is(false));
+		assertThat(regex.matchesWithinString("Amy"), is(true));
+		assertThat(regex.matchesWithinString("Bob"), is(true));
+		assertThat(regex.matchesWithinString("Charlie"), is(true));
+		assertThat(regex.matchesEntireString("Amy"), is(true));
+		assertThat(regex.matchesEntireString("Bob"), is(true));
+		assertThat(regex.matchesEntireString("Charlie"), is(true));
+		assertThat(regex.matchesWithinString("David"), is(false));
+		assertThat(regex.matchesWithinString("Emma"), is(false));
+		assertThat(regex.matchesWithinString("Try with Amy in the middle"), is(true));
+		assertThat(regex.matchesWithinString("End it with Bob"), is(true));
+		assertThat(regex.matchesWithinString("Charlie at the start"), is(true));
+		assertThat(regex.matchesEntireString("Try with Amy in the middle"), is(false));
+		assertThat(regex.matchesEntireString("End it with Bob"), is(false));
+		assertThat(regex.matchesEntireString("Charlie at the start"), is(false));
+		assertThat(regex.matchesWithinString("Still can't find David"), is(false));
+		assertThat(regex.matchesWithinString("Emma doesn't do any better"), is(false));
+
+		// Check that Regex.anyOf() is the same
+		regex = Regex.startingAnywhere().anyOf("Amy","Bob","Charlie");
+
+		assertThat(regex.matchesWithinString("Amy"), is(true));
+		assertThat(regex.matchesWithinString("Bob"), is(true));
+		assertThat(regex.matchesWithinString("Charlie"), is(true));
+		assertThat(regex.matchesEntireString("Amy"), is(true));
+		assertThat(regex.matchesEntireString("Bob"), is(true));
+		assertThat(regex.matchesEntireString("Charlie"), is(true));
+		assertThat(regex.matchesWithinString("David"), is(false));
+		assertThat(regex.matchesWithinString("Emma"), is(false));
+		assertThat(regex.matchesWithinString("Try with Amy in the middle"), is(true));
+		assertThat(regex.matchesWithinString("End it with Bob"), is(true));
+		assertThat(regex.matchesWithinString("Charlie at the start"), is(true));
+		assertThat(regex.matchesEntireString("Try with Amy in the middle"), is(false));
+		assertThat(regex.matchesEntireString("End it with Bob"), is(false));
+		assertThat(regex.matchesEntireString("Charlie at the start"), is(false));
+		assertThat(regex.matchesWithinString("Still can't find David"), is(false));
+		assertThat(regex.matchesWithinString("Emma doesn't do any better"), is(false));
 
 	}
 
@@ -295,23 +293,22 @@ public class RegexTest {
 						.space().once()
 						.numberIncludingScientificNotation().once()
 						.space().once()
-						.openGroup().word().closeGroup()
+						.beginOrGroup().word().endOrGroup()
 						.endOfInput();
 
-		System.out.println("REGEX: " + pattern.getRegex());
 		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND";
 		assertThat(pattern.matchesEntireString(intervalString), is(true));
 		final List<String> allMatches = pattern.getAllGroups(intervalString);
-		allMatches.stream().forEach(t -> System.out.println("MATCH: " + t));
 		assertThat(allMatches.size(), is(6));
+		
 		final Double value = Double.valueOf(allMatches.get(2));
 		assertThat(value, is(Double.valueOf("-1.999999999946489E-6")));
 		assertThat(Math.round(value * 1000000), is(-2L));
 
 	}
-	
+
 	@Test
-	public void testNamedGroups() {
+	public void testNamedCaptures() {
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -319,21 +316,19 @@ public class RegexTest {
 		// ^(?<interval>((?i)interval(?-i)){1}) {1}(?<value>([-+]?\b[1-9]+\d*(\.{1}\d+)?(((?i)E(?-i)){1}[-+]?[1-9]+\d*(\.{1}\d+)?)?(?!\S)){1}) {1}(?<unit>\w+)$
 		Regex pattern
 				= Regex.startingFromTheBeginning()
-						.namedCapture("interval").literalCaseInsensitive("interval").once().endCapture()
+						.beginNamedCapture("interval").literalCaseInsensitive("interval").once().endCapture()
 						.space().once()
-						.namedCapture("value").numberIncludingScientificNotation().once().endCapture()
+						.beginNamedCapture("value").numberIncludingScientificNotation().once().endCapture()
 						.space().once()
-						.namedCapture("unit").word().endCapture()
+						.beginNamedCapture("unit").word().endCapture()
 						.endOfInput();
 
-		System.out.println("REGEX: " + pattern.getRegex());
 		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND";
 		assertThat(pattern.matchesEntireString(intervalString), is(true));
-		final HashMap<String, String> allGroups = pattern.getAllNamedGroups(intervalString);
-		for (var entry : allGroups.entrySet()) {
-			System.out.println("GROUP: "+entry.getKey()+"="+entry.getValue());
-		}
+
+		final HashMap<String, String> allGroups = pattern.getAllNamedCapturesOfFirstMatchWithinString(intervalString);
 		assertThat(allGroups.size(), is(3));
+		
 		final Double value = Double.valueOf(allGroups.get("value"));
 		assertThat(value, is(Double.valueOf("-1.999999999946489E-6")));
 		assertThat(Math.round(value * 1000000), is(-2L));
@@ -387,6 +382,18 @@ public class RegexTest {
 		for (Match match : matches) {
 			assertThat(match.getEntireMatch(), isOneOf("-1", "2", "-234", "+4", "-4", "4.5", "02", "-0234", "004", "4", "4"));
 		}
+		List<String> collected = matches.stream().map(v->v.getEntireMatch()).collect(Collectors.toList());
+		assertThat(collected.get(0), is("-1"));
+		assertThat(collected.get(1), is("2"));
+		assertThat(collected.get(2), is("-234"));
+		assertThat(collected.get(3), is("+4"));
+		assertThat(collected.get(4), is("-4"));
+		assertThat(collected.get(5), is("4.5"));
+		assertThat(collected.get(6), is("02"));
+		assertThat(collected.get(7), is("-0234"));
+		assertThat(collected.get(8), is("-004"));
+		assertThat(collected.get(9), is("4"));
+		assertThat(collected.get(10), is("4"));
 
 		regex
 				= Regex.startingAnywhere()
@@ -398,7 +405,13 @@ public class RegexTest {
 		for (Match match : matches) {
 			assertThat(match.getEntireMatch(), isOneOf("-1", "2", "-234", "+4", "-4", "4.5"));
 		}
-//		assertThat(matches, contains("-1", "2", "-234", "+4", "-4", "4.5"));
+		collected = matches.stream().map(v->v.getEntireMatch()).collect(Collectors.toList());
+		assertThat(collected.get(0), is("-1"));
+		assertThat(collected.get(1), is("2"));
+		assertThat(collected.get(2), is("-234"));
+		assertThat(collected.get(3), is("+4"));
+		assertThat(collected.get(4), is("-4"));
+		assertThat(collected.get(5), is("4.5"));
 	}
 
 	@Test
@@ -466,7 +479,7 @@ public class RegexTest {
 		assertThat(regex.matchesWithinString("days after"), is(false));
 		assertThat(regex.matchesWithinString("before"), is(false));
 	}
-	
+
 	@Test
 	public void testLotsOfMatchesAndNamedGroups() {
 		System.out.println("nz.co.gregs.regexi.RegexTest.testLotsOfMatchesAndNamedGroups()");
@@ -475,29 +488,33 @@ public class RegexTest {
 		// 0 days 00:00:-5.5
 		//
 		// ^(?<interval>((?i)interval(?-i)){1}) {1}(?<value>([-+]?\b[1-9]+\d*(\.{1}\d+)?(((?i)E(?-i)){1}[-+]?[1-9]+\d*(\.{1}\d+)?)?(?!\S)){1}) {1}(?<unit>\w+)$
-		Regex pattern
+		Regex regex
 				= Regex.startingAnywhere()
-						.namedCapture("interval").literalCaseInsensitive("interval").once().endCapture()
+						.beginNamedCapture("interval").literalCaseInsensitive("interval").once().endCapture()
 						.space().once()
-						.namedCapture("value").numberIncludingScientificNotation().once().endCapture()
+						.beginNamedCapture("value").numberIncludingScientificNotation().once().endCapture()
 						.space().once()
-						.namedCapture("unit").word().endCapture();
+						.beginNamedCapture("unit")
+						.caseInsensitiveGroup()
+						.anyOf("DAY","HOUR","MINUTE","SECOND").once().literal("S").onceOrNotAtAll()
+						.caseInsensitiveEnd()
+						.endCapture();
 
-		System.out.println("REGEX: " + pattern.getRegex());
-		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND, INTERVAL 2 DAY, interval 3 month, interval 3 minutes";
-		assertThat(pattern.matchesWithinString(intervalString), is(true));
+		System.out.println("REGEX: " + regex.getRegex());
+		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND, INTERVAL 4 YEARS, INTERVAL 2 DAY, interval -34 hour, interval 56 minutes";
+		assertThat(regex.matchesWithinString(intervalString), is(true));
+
+		final List<Match> allMatches = regex.getAllMatches(intervalString);
+		allMatches.stream().forEach(t -> System.err.println("MATCH: "+t.getEntireMatch()));
+		assertThat(allMatches.size(), is(4));
 		
-		final List<Match> allMatches = pattern.getAllMatches(intervalString);
-		for (var entry : allMatches) {
-			System.out.println("MATCH: "+entry.getEntireMatch());
+		for (var match : allMatches) {
+			System.out.println("MATCH: " + match.getEntireMatch());
+			final HashMap<String, String> allNamedCaptures = match.getAllNamedCaptures();
+			assertThat(allNamedCaptures.size(), is(3));
+			final Double value = Double.valueOf(allNamedCaptures.get("value"));
+			assertThat(Math.abs(Math.round(value * 1000000)), isOneOf(2L, 2000000L, 34000000L,56000000L));
+			assertThat(match.getNamedCapture("unit").toLowerCase(), isOneOf("second", "day", "hour","minutes"));
 		}
-		final HashMap<String, String> allGroups = pattern.getAllNamedGroups(intervalString);
-		for (var entry : allGroups.entrySet()) {
-			System.out.println("GROUP: "+entry.getKey()+"="+entry.getValue());
-		}
-		assertThat(allGroups.size(), is(3));
-		final Double value = Double.valueOf(allGroups.get("value"));
-		assertThat(value, is(Double.valueOf("-1.999999999946489E-6")));
-		assertThat(Math.round(value * 1000000), is(-2L));
 	}
 }

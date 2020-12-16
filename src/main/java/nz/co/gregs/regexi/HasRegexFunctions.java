@@ -51,10 +51,10 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	public default REGEX integer() {
 		return extend(Regex
-				.startGroup().literal("-")
+				.startOrGroup().literal("-")
 				.or().literal("+")
-				.closeGroup().onceOrNotAtAll()
-				.anyBetween('1', '9').once().digit().zeroOrMore()
+				.endGroup().onceOrNotAtAll()
+				.anyCharacterBetween('1', '9').once().digit().zeroOrMore()
 		);
 	}
 
@@ -77,17 +77,17 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	public default REGEX number() {
 		return extend(
-				Regex.startGroup()
-						.anyOf("-+").onceOrNotAtAll()
+				Regex.startOrGroup()
+						.anyCharacterIn("-+").onceOrNotAtAll()
 						.wordBoundary()
-						.anyBetween('1', '9').atLeastOnce()
+						.anyCharacterBetween('1', '9').atLeastOnce()
 						.digit().zeroOrMore()
 						.add(Regex.startingAnywhere()
 								.dot().once()
 								.digit().oneOrMore()
 						).onceOrNotAtAll()
 						.notFollowedBy(Regex.startingAnywhere().nonWhitespace())
-						.closeGroup()
+						.endGroup()
 		);
 	}
 
@@ -117,14 +117,14 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	public default REGEX numberLike() {
 		return extend(
-				Regex.startGroup()
-						.anyOf("-+").onceOrNotAtAll()
+				Regex.startOrGroup()
+						.anyCharacterIn("-+").onceOrNotAtAll()
 						.digit().atLeastOnce()
 						.add(Regex.startingAnywhere()
 								.dot().once()
 								.digit().oneOrMore()
 						).onceOrNotAtAll()
-						.closeGroup()
+						.endGroup()
 		);
 	}
 
@@ -147,10 +147,10 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	public default REGEX numberIncludingScientificNotation() {
 		return extend(
-				Regex.startGroup()
-						.anyOf("-+").onceOrNotAtAll()
+				Regex.startOrGroup()
+						.anyCharacterIn("-+").onceOrNotAtAll()
 						.wordBoundary()
-						.anyBetween('1', '9').atLeastOnce()
+						.anyCharacterBetween('1', '9').atLeastOnce()
 						.digit().zeroOrMore()
 						.add(Regex.startingAnywhere()
 								.dot().once()
@@ -158,8 +158,8 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 						).onceOrNotAtAll()
 						.add(Regex.startingAnywhere()
 								.literalCaseInsensitive('E').once()
-								.anyOf("-+").onceOrNotAtAll()
-								.anyBetween('1', '9').atLeastOnce()
+								.anyCharacterIn("-+").onceOrNotAtAll()
+								.anyCharacterBetween('1', '9').atLeastOnce()
 								.digit().zeroOrMore()
 								.add(Regex.startingAnywhere()
 										.dot().once()
@@ -167,7 +167,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 								).onceOrNotAtAll()
 						).onceOrNotAtAll()
 						.notFollowedBy(Regex.startingAnywhere().nonWhitespace())
-						.closeGroup()
+						.endGroup()
 		);
 	}
 
@@ -175,11 +175,13 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 
 	REGEX addGroup(HasRegexFunctions<?> second);
 
-	REGEX anyBetween(Character lowest, Character highest);
+	REGEX anyCharacterBetween(Character lowest, Character highest);
 
 	REGEX anyCharacter();
 
-	REGEX anyOf(String literals);
+	REGEX anyCharacterIn(String literals);
+
+	REGEX anyOf(String literal, String... literals);
 
 	REGEX asterisk();
 
@@ -200,6 +202,8 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	REGEX carat();
 
 	REGEX carriageReturn();
+
+	public RegexGroup.CaseInsensitive<REGEX> caseInsensitiveGroup();
 
 	REGEX controlCharacter(String x);
 
@@ -241,7 +245,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 
 	REGEX newline();
 
-	RegexGroup.NamedCapture<?> namedCapture(String name);
+	RegexGroup.NamedCapture<?> beginNamedCapture(String name);
 
 	REGEX nonWhitespace();
 
@@ -253,7 +257,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 
 	REGEX nondigits();
 
-	REGEX noneOf(String literals);
+	REGEX noneOfTheseCharacters(String literals);
 
 	REGEX notFollowedBy(String literalValue);
 
@@ -263,7 +267,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 
 	REGEX notPrecededBy(Regex literalValue);
 
-	REGEX nothingBetween(Character lowest, Character highest);
+	REGEX noCharacterBetween(Character lowest, Character highest);
 
 	REGEX once();
 
@@ -276,27 +280,29 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * return to the regex.
 	 *
 	 * <p>
-	 * This provides more options than the {@link #anyBetween(java.lang.Character, java.lang.Character)
-	 * } and {@link #anyOf(java.lang.String) } methods for creating ranges.
+	 * This provides more options than the {@link #anyCharacterBetween(java.lang.Character, java.lang.Character)
+	 * } and {@link #anyCharacterIn(java.lang.String) } methods for creating
+	 * ranges.
 	 *
 	 * @param lowest
 	 * @param highest
 	 * @return the start of a range.
 	 */
-	RangeBuilder<REGEX> openRange(char lowest, char highest);
+	RangeBuilder<REGEX> beginRange(char lowest, char highest);
 
 	/**
 	 * Starts making a character range, use {@link RangeBuilder#closeRange() } to
 	 * return to the regex.
 	 *
 	 * <p>
-	 * This provides more options than the {@link #anyBetween(java.lang.Character, java.lang.Character)
-	 * } and {@link #anyOf(java.lang.String) } methods for creating ranges.
+	 * This provides more options than the {@link #anyCharacterBetween(java.lang.Character, java.lang.Character)
+	 * } and {@link #anyCharacterIn(java.lang.String) } methods for creating
+	 * ranges.
 	 *
 	 * @param literals
 	 * @return the start of a range.
 	 */
-	RangeBuilder<REGEX> openRange(String literals);
+	RangeBuilder<REGEX> beginRange(String literals);
 
 	REGEX optionalMany();
 
@@ -313,13 +319,13 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * for instance, use this to generate "(FRED|EMILY|GRETA|DONALD)".
 	 *
 	 * <p>
-	 * {@code Regex regex =  Regex.startAnywhere().literal("Project ").startGroup().literal("A").or().literal("B").closeGroup();
-	 * } produces "Project (A|B)".
+	 * {@code Regex regex =  Regex.startAnywhere().literal("Project ").startOrGroup().literal("A").or().literal("B").endGroup();
+ } produces "Project (A|B)".
 	 *
 	 * @return a new regular expression
 	 */
 	@SuppressWarnings("unchecked")
-	public default RegexGroup.Or<REGEX> openGroup() {
+	public default RegexGroup.Or<REGEX> beginOrGroup() {
 		return new RegexGroup.Or<>((REGEX) this);
 	}
 
