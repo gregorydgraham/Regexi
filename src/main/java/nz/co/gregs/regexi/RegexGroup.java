@@ -30,15 +30,11 @@
  */
 package nz.co.gregs.regexi;
 
-import nz.co.gregs.separatedstring.SeparatedString;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  *
  * @author gregorygraham
- * @param <THIS>
- * @param <REGEX>
+ * @param <THIS> the class of this Regex, returned by most methods to maintain type safety
+ * @param <REGEX> the regex to return to after ending this group
  */
 public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX extends HasRegexFunctions<REGEX>> implements HasRegexFunctions<THIS> {
 
