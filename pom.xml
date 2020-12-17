@@ -1,34 +1,187 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>nz.co.gregs</groupId>
-    <artifactId>Regexi</artifactId>
-    <version>0.6-SNAPSHOT</version>
-    <packaging>jar</packaging>
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13</version>
-            <scope>test</scope>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-all</artifactId>
-            <version>1.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>nz.co.gregs</groupId>
-            <artifactId>SeparatedString</artifactId>
-            <version>1.1</version>
-            <type>jar</type>
-        </dependency>
-    </dependencies>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>10</maven.compiler.source>
-        <maven.compiler.target>10</maven.compiler.target>
-    </properties>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>nz.co.gregs</groupId>
+	<artifactId>Regexi</artifactId>
+	<version>0.6-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>RegeXI</name>
+	<description>A fluent API to generate and use regular expressions</description>
+	<url>https://github.com/gregorydgraham/Regexi</url>
+	<licenses>
+		<license>
+			<name>Commercial License</name>
+			<comments>Commercial licenses and support are available. Check https://dbvolution.com/licensing.html for details.</comments>
+		</license>
+		<license>
+			<name>Non-commercial License</name>
+			<url>https://dbvolution.com/noncommercial_license.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	
+	<developers>
+		<developer>
+			<name>Gregory Graham</name>
+			<email>info@gregs.co.nz</email>
+			<url>http://gregs.co.nz</url>
+			<timezone>+12</timezone>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://github.com/gregorydgraham/Regexi</url>
+		<connection>scm:git:https://github.com/gregorydgraham/Regexi.git</connection>
+		<developerConnection>scm:git:https://github.com/gregorydgraham/Regexi.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+	
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13</version>
+			<scope>test</scope>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+			<version>1.3</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>nz.co.gregs</groupId>
+			<artifactId>SeparatedString</artifactId>
+			<version>1.1</version>
+			<type>jar</type>
+		</dependency>
+	</dependencies>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>10</maven.compiler.source>
+		<maven.compiler.target>10</maven.compiler.target>
+	</properties>
+		
+		
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
+	<profiles>
+		<profile> 
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>2.2.1</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.9.1</version>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<!-- check out the maven-release-plugin plugin below first -->
+						<!-- 
+								if it's not a SNAPSHOT, use 
+							
+								"mvn clean deploy -P release"
+								
+								otherwise "mvn versions:set -DnewVersion=1.1" then deploy as above
+						-->
+						<!-- 
+								With the property autoReleaseAfterClose set to 
+								false you can manually inspect the staging repository
+								in the Nexus Repository Manager and trigger a release 
+								of the staging repository later with
+						
+								"mvn nexus-staging:release"
+								
+								If you find something went wrong you can drop the staging repository with
+		
+								"mvn nexus-staging:drop"
+						-->
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>1.6.7</version>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	<build>
+		<plugins>
+			<plugin>
+				<!-- 
+					With the SCM connection configured correctly you can perform a release deployment to OSSRH with
+				
+					"mvn release:clean release:prepare"
+					
+					then answering the prompts for versions and tags, followed by
+				
+					"mvn release:perform"
+				-->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5.3</version>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<!-- sonatype prefer their own release profile -->
+					<useReleaseProfile>false</useReleaseProfile>
+					<!-- release profile as defined by Sonatype -->
+					<releaseProfiles>release</releaseProfiles>
+					<goals>deploy</goals>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
 </project>
