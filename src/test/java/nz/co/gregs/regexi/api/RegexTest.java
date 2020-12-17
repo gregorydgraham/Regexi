@@ -391,7 +391,7 @@ public class RegexTest {
 		assertThat(collected.get(5), is("4.5"));
 		assertThat(collected.get(6), is("02"));
 		assertThat(collected.get(7), is("-0234"));
-		assertThat(collected.get(8), is("-004"));
+		assertThat(collected.get(8), is("004"));
 		assertThat(collected.get(9), is("4"));
 		assertThat(collected.get(10), is("4"));
 
