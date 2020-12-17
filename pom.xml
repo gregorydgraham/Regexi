@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nz.co.gregs</groupId>
 	<artifactId>regexi</artifactId>
-	<version>1.1-SNAPSHOT</version>
+	<version>1.1</version>
 	<packaging>jar</packaging>
 	<name>RegeXI</name>
 	<description>A fluent API to generate and use regular expressions</description>
@@ -36,7 +36,7 @@
 		<url>https://github.com/gregorydgraham/Regexi</url>
 		<connection>scm:git:https://github.com/gregorydgraham/Regexi.git</connection>
 		<developerConnection>scm:git:https://github.com/gregorydgraham/Regexi.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>regexi-1.1b</tag>
 	</scm>
 	
 	<dependencies>
