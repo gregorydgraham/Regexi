@@ -50,7 +50,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @return a new regexp
 	 */
 	public default REGEX integer() {
-		return extend(Regex
+		return extend(RegexBuilder
 				.startOrGroup().literal("-")
 				.or().literal("+")
 				.endGroup().onceOrNotAtAll()
@@ -77,16 +77,16 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	public default REGEX number() {
 		return extend(
-				Regex.startOrGroup()
+				RegexBuilder.startOrGroup()
 						.anyCharacterIn("-+").onceOrNotAtAll()
 						.wordBoundary()
 						.anyCharacterBetween('1', '9').atLeastOnce()
 						.digit().zeroOrMore()
-						.add(Regex.startingAnywhere()
+						.add(RegexBuilder.startingAnywhere()
 								.dot().once()
 								.digit().oneOrMore()
 						).onceOrNotAtAll()
-						.notFollowedBy(Regex.startingAnywhere().nonWhitespace())
+						.notFollowedBy(RegexBuilder.startingAnywhere().nonWhitespace())
 						.endGroup()
 		);
 	}
@@ -117,10 +117,10 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	public default REGEX numberLike() {
 		return extend(
-				Regex.startOrGroup()
+				RegexBuilder.startOrGroup()
 						.anyCharacterIn("-+").onceOrNotAtAll()
 						.digit().atLeastOnce()
-						.add(Regex.startingAnywhere()
+						.add(RegexBuilder.startingAnywhere()
 								.dot().once()
 								.digit().oneOrMore()
 						).onceOrNotAtAll()
@@ -147,26 +147,26 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	public default REGEX numberIncludingScientificNotation() {
 		return extend(
-				Regex.startOrGroup()
+				RegexBuilder.startOrGroup()
 						.anyCharacterIn("-+").onceOrNotAtAll()
 						.wordBoundary()
 						.anyCharacterBetween('1', '9').atLeastOnce()
 						.digit().zeroOrMore()
-						.add(Regex.startingAnywhere()
+						.add(RegexBuilder.startingAnywhere()
 								.dot().once()
 								.digit().oneOrMore()
 						).onceOrNotAtAll()
-						.add(Regex.startingAnywhere()
+						.add(RegexBuilder.startingAnywhere()
 								.literalCaseInsensitive('E').once()
 								.anyCharacterIn("-+").onceOrNotAtAll()
 								.anyCharacterBetween('1', '9').atLeastOnce()
 								.digit().zeroOrMore()
-								.add(Regex.startingAnywhere()
+								.add(RegexBuilder.startingAnywhere()
 										.dot().once()
 										.digit().oneOrMore()
 								).onceOrNotAtAll()
 						).onceOrNotAtAll()
-						.notFollowedBy(Regex.startingAnywhere().nonWhitespace())
+						.notFollowedBy(RegexBuilder.startingAnywhere().nonWhitespace())
 						.endGroup()
 		);
 	}

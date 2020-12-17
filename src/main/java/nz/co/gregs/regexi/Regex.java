@@ -49,29 +49,10 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 
 	private Pattern compiledVersion;
 
-	private Regex() {
+	protected Regex() {
 	}
 
 	public abstract String getRegex();
-
-	/**
-	 * Create a new empty regular expression.
-	 *
-	 * @return a new empty regular expression
-	 */
-	public static Regex startingAnywhere() {
-		return new UnescapedSequence("");
-	}
-
-	/**
-	 * Create a new regular expression that includes a test for the start of the
-	 * string.
-	 *
-	 * @return a new regular expression
-	 */
-	public static Regex startingFromTheBeginning() {
-		return new UnescapedSequence("^");
-	}
 
 	/**
 	 * Adds the regular expression to the end of current expression as a new
@@ -699,7 +680,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	@Override
 	public Regex positiveInteger() {
 		return extend(
-				startingAnywhere()
+				RegexBuilder.startingAnywhere()
 						.notPrecededBy("-")
 						.plus().onceOrNotAtAll()
 						.anyCharacterBetween('1', '9').once()
@@ -719,7 +700,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex anyCharacterBetween(Character lowest, Character highest) {
-		return extend(startingAnywhere().beginRange(lowest, highest).endRange());
+		return extend(RegexBuilder.startingAnywhere().beginRange(lowest, highest).endRange());
 	}
 
 	/**
@@ -734,7 +715,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex anyCharacterIn(String literals) {
-		return extend(startingAnywhere().beginRange(literals).endRange());
+		return extend(RegexBuilder.startingAnywhere().beginRange(literals).endRange());
 	}
 
 	public Regex anyOf(String literal, String... literals) {
@@ -758,7 +739,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex noCharacterBetween(Character lowest, Character highest) {
-		return extend(startingAnywhere().beginRange(lowest, highest).negated().endRange());
+		return extend(RegexBuilder.startingAnywhere().beginRange(lowest, highest).negated().endRange());
 	}
 
 	/**
@@ -774,7 +755,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex noneOfTheseCharacters(String literals) {
-		return extend(startingAnywhere().beginRange(literals).negated().endRange());
+		return extend(RegexBuilder.startingAnywhere().beginRange(literals).negated().endRange());
 	}
 
 	/**
@@ -789,7 +770,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex groupEverythingBeforeThis() {
-		return Regex.startingAnywhere().unescaped("(").extend(this).unescaped(")");
+		return RegexBuilder.startingAnywhere().unescaped("(").extend(this).unescaped(")");
 	}
 
 	/**
@@ -1018,23 +999,6 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 		return new RangeBuilder<>(this, literals);
 	}
 
-	/**
-	 * Create a regular expression that includes all the regexps supplied within
-	 * an OR grouping.
-	 *
-	 * <p>
-	 * for instance, use this to generate "(FRED|EMILY|GRETA|DONALD)".
-	 *
-	 * <p>
-	 * {@code Regex regex =  Regex.startOrGroup().literal("A").or().literal("B").endGroup();
- } produces "(A|B)".
-	 *
-	 * @return a new regular expression
-	 */
-	public static OrGroup<Regex> startOrGroup() {
-		return startingAnywhere().beginOrGroup();
-	}
-
 	public List<Match> getAllMatches(String string) {
 		Matcher matcher = getMatcher(string);
 		List<Match> matches = matcher.results().map(m -> Match.from(this, m.group())).collect(Collectors.toList());
@@ -1059,7 +1023,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	@Override
 	public Regex literalCaseInsensitive(String literal) {
 		return this
-				.addGroup(Regex.startingAnywhere()
+				.addGroup(RegexBuilder.startingAnywhere()
 						.startCaseInsensitiveSection()
 						.literal(literal)
 						.endCaseInsensitiveSection()
@@ -1069,94 +1033,4 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	public CaseInsensitiveSection<Regex> startCaseInsensitiveSection() {
 		return new CaseInsensitiveSection<>(this);
 	}
-
-	public static class SingleCharacter extends Regex {
-
-		private final Character literal;
-
-		protected SingleCharacter(Character character) {
-			this.literal = character;
-		}
-
-		@Override
-		public String getRegex() {
-			return "" + literal;
-		}
-	}
-
-	public static class LiteralSequence extends Regex {
-
-		private final String literal;
-
-		public LiteralSequence(String literals) {
-			if (literals == null) {
-				this.literal = "";
-			} else {
-				this.literal = literals
-						.replaceAll("\\\\", "\\")
-						.replaceAll("\\.", "\\.")
-						.replaceAll("\\?", "\\?")
-						.replaceAll("\\+", "\\\\+")
-						.replaceAll("\\*", "\\*")
-						.replaceAll("\\^", "\\^")
-						.replaceAll("\\$", "\\$")
-						.replaceAll("\\|", "\\|")
-						.replaceAll("\\[", "\\[");
-			}
-		}
-
-		@Override
-		public String getRegex() {
-			return "" + literal;
-		}
-	}
-
-	protected static class UnescapedSequence extends Regex {
-
-		private final String literal;
-
-		protected UnescapedSequence(String literals) {
-			if (literals == null) {
-				this.literal = "";
-			} else {
-				this.literal = literals;
-			}
-		}
-
-		@Override
-		public String getRegex() {
-			return "" + literal;
-		}
-	}
-
-	protected static class RegexpCombination extends Regex {
-
-		private final HasRegexFunctions<?> first;
-		private final HasRegexFunctions<?> second;
-
-		protected RegexpCombination(HasRegexFunctions<?> first, HasRegexFunctions<?> second) {
-			this.first = first;
-			this.second = second;
-		}
-
-		@Override
-		public String getRegex() {
-			return first.getRegex() + second.getRegex();
-		}
-	}
-
-//	@Deprecated
-//	public static class Group extends Regex {
-//
-//		private final Regex regexp;
-//
-//		public Group(Regex regexp) {
-//			this.regexp = regexp;
-//		}
-//
-//		@Override
-//		public String getRegex() {
-//			return "(" + regexp.getRegex() + ")";
-//		}
-//	}
 }

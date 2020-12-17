@@ -39,7 +39,7 @@ package nz.co.gregs.regexi;
 public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX extends HasRegexFunctions<REGEX>> implements HasRegexFunctions<THIS> {
 
 	private final REGEX origin;
-	private Regex current = Regex.startingAnywhere();
+	private Regex current = RegexBuilder.startingAnywhere();
 
 	public RegexGroup(REGEX original) {
 		this.origin = original;

@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import nz.co.gregs.regexi.Match;
 import nz.co.gregs.regexi.Regex;
+import nz.co.gregs.regexi.RegexBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import org.junit.Assert;
@@ -51,7 +52,7 @@ public class RegexTest {
 
 	@Test
 	public void testFindingANegativeNumber() {
-		Regex negativeInteger = Regex.startingAnywhere().negativeInteger();
+		Regex negativeInteger = RegexBuilder.startingAnywhere().negativeInteger();
 		Assert.assertTrue(negativeInteger.matchesEntireString("-1"));
 		Assert.assertTrue(negativeInteger.matchesWithinString("-1"));
 		Assert.assertFalse(negativeInteger.matchesEntireString("1"));
@@ -62,7 +63,7 @@ public class RegexTest {
 
 	@Test
 	public void testFindingAPositiveNumber() {
-		Regex positiveInteger = Regex.startingAnywhere().positiveInteger();
+		Regex positiveInteger = RegexBuilder.startingAnywhere().positiveInteger();
 		assertThat(positiveInteger.matchesEntireString("-1"), is(false));
 		assertThat(positiveInteger.matchesWithinString("-1"), is(false));
 		assertThat(positiveInteger.matchesEntireString("1"), is(true));
@@ -86,20 +87,20 @@ public class RegexTest {
 		//(-?[0-9]+)([^-0-9]+)(-?[0-9]+):(-?[0-9]+):(-?[0-9]+)(\.\d+)?
 
 		final Regex allowedValue
-				= Regex.startingAnywhere()
+				= RegexBuilder.startingAnywhere()
 						.literal('-').onceOrNotAtAll()
 						.anyCharacterBetween('0', '9').atLeastOnce();
 
 		final Regex allowedSeconds
 				= allowedValue.add(
-						Regex.startingAnywhere().dot().digits()
+						RegexBuilder.startingAnywhere().dot().digits()
 				).onceOrNotAtAll();
 
 		final Regex separator
-				= Regex.startingAnywhere().beginRange('0', '9').includeMinus().negated().endRange().atLeastOnce();
+				= RegexBuilder.startingAnywhere().beginRange('0', '9').includeMinus().negated().endRange().atLeastOnce();
 
 		Regex pattern
-				= Regex.startingAnywhere()
+				= RegexBuilder.startingAnywhere()
 						.add(allowedValue).add(separator)
 						.add(allowedValue).literal(':')
 						.add(allowedValue).literal(':')
@@ -126,7 +127,7 @@ public class RegexTest {
 		//
 		//-?[0-9]+([^-0-9])+-?[0-9]+:{1}-?[0-9]+:{1}-?[0-9]+(\.\d+)?
 		Regex pattern
-				= Regex.startingAnywhere()
+				= RegexBuilder.startingAnywhere()
 						.literal('-').onceOrNotAtAll()
 						.anyCharacterBetween('0', '9').atLeastOnce()
 						.beginRange('0', '9')
@@ -141,7 +142,7 @@ public class RegexTest {
 						.anyCharacterBetween('0', '9').atLeastOnce()
 						.literal(':').once()
 						.literal('-').onceOrNotAtAll()
-						.anyCharacterBetween('0', '9').atLeastOnce().add(Regex.startingAnywhere().dot().digits()
+						.anyCharacterBetween('0', '9').atLeastOnce().add(RegexBuilder.startingAnywhere().dot().digits()
 				).onceOrNotAtAll();
 
 		assertThat(pattern.matchesWithinString("-2 days 00:00:00"), is(true));
@@ -161,7 +162,7 @@ public class RegexTest {
 	public void testGroupBuilding() {
 
 		Regex regex
-				= Regex.startOrGroup().literal("Amy").or().literal("Bob").or().literal("Charlie").endOrGroup();
+				= RegexBuilder.startOrGroup().literal("Amy").or().literal("Bob").or().literal("Charlie").endOrGroup();
 
 		assertThat(regex.matchesWithinString("Amy"), is(true));
 		assertThat(regex.matchesWithinString("Bob"), is(true));
@@ -181,7 +182,7 @@ public class RegexTest {
 		assertThat(regex.matchesWithinString("Emma doesn't do any better"), is(false));
 
 		// Check that Regex.anyOf() is the same
-		regex = Regex.startingAnywhere().anyOf("Amy","Bob","Charlie");
+		regex = RegexBuilder.startingAnywhere().anyOf("Amy","Bob","Charlie");
 
 		assertThat(regex.matchesWithinString("Amy"), is(true));
 		assertThat(regex.matchesWithinString("Bob"), is(true));
@@ -210,7 +211,7 @@ public class RegexTest {
 		//
 		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
 		Regex pattern
-				= Regex.startingAnywhere()
+				= RegexBuilder.startingAnywhere()
 						.number().once();
 
 //		System.out.println("REGEX: " + pattern.getRegex());
@@ -240,7 +241,7 @@ public class RegexTest {
 		//
 		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
 		Regex pattern
-				= Regex.startingAnywhere()
+				= RegexBuilder.startingAnywhere()
 						.numberIncludingScientificNotation().once();
 
 //		System.out.println("REGEX: " + pattern.getRegex());
@@ -288,7 +289,7 @@ public class RegexTest {
 		//
 		//  ^((?i)interval(?-i)){1} {1}([-+]?\b[1-9]+\d*(\.{1}\d+)?(((?i)E(?-i)){1}[-+]?[1-9]+\d*(\.{1}\d+)?)?(?!\S)){1} {1}(\w+)$
 		Regex pattern
-				= Regex.startingFromTheBeginning()
+				= RegexBuilder.startingFromTheBeginning()
 						.literalCaseInsensitive("interval").once()
 						.space().once()
 						.numberIncludingScientificNotation().once()
@@ -315,7 +316,7 @@ public class RegexTest {
 		//
 		// ^(?<interval>((?i)interval(?-i)){1}) {1}(?<value>([-+]?\b[1-9]+\d*(\.{1}\d+)?(((?i)E(?-i)){1}[-+]?[1-9]+\d*(\.{1}\d+)?)?(?!\S)){1}) {1}(?<unit>\w+)$
 		Regex pattern
-				= Regex.startingFromTheBeginning()
+				= RegexBuilder.startingFromTheBeginning()
 						.beginNamedCapture("interval").literalCaseInsensitive("interval").once().endNamedCapture()
 						.space().once()
 						.beginNamedCapture("value").numberIncludingScientificNotation().once().endNamedCapture()
@@ -342,7 +343,7 @@ public class RegexTest {
 		//
 		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
 		Regex pattern
-				= Regex.startingAnywhere()
+				= RegexBuilder.startingAnywhere()
 						.numberLike().once();
 
 //		System.out.println("REGEX: " + pattern.getRegex());
@@ -373,7 +374,7 @@ public class RegexTest {
 		//
 		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
 		Regex regex
-				= Regex.startingAnywhere()
+				= RegexBuilder.startingAnywhere()
 						.numberLike().once();
 
 //		System.out.println("REGEX: " + pattern.getRegex());
@@ -396,7 +397,7 @@ public class RegexTest {
 		assertThat(collected.get(10), is("4"));
 
 		regex
-				= Regex.startingAnywhere()
+				= RegexBuilder.startingAnywhere()
 						.number().once();
 
 //		System.out.println("REGEX: " + pattern.getRegex());
@@ -422,7 +423,7 @@ public class RegexTest {
 		//
 		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
 		Regex regex
-				= Regex.startingAnywhere()
+				= RegexBuilder.startingAnywhere()
 						.wordBoundary()
 						.startCaseInsensitiveSection()
 						.literal("day").once()
@@ -456,7 +457,7 @@ public class RegexTest {
 		//
 		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
 		Regex regex
-				= Regex.startingAnywhere()
+				= RegexBuilder.startingAnywhere()
 						.wordBoundary()
 						.literalCaseInsensitive("day").once()
 						.literalCaseInsensitive("s").onceOrNotAtAll()
@@ -489,7 +490,7 @@ public class RegexTest {
 		//
 		// ^(?<interval>((?i)interval(?-i)){1}) {1}(?<value>([-+]?\b[1-9]+\d*(\.{1}\d+)?(((?i)E(?-i)){1}[-+]?[1-9]+\d*(\.{1}\d+)?)?(?!\S)){1}) {1}(?<unit>\w+)$
 		Regex regex
-				= Regex.startingAnywhere()
+				= RegexBuilder.startingAnywhere()
 						.beginNamedCapture("interval").literalCaseInsensitive("interval").once().endNamedCapture()
 						.space().once()
 						.beginNamedCapture("value").numberIncludingScientificNotation().once().endNamedCapture()
