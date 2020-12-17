@@ -7,7 +7,6 @@ package nz.co.gregs.regexi;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Stream;
 
 /**
  *

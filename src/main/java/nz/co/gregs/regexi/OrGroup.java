@@ -12,7 +12,7 @@ import nz.co.gregs.separatedstring.SeparatedString;
 /**
  *
  * @author gregorygraham
- * @param <REGEX>
+ * @param <REGEX> the type returned by {@link #endOrGroup() }
  */
 public class OrGroup<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<OrGroup<REGEX>, REGEX> {
 	

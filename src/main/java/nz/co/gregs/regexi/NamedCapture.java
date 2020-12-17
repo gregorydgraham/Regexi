@@ -8,7 +8,7 @@ package nz.co.gregs.regexi;
 /**
  *
  * @author gregorygraham
- * @param <REGEX>
+ * @param <REGEX> the type return by {@link #endNamedCapture() }
  */
 public class NamedCapture<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<NamedCapture<REGEX>, REGEX> {
 	

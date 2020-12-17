@@ -33,7 +33,7 @@ package nz.co.gregs.regexi;
 /**
  *
  * @author gregorygraham
- * @param <REGEX>
+ * @param <REGEX> the Regex to return to after ending the group
  */
 public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 
@@ -276,7 +276,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	REGEX oneOrMore();
 
 	/**
-	 * Starts making a character range, use {@link RangeBuilder#closeRange() } to
+	 * Starts making a character range, use {@link RangeBuilder#endRange() } to
 	 * return to the regex.
 	 *
 	 * <p>
@@ -291,7 +291,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	RangeBuilder<REGEX> beginRange(char lowest, char highest);
 
 	/**
-	 * Starts making a character range, use {@link RangeBuilder#closeRange() } to
+	 * Starts making a character range, use {@link RangeBuilder#endRange() } to
 	 * return to the regex.
 	 *
 	 * <p>

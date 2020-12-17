@@ -8,6 +8,7 @@ package nz.co.gregs.regexi;
 /**
  *
  * @author gregorygraham
+ * @param <REGEX> the type returned by {@link #endRange() }
  */
 public class RangeBuilder<REGEX extends HasRegexFunctions<REGEX>> {
 	
