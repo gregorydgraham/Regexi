@@ -203,7 +203,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 
 	REGEX carriageReturn();
 
-	public RegexGroup.CaseInsensitive<REGEX> caseInsensitiveGroup();
+	public CaseInsensitiveSection<REGEX> startCaseInsensitiveSection();
 
 	REGEX controlCharacter(String x);
 
@@ -245,7 +245,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 
 	REGEX newline();
 
-	RegexGroup.NamedCapture<?> beginNamedCapture(String name);
+	NamedCapture<?> beginNamedCapture(String name);
 
 	REGEX nonWhitespace();
 
@@ -325,8 +325,8 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @return a new regular expression
 	 */
 	@SuppressWarnings("unchecked")
-	public default RegexGroup.Or<REGEX> beginOrGroup() {
-		return new RegexGroup.Or<>((REGEX) this);
+	public default OrGroup<REGEX> beginOrGroup() {
+		return new OrGroup<>((REGEX) this);
 	}
 
 	REGEX questionMark();

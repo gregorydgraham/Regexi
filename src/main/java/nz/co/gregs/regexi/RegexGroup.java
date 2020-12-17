@@ -335,8 +335,8 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public RegexGroup.CaseInsensitive<THIS> caseInsensitiveGroup() {
-		return new RegexGroup.CaseInsensitive<>((THIS) this);
+	public CaseInsensitiveSection<THIS> startCaseInsensitiveSection() {
+		return new CaseInsensitiveSection<>((THIS) this);
 	}
 
 	@Override
@@ -573,73 +573,4 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 	public NamedCapture<REGEX> beginNamedCapture(String name) {
 		return new NamedCapture<>((REGEX) this, name);
 	}
-
-	public static class Or<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<Or<REGEX>, REGEX> {
-
-		private final List<String> ors = new ArrayList<>(0);
-
-		protected Or(REGEX original) {
-			super(original);
-		}
-
-		protected Or(REGEX original, List<String> previousOptions) {
-			super(original);
-			ors.addAll(previousOptions);
-		}
-
-		public Or<REGEX> or() {
-			ors.add(getCurrent().getRegex());
-			return new Or<>(getOrigin(), ors);
-		}
-
-		public REGEX endOrGroup() {
-			return endGroup();
-		}
-
-		@Override
-		public String getRegex() {
-			final String regexp = getCurrent().getRegex();
-			ors.add(regexp);
-			final SeparatedString groupedString = SeparatedString.of(ors).separatedBy("|").withPrefix("(").withSuffix(")");
-			return groupedString.toString();
-		}
-	}
-
-	public static class NamedCapture<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<NamedCapture<REGEX>, REGEX> {
-
-		private final String name;
-
-		protected NamedCapture(REGEX original, String name) {
-			super(original);
-			this.name = name;
-		}
-
-		@Override
-		public String getRegex() {
-			final String regexp = getCurrent().getRegex();
-			return "(?<" + name + ">" + regexp + ")";
-		}
-
-		public REGEX endCapture() {
-			return endGroup();
-		}
-	}
-
-	public static class CaseInsensitive<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<CaseInsensitive<REGEX>, REGEX> {
-
-		public CaseInsensitive(REGEX original) {
-			super(original);
-		}
-
-		@Override
-		public String getRegex() {
-			final String regexp = getCurrent().getRegex();
-			return "(?i)" + regexp + "(?-i)";
-		}
-
-		public REGEX caseInsensitiveEnd() {
-			return endGroup();
-		}
-	}
-
 }

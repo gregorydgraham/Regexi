@@ -719,7 +719,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex anyCharacterBetween(Character lowest, Character highest) {
-		return extend(startingAnywhere().beginRange(lowest, highest).closeRange());
+		return extend(startingAnywhere().beginRange(lowest, highest).endRange());
 	}
 
 	/**
@@ -734,11 +734,11 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex anyCharacterIn(String literals) {
-		return extend(startingAnywhere().beginRange(literals).closeRange());
+		return extend(startingAnywhere().beginRange(literals).endRange());
 	}
 
 	public Regex anyOf(String literal, String... literals) {
-		var temp = beginOrGroup().literal(literal);
+		nz.co.gregs.regexi.OrGroup<nz.co.gregs.regexi.Regex> temp = beginOrGroup().literal(literal);
 		for (String literal1 : literals) {
 			temp = temp.or().literal(literal1);
 		}
@@ -758,7 +758,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex noCharacterBetween(Character lowest, Character highest) {
-		return extend(startingAnywhere().beginRange(lowest, highest).negated().closeRange());
+		return extend(startingAnywhere().beginRange(lowest, highest).negated().endRange());
 	}
 
 	/**
@@ -774,7 +774,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex noneOfTheseCharacters(String literals) {
-		return extend(startingAnywhere().beginRange(literals).negated().closeRange());
+		return extend(startingAnywhere().beginRange(literals).negated().endRange());
 	}
 
 	/**
@@ -828,8 +828,8 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	}
 
 	@Override
-	public RegexGroup.NamedCapture<Regex> beginNamedCapture(String name) {
-		return new RegexGroup.NamedCapture<>(this, name);
+	public NamedCapture<Regex> beginNamedCapture(String name) {
+		return new NamedCapture<>(this, name);
 	}
 
 	public Stream<MatchResult> getMatchResultsStream(String string) {
@@ -996,7 +996,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	}
 
 	/**
-	 * Starts making a character range, use {@link RangeBuilder#closeRange() } to
+	 * Starts making a character range, use {@link RangeBuilder#endRange() } to
 	 * return to the regex.
 	 *
 	 * <p>
@@ -1031,7 +1031,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 *
 	 * @return a new regular expression
 	 */
-	public static RegexGroup.Or<Regex> startOrGroup() {
+	public static OrGroup<Regex> startOrGroup() {
 		return startingAnywhere().beginOrGroup();
 	}
 
@@ -1060,14 +1060,14 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	public Regex literalCaseInsensitive(String literal) {
 		return this
 				.addGroup(Regex.startingAnywhere()
-						.caseInsensitiveGroup()
+						.startCaseInsensitiveSection()
 						.literal(literal)
-						.caseInsensitiveEnd()
+						.endCaseInsensitiveSection()
 				);
 	}
 
-	public RegexGroup.CaseInsensitive<Regex> caseInsensitiveGroup() {
-		return new RegexGroup.CaseInsensitive<>(this);
+	public CaseInsensitiveSection<Regex> startCaseInsensitiveSection() {
+		return new CaseInsensitiveSection<>(this);
 	}
 
 	public static class SingleCharacter extends Regex {

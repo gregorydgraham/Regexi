@@ -86,7 +86,7 @@ public class RangeBuilder<REGEX extends HasRegexFunctions<REGEX>> {
 		return "[" + (negated ? "^" : "") + (includeMinus ? "-" : "") + (includeOpenBracket ? "\\[" : "") + (includeCloseBracket ? "\\]" : "") + literals + "]";
 	}
 
-	public REGEX closeRange() {
+	public REGEX endRange() {
 		return origin.extend(new Regex.UnescapedSequence(encloseInBrackets()));
 	}
 	

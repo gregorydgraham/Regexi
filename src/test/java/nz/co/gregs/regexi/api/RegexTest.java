@@ -96,7 +96,7 @@ public class RegexTest {
 				).onceOrNotAtAll();
 
 		final Regex separator
-				= Regex.startingAnywhere().beginRange('0', '9').includeMinus().negated().closeRange().atLeastOnce();
+				= Regex.startingAnywhere().beginRange('0', '9').includeMinus().negated().endRange().atLeastOnce();
 
 		Regex pattern
 				= Regex.startingAnywhere()
@@ -132,7 +132,7 @@ public class RegexTest {
 						.beginRange('0', '9')
 						.includeMinus()
 						.negated()
-						.closeRange()
+						.endRange()
 						.atLeastOnce()
 						.literal('-').onceOrNotAtAll()
 						.anyCharacterBetween('0', '9').atLeastOnce()
@@ -316,11 +316,11 @@ public class RegexTest {
 		// ^(?<interval>((?i)interval(?-i)){1}) {1}(?<value>([-+]?\b[1-9]+\d*(\.{1}\d+)?(((?i)E(?-i)){1}[-+]?[1-9]+\d*(\.{1}\d+)?)?(?!\S)){1}) {1}(?<unit>\w+)$
 		Regex pattern
 				= Regex.startingFromTheBeginning()
-						.beginNamedCapture("interval").literalCaseInsensitive("interval").once().endCapture()
+						.beginNamedCapture("interval").literalCaseInsensitive("interval").once().endNamedCapture()
 						.space().once()
-						.beginNamedCapture("value").numberIncludingScientificNotation().once().endCapture()
+						.beginNamedCapture("value").numberIncludingScientificNotation().once().endNamedCapture()
 						.space().once()
-						.beginNamedCapture("unit").word().endCapture()
+						.beginNamedCapture("unit").word().endNamedCapture()
 						.endOfInput();
 
 		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND";
@@ -424,10 +424,10 @@ public class RegexTest {
 		Regex regex
 				= Regex.startingAnywhere()
 						.wordBoundary()
-						.caseInsensitiveGroup()
+						.startCaseInsensitiveSection()
 						.literal("day").once()
 						.literal("s").onceOrNotAtAll()
-						.caseInsensitiveEnd()
+						.endCaseInsensitiveSection()
 						.wordBoundary()
 						.endOfTheString();
 
@@ -490,15 +490,15 @@ public class RegexTest {
 		// ^(?<interval>((?i)interval(?-i)){1}) {1}(?<value>([-+]?\b[1-9]+\d*(\.{1}\d+)?(((?i)E(?-i)){1}[-+]?[1-9]+\d*(\.{1}\d+)?)?(?!\S)){1}) {1}(?<unit>\w+)$
 		Regex regex
 				= Regex.startingAnywhere()
-						.beginNamedCapture("interval").literalCaseInsensitive("interval").once().endCapture()
+						.beginNamedCapture("interval").literalCaseInsensitive("interval").once().endNamedCapture()
 						.space().once()
-						.beginNamedCapture("value").numberIncludingScientificNotation().once().endCapture()
+						.beginNamedCapture("value").numberIncludingScientificNotation().once().endNamedCapture()
 						.space().once()
 						.beginNamedCapture("unit")
-						.caseInsensitiveGroup()
+						.startCaseInsensitiveSection()
 						.anyOf("DAY","HOUR","MINUTE","SECOND").once().literal("S").onceOrNotAtAll()
-						.caseInsensitiveEnd()
-						.endCapture();
+						.endCaseInsensitiveSection()
+						.endNamedCapture();
 
 		System.out.println("REGEX: " + regex.getRegex());
 		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND, INTERVAL 4 YEARS, INTERVAL 2 DAY, interval -34 hour, interval 56 minutes";
