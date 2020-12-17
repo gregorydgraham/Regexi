@@ -30,6 +30,7 @@
  */
 package nz.co.gregs.regexi;
 
+import nz.co.gregs.separatedstring.SeparatedString;
 import java.util.ArrayList;
 import java.util.List;
 
