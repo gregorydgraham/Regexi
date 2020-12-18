@@ -55,7 +55,7 @@
 		</dependency>
 		<dependency>
 			<groupId>nz.co.gregs</groupId>
-			<artifactId>SeparatedString</artifactId>
+			<artifactId>separatedstring</artifactId>
 			<version>1.1</version>
 			<type>jar</type>
 		</dependency>
