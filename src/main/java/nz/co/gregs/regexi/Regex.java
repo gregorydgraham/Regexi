@@ -808,6 +808,10 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 		return getMatcher(string).find();
 	}
 
+	public CaseInsensitiveSection<Regex> beginCaseInsensitiveSection() {
+		return new CaseInsensitiveSection<>(this);
+	}
+
 	@Override
 	public NamedCapture<Regex> beginNamedCapture(String name) {
 		return new NamedCapture<>(this, name);
@@ -1024,13 +1028,9 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	public Regex literalCaseInsensitive(String literal) {
 		return this
 				.addGroup(RegexBuilder.startingAnywhere()
-						.startCaseInsensitiveSection()
+						.beginCaseInsensitiveSection()
 						.literal(literal)
 						.endCaseInsensitiveSection()
 				);
-	}
-
-	public CaseInsensitiveSection<Regex> startCaseInsensitiveSection() {
-		return new CaseInsensitiveSection<>(this);
 	}
 }
