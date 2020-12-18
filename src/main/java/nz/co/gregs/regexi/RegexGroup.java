@@ -331,7 +331,7 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public CaseInsensitiveSection<THIS> startCaseInsensitiveSection() {
+	public CaseInsensitiveSection<THIS> beginCaseInsensitiveSection() {
 		return new CaseInsensitiveSection<>((THIS) this);
 	}
 

@@ -203,7 +203,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 
 	REGEX carriageReturn();
 
-	public CaseInsensitiveSection<REGEX> startCaseInsensitiveSection();
+	CaseInsensitiveSection<REGEX> beginCaseInsensitiveSection();
 
 	REGEX controlCharacter(String x);
 

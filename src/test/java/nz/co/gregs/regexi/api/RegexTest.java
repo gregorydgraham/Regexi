@@ -425,7 +425,7 @@ public class RegexTest {
 		Regex regex
 				= RegexBuilder.startingAnywhere()
 						.wordBoundary()
-						.startCaseInsensitiveSection()
+						.beginCaseInsensitiveSection()
 						.literal("day").once()
 						.literal("s").onceOrNotAtAll()
 						.endCaseInsensitiveSection()
@@ -496,7 +496,7 @@ public class RegexTest {
 						.beginNamedCapture("value").numberIncludingScientificNotation().once().endNamedCapture()
 						.space().once()
 						.beginNamedCapture("unit")
-						.startCaseInsensitiveSection()
+						.beginCaseInsensitiveSection()
 						.anyOf("DAY","HOUR","MINUTE","SECOND").once().literal("S").onceOrNotAtAll()
 						.endCaseInsensitiveSection()
 						.endNamedCapture();
