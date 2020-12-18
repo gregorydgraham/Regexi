@@ -804,6 +804,35 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 		return getMatcher(string).matches();
 	}
 
+	/**
+	 * Tests whether the supplied string matches this regex at the beginning of
+	 * the string.
+	 *
+	 * The method works by combining {@link RegexBuilder#startingFromTheBeginning() ()
+	 * } with this regex and calling {@link #matchesWithinString(java.lang.String)
+	 * }.
+	 *
+	 * @param string
+	 * @return true if the beginning of the string matches this regex.
+	 */
+	public boolean matchesBeginningOf(String string) {
+		return RegexBuilder.startingFromTheBeginning().extend(this).matchesWithinString(string);
+	}
+
+	/**
+	 * Tests whether the supplied string matches this regex at the end of the
+	 * string.
+	 *
+	 * The method works by combining this regex with {@link #endOfTheString() }
+	 * and calling {@link #matchesWithinString(java.lang.String) }.
+	 *
+	 * @param string
+	 * @return true if the end of the string matches this regex.
+	 */
+	public boolean matchesEndOf(String string) {
+		return endOfTheString().matchesWithinString(string);
+	}
+
 	public boolean matchesWithinString(String string) {
 		return getMatcher(string).find();
 	}
