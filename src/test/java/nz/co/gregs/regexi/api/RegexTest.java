@@ -182,7 +182,7 @@ public class RegexTest {
 		assertThat(regex.matchesWithinString("Emma doesn't do any better"), is(false));
 
 		// Check that Regex.anyOf() is the same
-		regex = RegexBuilder.startingAnywhere().anyOf("Amy","Bob","Charlie");
+		regex = RegexBuilder.startingAnywhere().anyOf("Amy", "Bob", "Charlie");
 
 		assertThat(regex.matchesWithinString("Amy"), is(true));
 		assertThat(regex.matchesWithinString("Bob"), is(true));
@@ -301,7 +301,7 @@ public class RegexTest {
 		assertThat(pattern.matchesEntireString(intervalString), is(true));
 		final List<String> allMatches = pattern.getAllGroups(intervalString);
 		assertThat(allMatches.size(), is(6));
-		
+
 		final Double value = Double.valueOf(allMatches.get(2));
 		assertThat(value, is(Double.valueOf("-1.999999999946489E-6")));
 		assertThat(Math.round(value * 1000000), is(-2L));
@@ -329,7 +329,7 @@ public class RegexTest {
 
 		final HashMap<String, String> allGroups = pattern.getAllNamedCapturesOfFirstMatchWithinString(intervalString);
 		assertThat(allGroups.size(), is(3));
-		
+
 		final Double value = Double.valueOf(allGroups.get("value"));
 		assertThat(value, is(Double.valueOf("-1.999999999946489E-6")));
 		assertThat(Math.round(value * 1000000), is(-2L));
@@ -383,7 +383,7 @@ public class RegexTest {
 		for (Match match : matches) {
 			assertThat(match.getEntireMatch(), isOneOf("-1", "2", "-234", "+4", "-4", "4.5", "02", "-0234", "004", "4", "4"));
 		}
-		List<String> collected = matches.stream().map(v->v.getEntireMatch()).collect(Collectors.toList());
+		List<String> collected = matches.stream().map(v -> v.getEntireMatch()).collect(Collectors.toList());
 		assertThat(collected.get(0), is("-1"));
 		assertThat(collected.get(1), is("2"));
 		assertThat(collected.get(2), is("-234"));
@@ -406,7 +406,7 @@ public class RegexTest {
 		for (Match match : matches) {
 			assertThat(match.getEntireMatch(), isOneOf("-1", "2", "-234", "+4", "-4", "4.5"));
 		}
-		collected = matches.stream().map(v->v.getEntireMatch()).collect(Collectors.toList());
+		collected = matches.stream().map(v -> v.getEntireMatch()).collect(Collectors.toList());
 		assertThat(collected.get(0), is("-1"));
 		assertThat(collected.get(1), is("2"));
 		assertThat(collected.get(2), is("-234"));
@@ -497,7 +497,7 @@ public class RegexTest {
 						.space().once()
 						.beginNamedCapture("unit")
 						.beginCaseInsensitiveSection()
-						.anyOf("DAY","HOUR","MINUTE","SECOND").once().literal("S").onceOrNotAtAll()
+						.anyOf("DAY", "HOUR", "MINUTE", "SECOND").once().literal("S").onceOrNotAtAll()
 						.endCaseInsensitiveSection()
 						.endNamedCapture();
 
@@ -506,16 +506,83 @@ public class RegexTest {
 		assertThat(regex.matchesWithinString(intervalString), is(true));
 
 		final List<Match> allMatches = regex.getAllMatches(intervalString);
-		allMatches.stream().forEach(t -> System.err.println("MATCH: "+t.getEntireMatch()));
+		allMatches.stream().forEach(t -> System.err.println("MATCH: " + t.getEntireMatch()));
 		assertThat(allMatches.size(), is(4));
-		
+
 		for (var match : allMatches) {
 			System.out.println("MATCH: " + match.getEntireMatch());
 			final HashMap<String, String> allNamedCaptures = match.getAllNamedCaptures();
 			assertThat(allNamedCaptures.size(), is(3));
 			final Double value = Double.valueOf(allNamedCaptures.get("value"));
-			assertThat(Math.abs(Math.round(value * 1000000)), isOneOf(2L, 2000000L, 34000000L,56000000L));
-			assertThat(match.getNamedCapture("unit").toLowerCase(), isOneOf("second", "day", "hour","minutes"));
+			assertThat(Math.abs(Math.round(value * 1000000)), isOneOf(2L, 2000000L, 34000000L, 56000000L));
+			assertThat(match.getNamedCapture("unit").toLowerCase(), isOneOf("second", "day", "hour", "minutes"));
 		}
+	}
+
+	@Test
+	public void testEasyEndsWithMethod() {
+		// -2 days 00:00:00
+		// 1 days 00:00:5.5
+		// 0 days 00:00:-5.5
+		//
+		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
+		var regex
+				= RegexBuilder.startingAnywhere()
+						.wordBoundary()
+						.beginCaseInsensitiveSection()
+						.literal("day").once()
+						.literal("s").onceOrNotAtAll()
+						.endCaseInsensitiveSection()
+						.wordBoundary();
+
+		System.out.println("REGEX: " + regex.getRegex());
+
+		assertThat(regex.matchesEndOf("day"), is(true));
+		assertThat(regex.matchesEndOf("days"), is(true));
+		assertThat(regex.matchesEndOf("DAY"), is(true));
+		assertThat(regex.matchesEndOf("DAYS"), is(true));
+		assertThat(regex.matchesEndOf("before day"), is(true));
+		assertThat(regex.matchesEndOf("before days"), is(true));
+		assertThat(regex.matchesEndOf("before middleday"), is(false));
+		assertThat(regex.matchesEndOf("before middledays"), is(false));
+		assertThat(regex.matchesEndOf("before day after"), is(false));
+		assertThat(regex.matchesEndOf("before days after"), is(false));
+		assertThat(regex.matchesEndOf("day after"), is(false));
+		assertThat(regex.matchesEndOf("days after"), is(false));
+		assertThat(regex.matchesEndOf("before"), is(false));
+	}
+
+	@Test
+	public void testEasyBeginsWithMethod() {
+		// -2 days 00:00:00
+		// 1 days 00:00:5.5
+		// 0 days 00:00:-5.5
+		//
+		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
+		var regex
+				= RegexBuilder.startingAnywhere()
+						.wordBoundary()
+						.beginCaseInsensitiveSection()
+						.literal("day").once()
+						.literal("s").onceOrNotAtAll()
+						.endCaseInsensitiveSection()
+						.wordBoundary();
+
+		System.out.println("REGEX: " + regex.getRegex());
+
+		assertThat(regex.matchesBeginningOf("day"), is(true));
+		assertThat(regex.matchesBeginningOf("days"), is(true));
+		assertThat(regex.matchesBeginningOf("DAY"), is(true));
+		assertThat(regex.matchesBeginningOf("DAYS"), is(true));
+		assertThat(regex.matchesBeginningOf("before day"), is(false));
+		assertThat(regex.matchesBeginningOf("before days"), is(false));
+		assertThat(regex.matchesBeginningOf("before middleday"), is(false));
+		assertThat(regex.matchesBeginningOf("before middledays"), is(false));
+		assertThat(regex.matchesBeginningOf("before day after"), is(false));
+		assertThat(regex.matchesBeginningOf("before days after"), is(false));
+		assertThat(regex.matchesBeginningOf("day after"), is(true));
+		assertThat(regex.matchesBeginningOf("days after"), is(true));
+		assertThat(regex.matchesBeginningOf("daysmiddle after"), is(false));
+		assertThat(regex.matchesBeginningOf("before"), is(false));
 	}
 }
