@@ -103,11 +103,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 
 	@Override
 	public Regex literal(Character character) {
-		if (character.equals('/')) {
-			return extend(backslash());
-		} else {
-			return extend(new SingleCharacter(character));
-		}
+		return extend(new LiteralSequence("" + character));
 	}
 
 	/**
@@ -695,7 +691,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 						.anyCharacterBetween('1', '9').once()
 						.digit().zeroOrMore()
 						.or()
-						.literal('0').notFollowedBy(RegexBuilder.startingAnywhere().digit())
+						.literal('0').oneOrMore().notFollowedBy(RegexBuilder.startingAnywhere().digit())
 						.endOrGroup()
 		);
 	}
@@ -791,7 +787,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 			.beginOrGroup()
 			.anyCharacterBetween('1', '9').atLeastOnce()
 			.digit().zeroOrMore()
-			.or().literal('0').notFollowedBy(RegexBuilder.startingAnywhere().digit())
+			.or().literal('0').oneOrMore().notFollowedBy(RegexBuilder.startingAnywhere().digit())
 			.endOrGroup();
 
 	/**
@@ -1106,5 +1102,17 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 						.literal(literal)
 						.endCaseInsensitiveSection()
 				);
+	}
+
+	public void testAgainst(String testStr) {
+		System.out.println("TESTING: " + getRegex());
+		System.out.println("AGAINST: " + testStr);
+		final boolean result = this.matchesWithinString(testStr);
+		System.out.println("RESULT: " + (result ? "found" : "FAILED"));
+		if (result) {
+			final List<Match> allMatches = this.getAllMatches(testStr);
+			allMatches.stream().forEach(v -> System.out.println("MATCHED: " + v.getEntireMatch()));
+		}
+
 	}
 }
