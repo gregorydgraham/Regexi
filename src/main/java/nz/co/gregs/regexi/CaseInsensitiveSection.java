@@ -19,7 +19,7 @@ public class CaseInsensitiveSection<REGEX extends HasRegexFunctions<REGEX>> exte
 	@Override
 	public String getRegex() {
 		final String regexp = getCurrent().getRegex();
-		return "(?i)" + regexp + "(?-i)";
+		return "((?i)" + regexp + "(?-i))";
 	}
 
 	public REGEX endCaseInsensitiveSection() {
