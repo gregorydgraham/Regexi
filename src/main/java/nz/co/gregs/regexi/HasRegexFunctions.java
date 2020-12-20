@@ -118,10 +118,10 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 		return extend(
 				RegexBuilder.startOrGroup()
 						.anyCharacterIn("-+").onceOrNotAtAll()
-						.digit().atLeastOnce()
+						.digit().atLeastOnce().notFollowedBy(RegexBuilder.startingAnywhere().digit())
 						.add(RegexBuilder.startingAnywhere()
 								.dot().once()
-								.digit().oneOrMore()
+								.digit().oneOrMore().notFollowedBy(RegexBuilder.startingAnywhere().digit())
 						).onceOrNotAtAll()
 						.endGroup()
 		);
@@ -157,7 +157,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 						.beginOrGroup()
 						.anyCharacterBetween('1', '9').atLeastOnce()
 						.digit().zeroOrMore()
-						.or().literal('0').notFollowedBy(RegexBuilder.startingAnywhere().digit())
+						.or().literal('0').oneOrMore().notFollowedBy(RegexBuilder.startingAnywhere().digit())
 						.endOrGroup().once()
 						.beginGroup()
 						.dot().once()
@@ -351,6 +351,8 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	REGEX star();
 
 	REGEX tab();
+	
+	void testAgainst(String testStr) ;
 
 	REGEX theBeginningOfTheInput();
 
