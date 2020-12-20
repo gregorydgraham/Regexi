@@ -5,8 +5,10 @@
  */
 package nz.co.gregs.regexi;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.MatchResult;
 
 /**
  *
@@ -14,16 +16,27 @@ import java.util.List;
  */
 public class Match {
 
-	static Match from(Regex regex, String group) {
-		return new Match(regex, group);
+	static Match from(Regex aThis, MatchResult m) {
+		return new Match(aThis, /*matcher,*/ m);
 	}
-	private final String match;
-	private final Regex regex;
-	private HashMap<String, String> namedCaptures = null;
 
-	private Match(Regex regex, String group) {
-		this.match = group;
+	private final String match;
+	private final List<String> groups = new ArrayList<>(1);
+	private final Regex regex;
+	private HashMap<String, String> namedCaptures = null; // will be set when needed
+	private boolean didMatch;
+
+	private Match(Regex regex, MatchResult matchResult) {
 		this.regex = regex;
+		this.match = matchResult.group();
+		for (int i = 0; i < matchResult.groupCount(); i++) {
+			this.groups.add(matchResult.group(i));
+		}
+		didMatch = true;
+	}
+
+	public boolean didMatch() {
+		return didMatch;
 	}
 
 	public String getEntireMatch() {
@@ -37,8 +50,8 @@ public class Match {
 		return namedCaptures;
 	}
 
-	public List<String> getAllGroups() {
-		return regex.getAllGroups(match);
+	public List<String> allGroups() {
+		return groups;
 	}
 
 	public String getNamedCapture(String name) {
