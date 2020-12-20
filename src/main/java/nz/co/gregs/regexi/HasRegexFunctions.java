@@ -311,8 +311,8 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * } and {@link #anyCharacterIn(java.lang.String) } methods for creating
 	 * ranges.
 	 *
-	 * @param lowest
-	 * @param highest
+	 * @param lowest the first character to be included in the range
+	 * @param highest the last character to be included in the range
 	 * @return the start of a range.
 	 */
 	RangeBuilder<REGEX> beginRange(char lowest, char highest);
@@ -326,7 +326,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * } and {@link #anyCharacterIn(java.lang.String) } methods for creating
 	 * ranges.
 	 *
-	 * @param literals
+	 * @param literals all of the characters you would like included in the range
 	 * @return the start of a range.
 	 */
 	RangeBuilder<REGEX> beginRange(String literals);
