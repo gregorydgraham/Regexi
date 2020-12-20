@@ -624,18 +624,18 @@ public class RegexTest {
 				//						.extend(nanosCapture);
 				= RegexBuilder.startingAnywhere()
 						.beginCaseInsensitiveSection().literal("INTERVAL ").endCaseInsensitiveSection().onceOrNotAtAll()
-						.beginNamedCapture("days").number().onceOrNotAtAll().endNamedCapture()
-						
+						.literal("'").onceOrNotAtAll()
+						.beginNamedCapture("days").numberLike().onceOrNotAtAll().endNamedCapture()
 						.beginGroup().space().once()
 						.beginCaseInsensitiveSection().literal("day").once().literal('s').onceOrNotAtAll().endCaseInsensitiveSection()
 						.onceOrNotAtAll().space().onceOrNotAtAll().endGroup().onceOrNotAtAll()
-						
-						.beginNamedCapture("hours").number().once().endNamedCapture()
+						.beginNamedCapture("hours").numberLike().once().endNamedCapture()
 						.literal(":")
-						.beginNamedCapture("minutes").number().once().endNamedCapture()
+						.beginNamedCapture("minutes").numberLike().once().endNamedCapture()
 						.literal(":")
 						.beginNamedCapture("seconds").numberIncludingScientificNotation().once().endNamedCapture()
-						.beginNamedCapture("nanos").number().onceOrNotAtAll().endNamedCapture();
+						.beginNamedCapture("nanos").number().onceOrNotAtAll().endNamedCapture()
+						.literal("'").onceOrNotAtAll();
 
 		shouldMatchTests(regex, "0 -2:0:0.0 DAY TO SECOND", "0", "-2", "0", "0.0", "");
 		shouldMatchTests(regex, "0 day -2:0:0.0 DAY TO SECOND", "0", "-2", "0", "0.0", "");
@@ -648,22 +648,29 @@ public class RegexTest {
 		shouldMatchTests(regex, "INTERVAL 0:-2:0 DAY TO SECOND", "", "0", "-2", "0", "");
 		shouldMatchTests(regex, "INTERVAL 0:0:-0.1 DAY TO SECOND", "", "0", "0", "-0.1", "");
 		shouldMatchTests(regex, "INTERVAL 0:0:-2e-9.2 DAY TO SECOND", "", "0", "0", "-2e-9.2", "");
+		shouldMatchTests(regex, "INTERVAL '-0 00:02:00' DAY TO SECOND", "-0", "00", "02", "00", "");
+
 	}
 
 	private void shouldMatchTests(final Regex regex, String testStr, String days, String hours, String minutes, String seconds, String nanos) {
-		assertThat(regex.matchesWithinString(testStr), is(true));
-
-		Optional<Match> optional = regex.getFirstMatchFrom(testStr);
-		if (optional.isPresent()) {
-			Match match = optional.get();
-			System.out.println("TESTING: "+testStr);
-			match.getAllNamedCaptures().forEach((k, v) -> System.out.println("" + k + " => " + v));
-			assertThat(match.getNamedCapture("days"), is(days));
-			assertThat(match.getNamedCapture("hours"), is(hours));
-			assertThat(match.getNamedCapture("minutes"), is(minutes));
-			assertThat(match.getNamedCapture("seconds"), is(seconds));
-			assertThat(match.getNamedCapture("nanos"), is(nanos));
+//		assertThat(regex.matchesWithinString(testStr), is(true));
+		if (regex.matchesWithinString(testStr)) {
+			Optional<Match> optional = regex.getFirstMatchFrom(testStr);
+			if (optional.isPresent()) {
+				Match match = optional.get();
+				System.out.println("TESTING: " + testStr);
+				match.getAllNamedCaptures().forEach((k, v) -> System.out.println("" + k + " => " + v));
+				assertThat(match.getNamedCapture("days"), is(days));
+				assertThat(match.getNamedCapture("hours"), is(hours));
+				assertThat(match.getNamedCapture("minutes"), is(minutes));
+				assertThat(match.getNamedCapture("seconds"), is(seconds));
+				assertThat(match.getNamedCapture("nanos"), is(nanos));
+			} else {
+				regex.testAgainst(testStr);
+				Assert.fail("Match Failed");
+			}
 		} else {
+			regex.testAgainst(testStr);
 			Assert.fail("Match Failed");
 		}
 	}
