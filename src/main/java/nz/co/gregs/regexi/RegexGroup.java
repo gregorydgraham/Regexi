@@ -59,7 +59,7 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 		return origin;
 	}
 
-	protected final REGEX endGroup() {
+	protected REGEX endGroup() {
 		return getOrigin().unescaped(this.getRegex());
 	}
 
