@@ -23,5 +23,11 @@ class RegexpCombination extends Regex {
 	public String getRegex() {
 		return first.getRegex() + second.getRegex();
 	}
-	
+
+	@Override
+	public void testAgainst(String testStr) {
+		first.testAgainst(testStr);
+		second.testAgainst(testStr);
+		super.testAgainst(testStr);
+	}
 }
