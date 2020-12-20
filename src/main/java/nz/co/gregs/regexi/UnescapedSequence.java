@@ -25,5 +25,9 @@ public class UnescapedSequence extends Regex {
 	public String getRegex() {
 		return "" + literal;
 	}
-	
+
+	@Override
+	public void testAgainst(String testStr) {
+		// these are general regex control sequences and shouldn't be dismantled
+	}
 }
