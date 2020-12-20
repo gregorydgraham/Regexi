@@ -167,6 +167,37 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 		);
 	}
 
+	/**
+	 * Adds a standard pattern that will match any valid number to the pattern as
+	 * a grouped element.
+	 *
+	 * <p>
+	 * A valid number is any sequence of digits not starting with zero, optionally
+	 * preceded with a plus or minus, and optionally followed by a decimal point
+	 * and a sequence of digits, that is clearly separated from other characters.
+	 *
+	 * <p>
+	 * Examples of a valid number would be +2.345, 2E10, -2.89E-7.98, or 1.37e+15.
+	 *
+	 * <p>
+	 * Invalid numbers include 02.345, A4, _234, 2*E10, and 5678ABC.
+	 *
+	 * @return the current regex with a number matching pattern added to it
+	 */
+	public default REGEX numberLikeIncludingScientificNotation() {
+		return add(
+				RegexBuilder.startingAnywhere()
+						// it's just a number
+						.numberLike().once()
+						.beginGroup()
+						// possibly followed by an E
+						.anyCharacterIn("Ee")
+						// followed by another number (but without the wordboundary in the middle)
+						.numberLike()
+						.endGroup().onceOrNotAtAll()
+		);
+	}
+
 	REGEX add(HasRegexFunctions<?> second);
 
 	REGEX addGroup(HasRegexFunctions<?> second);
