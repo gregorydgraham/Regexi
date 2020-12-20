@@ -25,17 +25,3 @@ class RegexpCombination extends Regex {
 	}
 	
 }
-//	@Deprecated
-//	public static class Group extends Regex {
-//
-//		private final Regex regexp;
-//
-//		public Group(Regex regexp) {
-//			this.regexp = regexp;
-//		}
-//
-//		@Override
-//		public String getRegex() {
-//			return "(" + regexp.getRegex() + ")";
-//		}
-//	}
