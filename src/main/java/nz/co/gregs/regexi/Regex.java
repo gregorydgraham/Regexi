@@ -470,8 +470,8 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	}
 
 	/**
-	 * Adds a check for one or more digits to the regular expression without
-	 * grouping.
+	 * Adds a check for one or more digits to the regular expression as a grouped
+	 * element.
 	 *
 	 * <p>
 	 * Please note that digits is not the same as a valid integer or number, use {@link #positiveInteger() }, {@link #negativeInteger() }, {@link #integer()
@@ -481,7 +481,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex digits() {
-		return digit().oneOrMore();
+		return beginGroup().digit().oneOrMore().endGroup();
 	}
 
 	/**
@@ -533,7 +533,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex word() {
-		return wordCharacter().oneOrMore();
+		return beginGroup().wordCharacter().oneOrMore().endGroup();
 	}
 
 	/**
@@ -650,7 +650,8 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex capture(Regex regexp) {
-		return new UnescapedSequence("(" + regexp.getRegex() + ")");
+		return this.beginGroup().extend(regexp).endGroup();
+//		return new UnescapedSequence("(" + regexp.getRegex() + ")");
 	}
 
 	/**
@@ -665,7 +666,14 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex negativeInteger() {
-		return extend(literal('-').anyCharacterBetween('1', '9').once().digit().zeroOrMore());
+		return extend(
+				literal('-')
+						.beginOrGroup()
+						.anyCharacterBetween('1', '9').once().digit().zeroOrMore()
+						.or()
+						.literal('0').notFollowedBy(RegexBuilder.startingAnywhere().digit())
+						.endOrGroup()
+		);
 	}
 
 	/**
@@ -683,8 +691,12 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 				RegexBuilder.startingAnywhere()
 						.notPrecededBy("-")
 						.plus().onceOrNotAtAll()
+						.beginOrGroup()
 						.anyCharacterBetween('1', '9').once()
 						.digit().zeroOrMore()
+						.or()
+						.literal('0').notFollowedBy(RegexBuilder.startingAnywhere().digit())
+						.endOrGroup()
 		);
 	}
 
@@ -770,8 +782,17 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex groupEverythingBeforeThis() {
-		return RegexBuilder.startingAnywhere().unescaped("(").extend(this).unescaped(")");
+		return RegexBuilder.startingAnywhere().beginGroup().extend(this).endGroup();
 	}
+
+	protected static final Regex INTEGER_REGEX = RegexBuilder.startingAnywhere()
+			.anyCharacterIn("-+").onceOrNotAtAll()
+			.wordBoundary()
+			.beginOrGroup()
+			.anyCharacterBetween('1', '9').atLeastOnce()
+			.digit().zeroOrMore()
+			.or().literal('0').notFollowedBy(RegexBuilder.startingAnywhere().digit())
+			.endOrGroup();
 
 	/**
 	 * Places the regular expression in a group and add it as one element for the
@@ -858,6 +879,8 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 *
 	 * Convenient access to Matcher.group().
 	 *
+	 * Deprecated: use {@link #getFirstMatchFrom(java.lang.String) }
+	 *
 	 * Returns the input subsequence matched by the previous match.
 	 *
 	 * <p>
@@ -877,6 +900,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * @throws IllegalStateException If no match has yet been attempted, or if the
 	 * previous match operation failed
 	 */
+	@Deprecated
 	public String getFirstMatch(String string) {
 		return getMatcher(string).group();
 	}
@@ -894,6 +918,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 		return getMatcher(string).toMatchResult();
 	}
 
+	@Deprecated
 	public Optional<String> getNamedCapture(String name, String string) {
 		final String found = getMatcher(string).group(name);
 		if (found == null) {
@@ -1034,10 +1059,30 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 
 	public List<Match> getAllMatches(String string) {
 		Matcher matcher = getMatcher(string);
-		List<Match> matches = matcher.results().map(m -> Match.from(this, m.group())).collect(Collectors.toList());
+		List<Match> matches = matcher.results().map(
+				m -> Match.from(this, m)
+		).collect(Collectors.toList());
 		return matches;
 	}
 
+	public Optional<Match> getFirstMatchFrom(String string) {
+		Matcher matcher = getMatcher(string);
+		if (matcher.find()) {
+			MatchResult result = matcher.toMatchResult();
+			return Optional.of(Match.from(this, result));
+		}
+		return Optional.empty();
+	}
+
+	/**
+	 * Use {@link #getFirstMatchFrom(java.lang.String) } and {@link Match#allGroups()
+	 * }
+	 *
+	 * @param string
+	 * @return
+	 * @deprecated
+	 */
+	@Deprecated
 	public List<String> getAllGroups(String string) {
 		Matcher matcher = getMatcher(string);
 		List<String> groups = new ArrayList<>(0);
