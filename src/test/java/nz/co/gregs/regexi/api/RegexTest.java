@@ -613,15 +613,6 @@ public class RegexTest {
 //		final Regex secondsCapture = RegexBuilder.startingAnywhere().beginNamedCapture("seconds").numberIncludingScientificNotation().once().endNamedCapture();
 //		final Regex nanosCapture = RegexBuilder.startingAnywhere().beginNamedCapture("nanos").number().onceOrNotAtAll().endNamedCapture();
 		Regex regex
-				//				= daysCapture
-				//						.extend(literalDaysBetweenDaysAndHours)
-				//						.extend(hoursCapture)
-				//						.literal(":")
-				//						.extend(minutesCapture)
-				//						.literal(":")
-				//						.extend(secondsCapture)
-				//						.literal(":").onceOrNotAtAll()
-				//						.extend(nanosCapture);
 				= RegexBuilder.startingAnywhere()
 						.beginCaseInsensitiveSection().literal("INTERVAL ").endCaseInsensitiveSection().onceOrNotAtAll()
 						.literal("'").onceOrNotAtAll()
@@ -633,7 +624,7 @@ public class RegexTest {
 						.literal(":")
 						.beginNamedCapture("minutes").numberLike().once().endNamedCapture()
 						.literal(":")
-						.beginNamedCapture("seconds").numberIncludingScientificNotation().once().endNamedCapture()
+						.beginNamedCapture("seconds").numberLikeIncludingScientificNotation().once().endNamedCapture()
 						.beginNamedCapture("nanos").number().onceOrNotAtAll().endNamedCapture()
 						.literal("'").onceOrNotAtAll();
 
@@ -649,6 +640,7 @@ public class RegexTest {
 		shouldMatchTests(regex, "INTERVAL 0:0:-0.1 DAY TO SECOND", "", "0", "0", "-0.1", "");
 		shouldMatchTests(regex, "INTERVAL 0:0:-2e-9.2 DAY TO SECOND", "", "0", "0", "-2e-9.2", "");
 		shouldMatchTests(regex, "INTERVAL '-0 00:02:00' DAY TO SECOND", "-0", "00", "02", "00", "");
+		shouldMatchTests(regex, "INTERVAL '5 04:03:02' DAY TO SECOND", "5", "04", "03", "02", "");
 
 	}
 
