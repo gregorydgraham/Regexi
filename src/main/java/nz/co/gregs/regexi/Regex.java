@@ -64,7 +64,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * (the rest of the instruction adds nothing). Assuming that allowedValue is
 	 * "[0-9]" and separator is ":", the full regexp will be "([0-9])(:)".
 	 *
-	 * @param second
+	 * @param second the regular expression to add to this regular expression
 	 * @return a new regular expression consisting of the current expression and
 	 * the supplied expression added together
 	 */
@@ -92,7 +92,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * allowedValue is "[0-9]" and separator is ":", the full regexp will be
 	 * "[0-9]:".
 	 *
-	 * @param second
+	 * @param second the regular expression to extend this regular expression with
 	 * @return a new regular expression consisting of the current expression and
 	 * the supplied expression added together
 	 */
@@ -110,7 +110,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * Adds a literal string to the regexp without grouping it.
 	 *
 	 *
-	 * @param literals
+	 * @param literals the literal value to add to this regex
 	 * @return a new regexp
 	 */
 	@Override
@@ -122,7 +122,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * Adds a unescaped sequence to the regexp without grouping it.
 	 *
 	 *
-	 * @param literals
+	 * @param literals the literal value to add to this regex
 	 * @return a new regexp
 	 */
 	@Override
@@ -641,7 +641,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * capturing and grouping are the same, there are methods of both names to
 	 * capture the intent.
 	 *
-	 * @param regexp
+	 * @param regexp the regex to add to this regex as a new capturing group
 	 * @return a new regexp
 	 */
 	@Override
@@ -829,7 +829,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * } with this regex and calling {@link #matchesWithinString(java.lang.String)
 	 * }.
 	 *
-	 * @param string
+	 * @param string the string to test with this regex
 	 * @return true if the beginning of the string matches this regex.
 	 */
 	public boolean matchesBeginningOf(String string) {
@@ -843,7 +843,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * The method works by combining this regex with {@link #endOfTheString() }
 	 * and calling {@link #matchesWithinString(java.lang.String) }.
 	 *
-	 * @param string
+	 * @param string the string to test with this regex
 	 * @return true if the end of the string matches this regex.
 	 */
 	public boolean matchesEndOf(String string) {
@@ -895,6 +895,8 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 *
 	 * @throws IllegalStateException If no match has yet been attempted, or if the
 	 * previous match operation failed
+	 * @param string the string to match
+	 * @deprecated use {@link #getFirstMatchFrom(java.lang.String) }
 	 */
 	@Deprecated
 	public String getFirstMatch(String string) {
@@ -908,6 +910,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * result is unaffected by subsequent operations performed upon this matcher.
 	 *
 	 * @return a {@code MatchResult} with the state of this matcher
+	 * @param string the string to generate the MatchResult for
 	 * @since 1.5
 	 */
 	public MatchResult getMatchResult(String string) {
@@ -967,7 +970,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * of it but definitely isn't preceded by a minus. So it uses a notPrecededBy:
 	 * startingAnywhere().notPrecededBy("-").plus().onceOrNotAtAll()...
 	 *
-	 * @param literalValue
+	 * @param literalValue the literal string that cannot come before this regex
 	 * @return a new regexp
 	 */
 	@Override
@@ -984,7 +987,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * of it but definitely isn't preceded by a minus. So it uses a notPrecededBy:
 	 * startingAnywhere().notPrecededBy("-").plus().onceOrNotAtAll()...
 	 *
-	 * @param literalValue
+	 * @param literalValue the literal string that cannot come before this regex
 	 * @return a new regexp
 	 */
 	@Override
@@ -1003,7 +1006,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * For instance to match words but not e-mail addresses you might use
 	 * Regex.startingAnywhere().word().notFollowedBy("@").
 	 *
-	 * @param literalValue
+	 * @param literalValue the literal string that cannot come after this regex
 	 * @return a new regexp
 	 */
 	@Override
@@ -1019,7 +1022,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * For instance to match words but not e-mail addresses you might use
 	 * Regex.startingAnywhere().word().notFollowedBy("@").
 	 *
-	 * @param literalValue
+	 * @param literalValue the literal string that cannot come after this regex
 	 * @return a new regexp
 	 */
 	@Override
@@ -1039,8 +1042,8 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * } and {@link #anyCharacterIn(java.lang.String) } methods for creating
 	 * ranges.
 	 *
-	 * @param lowest
-	 * @param highest
+	 * @param lowest the first value to include in the range
+	 * @param highest the last value to include in the range
 	 * @return the start of a range.
 	 */
 	@Override
@@ -1074,8 +1077,8 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * Use {@link #getFirstMatchFrom(java.lang.String) } and {@link Match#allGroups()
 	 * }
 	 *
-	 * @param string
-	 * @return
+	 * @param string the string to match
+	 * @return a list of all groups in all matches within string
 	 * @deprecated
 	 */
 	@Deprecated

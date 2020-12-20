@@ -10,7 +10,7 @@ import java.util.List;
 /**
  *
  * @author gregorygraham
- * @param <REGEX> the type returned by {@link #endOrGroup() }
+ * @param <REGEX> the type returned by {@link #endGroup() }
  */
 public class Group<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<Group<REGEX>, REGEX> {
 	
