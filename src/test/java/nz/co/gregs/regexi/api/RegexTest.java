@@ -503,7 +503,6 @@ public class RegexTest {
 
 	@Test
 	public void testLotsOfMatchesAndNamedGroups() {
-		System.out.println("nz.co.gregs.regexi.RegexTest.testLotsOfMatchesAndNamedGroups()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -521,7 +520,6 @@ public class RegexTest {
 						.endCaseInsensitiveSection()
 						.endNamedCapture();
 
-		System.out.println("REGEX: " + regex.getRegex());
 		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND, INTERVAL 4 YEARS, INTERVAL 2 DAY, interval -34 hour, interval 56 minutes";
 		assertThat(regex.matchesWithinString(intervalString), is(true));
 
@@ -554,8 +552,6 @@ public class RegexTest {
 						.literal("s").onceOrNotAtAll()
 						.endCaseInsensitiveSection()
 						.wordBoundary();
-
-		System.out.println("REGEX: " + regex.getRegex());
 
 		assertThat(regex.matchesEndOf("day"), is(true));
 		assertThat(regex.matchesEndOf("days"), is(true));
@@ -626,26 +622,26 @@ public class RegexTest {
 						.extend(secondsCapture)
 						.literal(":").onceOrNotAtAll()
 						.extend(nanosCapture);
-		System.out.println("nz.co.gregs.regexi.api.RegexTest.testShouldMatch()");
-		System.out.println("REGEX: " + regex.getRegex());
-		String testStr = "INTERVAL 0 -2:0:0.0 DAY TO SECOND";
-		assertThat(daysCapture.matchesWithinString(testStr), is(true));
-		assertThat(literalDaysBetweenDaysAndHours.matchesWithinString(testStr), is(true));
-		assertThat(hoursCapture.matchesWithinString(testStr), is(true));
-		assertThat(minutesCapture.matchesWithinString(testStr), is(true));
-		assertThat(secondsCapture.matchesWithinString(testStr), is(true));
-		assertThat(nanosCapture.matchesWithinString(testStr), is(true));
+		shouldMatchTests(regex, "INTERVAL 0 -2:0:0.0 DAY TO SECOND", "0", "-2","0","0.0","");
+		shouldMatchTests(regex, "INTERVAL -20 0:0:0.0 DAY TO SECOND", "-20", "0","0","0.0","");
+		shouldMatchTests(regex, "INTERVAL -20:0:0:0 DAY TO SECOND", "", "-20","0","0","0");
+		shouldMatchTests(regex, "INTERVAL 0:-2:0 DAY TO SECOND", "", "0","-2","0","");
+		shouldMatchTests(regex, "INTERVAL 0:0:-0.1 DAY TO SECOND", "", "0","0","-0.1","");
+		shouldMatchTests(regex, "INTERVAL 0:0:-2e-9.2 DAY TO SECOND", "", "0","0","-2e-9.2","");
+	}
+
+	private void shouldMatchTests(final Regex regex, String testStr, String days, String hours, String minutes, String seconds, String nanos) {
 		assertThat(regex.matchesWithinString(testStr), is(true));
 
 		Optional<Match> optional = regex.getFirstMatchFrom(testStr);
 		if (optional.isPresent()) {
 			Match match = optional.get();
 			match.getAllNamedCaptures().forEach((k, v) -> System.out.println("" + k + " => " + v));
-			assertThat(match.getNamedCapture("days"), is("0"));
-			assertThat(match.getNamedCapture("hours"), is("-2"));
-			assertThat(match.getNamedCapture("minutes"), is("0"));
-			assertThat(match.getNamedCapture("seconds"), is("0.0"));
-			assertThat(match.getNamedCapture("nanos"), isEmptyOrNullString());
+			assertThat(match.getNamedCapture("days"), is(days));
+			assertThat(match.getNamedCapture("hours"), is(hours));
+			assertThat(match.getNamedCapture("minutes"), is(minutes));
+			assertThat(match.getNamedCapture("seconds"), is(seconds));
+			assertThat(match.getNamedCapture("nanos"), is(nanos));
 		} else {
 			Assert.fail("Match Failed");
 		}
