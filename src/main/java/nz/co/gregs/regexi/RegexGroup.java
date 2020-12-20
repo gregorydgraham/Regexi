@@ -348,6 +348,12 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 		current = getCurrent().tab();
 		return (THIS) this;
 	}
+	
+	@Override
+	public void testAgainst(String testStr) {
+		getOrigin().testAgainst(testStr);
+		getCurrent().testAgainst(testStr);
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")
