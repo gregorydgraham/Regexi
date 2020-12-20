@@ -50,12 +50,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @return a new regexp
 	 */
 	public default REGEX integer() {
-		return extend(RegexBuilder
-				.startOrGroup().literal("-")
-				.or().literal("+")
-				.endGroup().onceOrNotAtAll()
-				.anyCharacterBetween('1', '9').once().digit().zeroOrMore()
-		);
+		return addGroup(Regex.INTEGER_REGEX);
 	}
 
 	/**
@@ -68,6 +63,13 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * and a sequence of digits, that is clearly separated from other characters.
 	 *
 	 * <p>
+	 * A number may be followed by characters as "12tonnes" is a valid number.
+	 *
+	 * <p>
+	 * Scientific notation is not supported but " 2E16" will match as "2" is a
+	 * valid number by this definition.
+	 *
+	 * <p>
 	 * An example of a valid number would be +2.345.
 	 *
 	 * <p>
@@ -77,16 +79,13 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	public default REGEX number() {
 		return extend(
-				RegexBuilder.startOrGroup()
-						.anyCharacterIn("-+").onceOrNotAtAll()
-						.wordBoundary()
-						.anyCharacterBetween('1', '9').atLeastOnce()
-						.digit().zeroOrMore()
+				RegexBuilder.startingAnywhere()
+						.beginGroup()
+						.extend(Regex.INTEGER_REGEX)
 						.add(RegexBuilder.startingAnywhere()
 								.dot().once()
-								.digit().oneOrMore()
+								.digits()
 						).onceOrNotAtAll()
-						.notFollowedBy(RegexBuilder.startingAnywhere().nonWhitespace())
 						.endGroup()
 		);
 	}
@@ -146,28 +145,25 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @return the current regex with a number matching pattern added to it
 	 */
 	public default REGEX numberIncludingScientificNotation() {
-		return extend(
-				RegexBuilder.startOrGroup()
+		return add(
+				RegexBuilder.startingAnywhere()
+						// it's just a number
+						.number().once()
+						.beginGroup()
+						// possibly followed by an E
+						.anyCharacterIn("Ee")
+						// followed by another number (but without the wordboundary in the middle)
 						.anyCharacterIn("-+").onceOrNotAtAll()
-						.wordBoundary()
+						.beginOrGroup()
 						.anyCharacterBetween('1', '9').atLeastOnce()
 						.digit().zeroOrMore()
-						.add(RegexBuilder.startingAnywhere()
-								.dot().once()
-								.digit().oneOrMore()
-						).onceOrNotAtAll()
-						.add(RegexBuilder.startingAnywhere()
-								.literalCaseInsensitive('E').once()
-								.anyCharacterIn("-+").onceOrNotAtAll()
-								.anyCharacterBetween('1', '9').atLeastOnce()
-								.digit().zeroOrMore()
-								.add(RegexBuilder.startingAnywhere()
-										.dot().once()
-										.digit().oneOrMore()
-								).onceOrNotAtAll()
-						).onceOrNotAtAll()
-						.notFollowedBy(RegexBuilder.startingAnywhere().nonWhitespace())
-						.endGroup()
+						.or().literal('0').notFollowedBy(RegexBuilder.startingAnywhere().digit())
+						.endOrGroup().once()
+						.beginGroup()
+						.dot().once()
+						.digits()
+						.endGroup().onceOrNotAtAll()
+						.endGroup().onceOrNotAtAll()
 		);
 	}
 
@@ -319,14 +315,31 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * for instance, use this to generate "(FRED|EMILY|GRETA|DONALD)".
 	 *
 	 * <p>
-	 * {@code Regex regex =  Regex.startAnywhere().literal("Project ").startOrGroup().literal("A").or().literal("B").endGroup();
- } produces "Project (A|B)".
+	 * {@code Regex regex =  Regex.startAnywhere().literal("Project ").startOrGroup().literal("A").or().literal("B").endOrGroup();
+	 * } produces "Project (A|B)".
 	 *
 	 * @return a new regular expression
 	 */
 	@SuppressWarnings("unchecked")
 	public default OrGroup<REGEX> beginOrGroup() {
 		return new OrGroup<>((REGEX) this);
+	}
+
+	/**
+	 * Start the creation of a new group that collects one or more regular expression elements into a single element.
+	 *
+	 * <p>
+	 * for instance, use this to generate "(\d*\.\d)?".
+	 *
+	 * <p>
+	 * {@code Regex regex =  Regex.startAnywhere().literal("Project ").startGroup().literal("A").literal("B").endGroup().once();
+	 * } produces "Project (AB){1}" and will find "Project AB" but not "Project A", "Project B", nor "Project ABAB".
+	 *
+	 * @return a new regular expression that is an incomplete group
+	 */
+	@SuppressWarnings("unchecked")
+	public default Group<REGEX> beginGroup() {
+		return new Group<>((REGEX) this);
 	}
 
 	REGEX questionMark();
