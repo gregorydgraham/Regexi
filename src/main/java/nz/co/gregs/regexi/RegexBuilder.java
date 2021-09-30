@@ -46,4 +46,7 @@ public class RegexBuilder {
 	public static OrGroup<Regex> startOrGroup() {
 		return startingAnywhere().beginOrGroup();
 	}
+
+	private RegexBuilder() {
+	}
 }
