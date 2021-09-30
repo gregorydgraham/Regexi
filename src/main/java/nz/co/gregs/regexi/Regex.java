@@ -52,6 +52,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	protected Regex() {
 	}
 
+	@Override
 	public abstract String getRegex();
 
 	/**
@@ -303,6 +304,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	/**
 	 * Adds a control character(\cX) to the regexp without grouping it.
 	 *
+	 * @param x
 	 * @return a new regexp
 	 */
 	@Override
@@ -335,6 +337,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position exactly X number of times.
 	 *
+	 * @param x
 	 * @return a new regexp
 	 */
 	@Override
@@ -346,6 +349,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position X times or more.
 	 *
+	 * @param x
 	 * @return a new regexp
 	 */
 	@Override
@@ -361,6 +365,8 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * literal('a').atLeastXAndNoMoreThanYTimes(2,3) will match "aa" and "aaa" but
 	 * not "aa" nor "aaaa".
 	 *
+	 * @param x
+	 * @param y
 	 * @return a new regexp
 	 */
 	@Override
@@ -726,6 +732,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 		return extend(RegexBuilder.startingAnywhere().beginRange(literals).endRange());
 	}
 
+	@Override
 	public Regex anyOf(String literal, String... literals) {
 		nz.co.gregs.regexi.OrGroup<nz.co.gregs.regexi.Regex> temp = beginOrGroup().literal(literal);
 		for (String literal1 : literals) {
@@ -798,6 +805,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * capturing and grouping are the same, there are methods of both names to
 	 * capture the intent.
 	 *
+	 * @param regex
 	 * @return a new regexp
 	 */
 	@Override
@@ -854,6 +862,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 		return getMatcher(string).find();
 	}
 
+	@Override
 	public CaseInsensitiveSection<Regex> beginCaseInsensitiveSection() {
 		return new CaseInsensitiveSection<>(this);
 	}
@@ -1107,6 +1116,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 				);
 	}
 
+	@Override
 	public void testAgainst(String testStr) {
 		System.out.println("TESTING: " + getRegex());
 		System.out.println("AGAINST: " + testStr);
