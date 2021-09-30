@@ -56,6 +56,42 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	public abstract String getRegex();
 
 	/**
+	 * Create a new empty regular expression.
+	 *
+	 * @return a new empty regular expression
+	 */
+	public static Regex startingAnywhere() {
+		return new UnescapedSequence("");
+	}
+
+	/**
+	 * Create a new regular expression that includes a test for the start of the
+	 * string.
+	 *
+	 * @return a new regular expression
+	 */
+	public static Regex startingFromTheBeginning() {
+		return new UnescapedSequence("^");
+	}
+
+	/**
+	 * Create a regular expression that includes all the regexps supplied within
+	 * an OR grouping.
+	 *
+	 * <p>
+	 * for instance, use this to generate "(FRED|EMILY|GRETA|DONALD)".
+	 *
+	 * <p>
+	 * {@code Regex regex =  Regex.startOrGroup().literal("A").or().literal("B").endGroup();
+	 * } produces "(A|B)".
+	 *
+	 * @return a new regular expression
+	 */
+	public static OrGroup<Regex> startOrGroup() {
+		return startingAnywhere().beginOrGroup();
+	}
+
+	/**
 	 * Adds the regular expression to the end of current expression as a new
 	 * group.
 	 *
