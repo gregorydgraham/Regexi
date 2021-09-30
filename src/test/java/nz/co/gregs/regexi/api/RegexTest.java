@@ -37,7 +37,6 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import nz.co.gregs.regexi.Match;
 import nz.co.gregs.regexi.Regex;
-import nz.co.gregs.regexi.Regex;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
