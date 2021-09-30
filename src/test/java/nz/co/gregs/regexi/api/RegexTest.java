@@ -34,12 +34,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.junit.Assert;
 import nz.co.gregs.regexi.Match;
 import nz.co.gregs.regexi.Regex;
 import nz.co.gregs.regexi.RegexBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import org.junit.Assert;
+
 import org.junit.Test;
 
 /**
