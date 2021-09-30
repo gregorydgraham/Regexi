@@ -8,14 +8,18 @@ package nz.co.gregs.regexi;
 /**
  *
  * @author gregorygraham
+ * @deprecated this class adds little in the way of functionality over Regex
  */
+@Deprecated
 public class RegexBuilder {
 
 	/**
 	 * Create a new empty regular expression.
 	 *
 	 * @return a new empty regular expression
+	 * @deprecated use {@link Regex#startingAnywhere() } instead
 	 */
+	@Deprecated
 	public static Regex startingAnywhere() {
 		return new UnescapedSequence("");
 	}
@@ -25,7 +29,9 @@ public class RegexBuilder {
 	 * string.
 	 *
 	 * @return a new regular expression
+	 * @deprecated use {@link Regex#startingFromTheBeginning() } instead
 	 */
+	@Deprecated
 	public static Regex startingFromTheBeginning() {
 		return new UnescapedSequence("^");
 	}
@@ -42,7 +48,10 @@ public class RegexBuilder {
 	 * } produces "(A|B)".
 	 *
 	 * @return a new regular expression
+	 * @deprecated use {@link Regex#startOrGroup() } instead
 	 */
+	@Deprecated
+
 	public static OrGroup<Regex> startOrGroup() {
 		return startingAnywhere().beginOrGroup();
 	}
