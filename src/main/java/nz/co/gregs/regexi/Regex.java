@@ -1124,7 +1124,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 *
 	 * @param string the string to match
 	 * @return a list of all groups in all matches within string
-	 * @deprecatedUse {@link #getFirstMatchFrom(java.lang.String) } and {@link Match#allGroups()
+	 * @deprecated Use {@link #getFirstMatchFrom(java.lang.String) } and {@link Match#allGroups()
 	 * }
 	 */
 	@Deprecated
