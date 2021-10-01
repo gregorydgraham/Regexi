@@ -79,10 +79,10 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	public default REGEX number() {
 		return extend(
-				RegexBuilder.startingAnywhere()
+				Regex.startingAnywhere()
 						.beginGroup()
 						.extend(Regex.INTEGER_REGEX)
-						.add(RegexBuilder.startingAnywhere()
+						.add(Regex.startingAnywhere()
 								.dot().once()
 								.digits()
 						).onceOrNotAtAll()
@@ -116,12 +116,12 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	public default REGEX numberLike() {
 		return extend(
-				RegexBuilder.startOrGroup()
+				Regex.startOrGroup()
 						.anyCharacterIn("-+").onceOrNotAtAll()
-						.digit().atLeastOnce().notFollowedBy(RegexBuilder.startingAnywhere().digit())
-						.add(RegexBuilder.startingAnywhere()
+						.digit().atLeastOnce().notFollowedBy(Regex.startingAnywhere().digit())
+						.add(Regex.startingAnywhere()
 								.dot().once()
-								.digit().oneOrMore().notFollowedBy(RegexBuilder.startingAnywhere().digit())
+								.digit().oneOrMore().notFollowedBy(Regex.startingAnywhere().digit())
 						).onceOrNotAtAll()
 						.endGroup()
 		);
@@ -146,7 +146,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	public default REGEX numberIncludingScientificNotation() {
 		return add(
-				RegexBuilder.startingAnywhere()
+				Regex.startingAnywhere()
 						// it's just a number
 						.number().once()
 						.beginGroup()
@@ -157,7 +157,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 						.beginOrGroup()
 						.anyCharacterBetween('1', '9').atLeastOnce()
 						.digit().zeroOrMore()
-						.or().literal('0').oneOrMore().notFollowedBy(RegexBuilder.startingAnywhere().digit())
+						.or().literal('0').oneOrMore().notFollowedBy(Regex.startingAnywhere().digit())
 						.endOrGroup().once()
 						.beginGroup()
 						.dot().once()
@@ -186,7 +186,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	public default REGEX numberLikeIncludingScientificNotation() {
 		return add(
-				RegexBuilder.startingAnywhere()
+				Regex.startingAnywhere()
 						// it's just a number
 						.numberLike().once()
 						.beginGroup()

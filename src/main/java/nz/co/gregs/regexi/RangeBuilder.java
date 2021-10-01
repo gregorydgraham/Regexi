@@ -69,12 +69,12 @@ public class RangeBuilder<REGEX extends HasRegexFunctions<REGEX>> {
 	}
 
 	public RangeBuilder<REGEX> excluding(Character lowest, Character highest) {
-		excluding(new RangeBuilder<>(RegexBuilder.startingAnywhere(), lowest, highest));
+		excluding(new RangeBuilder<>(Regex.startingAnywhere(), lowest, highest));
 		return this;
 	}
 
 	public RangeBuilder<REGEX> excluding(String literals) {
-		excluding(new RangeBuilder<>(RegexBuilder.startingAnywhere(), literals));
+		excluding(new RangeBuilder<>(Regex.startingAnywhere(), literals));
 		return this;
 	}
 

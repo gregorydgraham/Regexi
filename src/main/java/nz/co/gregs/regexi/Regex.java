@@ -709,7 +709,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 						.beginOrGroup()
 						.anyCharacterBetween('1', '9').once().digit().zeroOrMore()
 						.or()
-						.literal('0').notFollowedBy(RegexBuilder.startingAnywhere().digit())
+						.literal('0').notFollowedBy(Regex.startingAnywhere().digit())
 						.endOrGroup()
 		);
 	}
@@ -726,14 +726,14 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	@Override
 	public Regex positiveInteger() {
 		return extend(
-				RegexBuilder.startingAnywhere()
+				Regex.startingAnywhere()
 						.notPrecededBy("-")
 						.plus().onceOrNotAtAll()
 						.beginOrGroup()
 						.anyCharacterBetween('1', '9').once()
 						.digit().zeroOrMore()
 						.or()
-						.literal('0').oneOrMore().notFollowedBy(RegexBuilder.startingAnywhere().digit())
+						.literal('0').oneOrMore().notFollowedBy(Regex.startingAnywhere().digit())
 						.endOrGroup()
 		);
 	}
@@ -750,7 +750,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex anyCharacterBetween(Character lowest, Character highest) {
-		return extend(RegexBuilder.startingAnywhere().beginRange(lowest, highest).endRange());
+		return extend(Regex.startingAnywhere().beginRange(lowest, highest).endRange());
 	}
 
 	/**
@@ -765,7 +765,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex anyCharacterIn(String literals) {
-		return extend(RegexBuilder.startingAnywhere().beginRange(literals).endRange());
+		return extend(Regex.startingAnywhere().beginRange(literals).endRange());
 	}
 
 	@Override
@@ -790,7 +790,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex noCharacterBetween(Character lowest, Character highest) {
-		return extend(RegexBuilder.startingAnywhere().beginRange(lowest, highest).negated().endRange());
+		return extend(Regex.startingAnywhere().beginRange(lowest, highest).negated().endRange());
 	}
 
 	/**
@@ -806,7 +806,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex noneOfTheseCharacters(String literals) {
-		return extend(RegexBuilder.startingAnywhere().beginRange(literals).negated().endRange());
+		return extend(Regex.startingAnywhere().beginRange(literals).negated().endRange());
 	}
 
 	/**
@@ -821,16 +821,16 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex groupEverythingBeforeThis() {
-		return RegexBuilder.startingAnywhere().beginGroup().extend(this).endGroup();
+		return Regex.startingAnywhere().beginGroup().extend(this).endGroup();
 	}
 
-	protected static final Regex INTEGER_REGEX = RegexBuilder.startingAnywhere()
+	protected static final Regex INTEGER_REGEX = Regex.startingAnywhere()
 			.anyCharacterIn("-+").onceOrNotAtAll()
 			.wordBoundary()
 			.beginOrGroup()
 			.anyCharacterBetween('1', '9').atLeastOnce()
 			.digit().zeroOrMore()
-			.or().literal('0').oneOrMore().notFollowedBy(RegexBuilder.startingAnywhere().digit())
+			.or().literal('0').oneOrMore().notFollowedBy(Regex.startingAnywhere().digit())
 			.endOrGroup();
 
 	/**
@@ -869,7 +869,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * Tests whether the supplied string matches this regex at the beginning of
 	 * the string.
 	 *
-	 * The method works by combining {@link RegexBuilder#startingFromTheBeginning() ()
+	 * The method works by combining {@link Regex#startingFromTheBeginning() ()
 	 * } with this regex and calling {@link #matchesWithinString(java.lang.String)
 	 * }.
 	 *
@@ -877,7 +877,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * @return true if the beginning of the string matches this regex.
 	 */
 	public boolean matchesBeginningOf(String string) {
-		return RegexBuilder.startingFromTheBeginning().extend(this).matchesWithinString(string);
+		return Regex.startingFromTheBeginning().extend(this).matchesWithinString(string);
 	}
 
 	/**
@@ -1145,7 +1145,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	@Override
 	public Regex literalCaseInsensitive(String literal) {
 		return this
-				.addGroup(RegexBuilder.startingAnywhere()
+				.addGroup(Regex.startingAnywhere()
 						.beginCaseInsensitiveSection()
 						.literal(literal)
 						.endCaseInsensitiveSection()
@@ -1163,5 +1163,9 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 			allMatches.stream().forEach(v -> System.out.println("MATCHED: " + v.getEntireMatch()));
 		}
 
+	}
+
+	public Regex namedBackReference(String value) {
+		throw new UnsupportedOperationException("Not supported yet.");
 	}
 }
