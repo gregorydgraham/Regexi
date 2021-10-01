@@ -340,7 +340,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	/**
 	 * Adds a control character(\cX) to the regexp without grouping it.
 	 *
-	 * @param x
+	 * @param x the control character
 	 * @return a new regexp
 	 */
 	@Override
@@ -373,7 +373,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position exactly X number of times.
 	 *
-	 * @param x
+	 * @param x the number of times the previous match must occur
 	 * @return a new regexp
 	 */
 	@Override
@@ -385,7 +385,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position X times or more.
 	 *
-	 * @param x
+	 * @param x the minimum number of times the previous match must occur
 	 * @return a new regexp
 	 */
 	@Override
@@ -401,8 +401,8 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * literal('a').atLeastXAndNoMoreThanYTimes(2,3) will match "aa" and "aaa" but
 	 * not "aa" nor "aaaa".
 	 *
-	 * @param x
-	 * @param y
+	 * @param x the minimum number of times the previous match must occur
+	 * @param y the maximum number of times the previous match must occur
 	 * @return a new regexp
 	 */
 	@Override
@@ -841,7 +841,7 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 * capturing and grouping are the same, there are methods of both names to
 	 * capture the intent.
 	 *
-	 * @param regex
+	 * @param regex the expression to add as a group
 	 * @return a new regexp
 	 */
 	@Override
