@@ -5,22 +5,20 @@
  */
 package nz.co.gregs.regexi;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  *
  * @author gregorygraham
  */
-public class UnescapedSequence extends Regex {
-	
+public class NamedBackReference extends Regex {
+
 	private final String literal;
 
-	protected UnescapedSequence(String literals) {
-		if (literals == null) {
+	public NamedBackReference(String name) {
+		if (name == null) {
 			this.literal = "";
 		} else {
-			this.literal = literals;
+			// \k<name>
+			this.literal = "\\k<" + name + ">";
 		}
 	}
 
@@ -29,9 +27,4 @@ public class UnescapedSequence extends Regex {
 		return "" + literal;
 	}
 
-	@Override
-	public List<String> testAgainst(String testStr) {
-		// these are general regex control sequences and shouldn't be dismantled
-		return new ArrayList<String>(0);
-	}
 }

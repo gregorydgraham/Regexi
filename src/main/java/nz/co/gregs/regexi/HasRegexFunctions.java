@@ -383,7 +383,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 
 	REGEX tab();
 	
-	void testAgainst(String testStr) ;
+	java.util.List<String> testAgainst(String testStr) ;
 
 	REGEX theBeginningOfTheInput();
 
@@ -419,6 +419,13 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	public default REGEX zeroOrOnce() {
 		return onceOrNotAtAll();
+	}
+	public default REGEX namedBackReference(String name) {
+		return extend(new NamedBackReference(name));
+	}
+
+	public default REGEX numberedBackReference(int number) {
+		return extend(new NumberedBackReference(number));
 	}
 
 }

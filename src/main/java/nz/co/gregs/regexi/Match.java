@@ -21,16 +21,16 @@ public class Match {
 	}
 
 	private final String match;
-	private final List<String> groups = new ArrayList<>(1);
+	private final List<MatchedGroup> groups = new ArrayList<>(1);
 	private final Regex regex;
 	private HashMap<String, String> namedCaptures = null; // will be set when needed
-	private boolean didMatch;
+	private final boolean didMatch;
 
 	private Match(Regex regex, MatchResult matchResult) {
 		this.regex = regex;
 		this.match = matchResult.group();
 		for (int i = 0; i < matchResult.groupCount(); i++) {
-			this.groups.add(matchResult.group(i));
+			this.groups.add(new MatchedGroup(matchResult.group(i), i));
 		}
 		didMatch = true;
 	}
@@ -50,7 +50,7 @@ public class Match {
 		return namedCaptures;
 	}
 
-	public List<String> allGroups() {
+	public List<MatchedGroup> allGroups() {
 		return groups;
 	}
 

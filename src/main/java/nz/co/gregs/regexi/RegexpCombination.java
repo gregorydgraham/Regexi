@@ -5,12 +5,14 @@
  */
 package nz.co.gregs.regexi;
 
+import java.util.List;
+
 /**
  *
  * @author gregorygraham
  */
 class RegexpCombination extends Regex {
-	
+
 	private final HasRegexFunctions<?> first;
 	private final HasRegexFunctions<?> second;
 
@@ -25,9 +27,10 @@ class RegexpCombination extends Regex {
 	}
 
 	@Override
-	public void testAgainst(String testStr) {
-		first.testAgainst(testStr);
-		second.testAgainst(testStr);
-		super.testAgainst(testStr);
+	public List<String> testAgainst(String testStr) {
+		List<String> strings = first.testAgainst(testStr);
+		strings.addAll(second.testAgainst(testStr));
+		strings.addAll(super.testAgainst(testStr));
+		return strings;
 	}
 }

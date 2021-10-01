@@ -1124,7 +1124,8 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 *
 	 * @param string the string to match
 	 * @return a list of all groups in all matches within string
-	 * @deprecated
+	 * @deprecatedUse {@link #getFirstMatchFrom(java.lang.String) } and {@link Match#allGroups()
+	 * }
 	 */
 	@Deprecated
 	public List<String> getAllGroups(String string) {
@@ -1153,19 +1154,20 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	}
 
 	@Override
-	public void testAgainst(String testStr) {
-		System.out.println("TESTING: " + getRegex());
-		System.out.println("AGAINST: " + testStr);
-		final boolean result = this.matchesWithinString(testStr);
-		System.out.println("RESULT: " + (result ? "found" : "FAILED"));
-		if (result) {
-			final List<Match> allMatches = this.getAllMatches(testStr);
-			allMatches.stream().forEach(v -> System.out.println("MATCHED: " + v.getEntireMatch()));
+	public List<String> testAgainst(String testStr) {
+		List<String> strings = new ArrayList<>(2);
+		strings.add("TESTING: " + getRegex());
+		strings.add("AGAINST: " + testStr);
+		try {
+			final boolean result = this.matchesWithinString(testStr);
+			strings.add("RESULT: " + (result ? "found" : "FAILED"));
+			if (result) {
+				final List<Match> allMatches = this.getAllMatches(testStr);
+				allMatches.stream().forEach(v -> strings.add("MATCHED: " + v.getEntireMatch()));
+			}
+		} catch (Exception ex) {
+			strings.add("Skipping invalid regex: " + ex.getLocalizedMessage());
 		}
-
-	}
-
-	public Regex namedBackReference(String value) {
-		throw new UnsupportedOperationException("Not supported yet.");
+		return strings;
 	}
 }

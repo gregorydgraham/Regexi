@@ -30,6 +30,8 @@
  */
 package nz.co.gregs.regexi;
 
+import java.util.List;
+
 /**
  *
  * @author gregorygraham
@@ -350,9 +352,10 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 	}
 	
 	@Override
-	public void testAgainst(String testStr) {
-		getOrigin().testAgainst(testStr);
-		getCurrent().testAgainst(testStr);
+	public List<String> testAgainst(String testStr) {
+		List<String> strings = getOrigin().testAgainst(testStr);
+		strings.addAll(getCurrent().testAgainst(testStr));
+		return strings;
 	}
 
 	@Override
