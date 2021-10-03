@@ -17,7 +17,7 @@ public class LiteralSequence extends Regex {
 		if (literals == null) {
 			this.literal = "";
 		} else {
-			this.literal = literals.replaceAll("\\\\", "\\").replaceAll("\\.", "\\.").replaceAll("\\?", "\\?").replaceAll("\\+", "\\\\+").replaceAll("\\*", "\\*").replaceAll("\\^", "\\^").replaceAll("\\$", "\\$").replaceAll("\\|", "\\|").replaceAll("\\[", "\\[");
+			this.literal = literals.replaceAll("\\\\", "\\").replaceAll("\\.", "\\.").replaceAll("\\?", "\\?").replaceAll("\\+", "\\\\+").replaceAll("\\*", "\\*").replaceAll("\\^", "\\^").replaceAll("\\$", "\\$").replaceAll("\\|", "\\|").replaceAll("\\[", "\\[").replaceAll("\\(", "\\\\(").replaceAll("\\)", "\\\\)");
 		}
 	}
 
