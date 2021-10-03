@@ -428,4 +428,32 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 		return extend(new NumberedBackReference(number));
 	}
 
+	public default REGEX charactersWrappedBy(Character literal) {
+		return this.add(Regex.startingAnywhere().literal(literal).noneOfThisCharacter(literal).optionalMany().literal(literal));
+	}
+
+	public default REGEX charactersWrappedBy(Character starter, Character ender) {
+		return this.add(Regex.startingAnywhere().literal(starter).noneOfThisCharacter(ender).optionalMany().literal(ender));
+	}	
+
+	public default REGEX charactersWrappedBy(String starter, String ender) {
+		return this.add(Regex.startingAnywhere().literal(starter).unescaped("(((?!").literal(ender).unescaped(").)*)").literal(ender));
+	}	
+	
+	/**
+	 * Adds a check to exclude a character from the regular expression without
+	 * grouping.
+	 *
+	 * <p>
+	 * To add more complex ranges use .add(new Regex.Range(rangeItems)).
+	 *
+	 * @param literal a character to be excluded, for example "a"
+	 * @return a new regexp
+	 */
+	public default REGEX noneOfThisCharacter(Character literal) {
+		return extend(Regex.startingAnywhere().beginRange(""+literal).negated().endRange());
+	}
+
+
+
 }
