@@ -1156,8 +1156,42 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	@Override
 	public List<String> testAgainst(String testStr) {
 		List<String> strings = new ArrayList<>(2);
+		testAgainstEntireString(strings, testStr);
+		testAgainstAnywhereInString(testStr, strings);
+		testAgainstBeginningOfString(testStr, strings);
+		testAgainstEndOfString(testStr, strings);
+		return strings;
+	}
+
+	private void testAgainstEndOfString(String testStr, List<String> strings) {
+		try {
+			final boolean result = this.matchesEndOf(testStr);
+			strings.add("RESULT: " + (result ? "found" : "FAILED"));
+			if (result) {
+				final List<Match> allMatches = this.getAllMatches(testStr);
+				allMatches.stream().forEach(v -> strings.add("MATCHED: " + v.getEntireMatch()));
+			}
+		} catch (Exception ex) {
+			strings.add("Skipping invalid regex: " + ex.getLocalizedMessage());
+		}
+	}
+
+	private void testAgainstBeginningOfString(String testStr, List<String> strings) {
+		try {
+			final boolean result = this.matchesBeginningOf(testStr);
+			strings.add("RESULT: " + (result ? "found" : "FAILED"));
+			if (result) {
+				final List<Match> allMatches = this.getAllMatches(testStr);
+				allMatches.stream().forEach(v -> strings.add("MATCHED: " + v.getEntireMatch()));
+			}
+		} catch (Exception ex) {
+			strings.add("Skipping invalid regex: " + ex.getLocalizedMessage());
+		}
 		strings.add("TESTING: " + getRegex());
-		strings.add("AGAINST: " + testStr);
+		strings.add("AT END OF: " + testStr);
+	}
+
+	private void testAgainstAnywhereInString(String testStr, List<String> strings) {
 		try {
 			final boolean result = this.matchesWithinString(testStr);
 			strings.add("RESULT: " + (result ? "found" : "FAILED"));
@@ -1168,6 +1202,24 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 		} catch (Exception ex) {
 			strings.add("Skipping invalid regex: " + ex.getLocalizedMessage());
 		}
-		return strings;
+		strings.add("TESTING: " + getRegex());
+		strings.add("AT BEGINNING OF: " + testStr);
+	}
+
+	private void testAgainstEntireString(List<String> strings, String testStr) {
+		strings.add("TESTING: " + getRegex());
+		strings.add("AGAINST ALL OF: " + testStr);
+		try {
+			final boolean result = this.matchesEntireString(testStr);
+			strings.add("RESULT: " + (result ? "found" : "FAILED"));
+			if (result) {
+				final List<Match> allMatches = this.getAllMatches(testStr);
+				allMatches.stream().forEach(v -> strings.add("MATCHED: " + v.getEntireMatch()));
+			}
+		} catch (Exception ex) {
+			strings.add("Skipping invalid regex: " + ex.getLocalizedMessage());
+		}
+		strings.add("TESTING: " + getRegex());
+		strings.add("WITHIN: " + testStr);
 	}
 }
