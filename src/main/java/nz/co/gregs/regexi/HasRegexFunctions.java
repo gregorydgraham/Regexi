@@ -365,8 +365,8 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * capture the intent.</p>
 	 *
 	 * <p>
-	 * You may want to use
-	 * {@link #beginNamedCapture(java.lang.String) as it is more robust and reliable method for most uses of capture.</p>
+	 * You may want to use {@link #beginNamedCapture(java.lang.String)} as it is
+	 * more robust and reliable method for most uses of capture.</p>
 	 *
 	 * @param regexp the regex to add to this regex as a new capturing group
 	 * @return a new regexp
@@ -544,7 +544,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * adds the literal expression within a case insensitive section so that, for
 	 * instance, "one", "One", and "ONE" would be equivalent.
 	 *
-	 * @param literals
+	 * @param literals the literal character expected to found in the match
 	 * @return this regular expression
 	 */
 	default REGEX literalCaseInsensitive(String literals) {
@@ -555,7 +555,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * adds the literal expression within a case insensitive section so that, for
 	 * instance, "one", "One", and "ONE" would be equivalent.
 	 *
-	 * @param literal
+	 * @param literal the literal character expected to be found in the match
 	 * @return this regular expression
 	 */
 	default REGEX literalCaseInsensitive(Character literal) {
@@ -601,11 +601,12 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 *
 	 * <p>
 	 * Named captures can be used with named back references and can be retrieved
-	 * with {@link Regex#getAllNamedCapturesOfFirstMatchWithinString() } and
-	 * {@code regex.getAllMatches(target).get(index).getAllNamedCaptures()}
+	 * with {@link Regex#getAllNamedCapturesOfFirstMatchWithinString(java.lang.String)
+	 * } and {@code regex.getAllMatches(target).get(index).getAllNamedCaptures()}
 	 * </p>
 	 *
-	 * @param name
+	 * @param name the name for this capture so it can be used in back references
+	 * and processing of the parts of the match
 	 * @return a NamedCapture regexp
 	 */
 	@SuppressWarnings("unchecked")
@@ -1119,9 +1120,13 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	}
 
 	/**
-	 * Implements
+	 * Implements positive lookahead, only matches if the previous pattern is
+	 * followed by the lookahead pattern.
 	 *
-	 * @param ender
+	 * <p>
+	 * Note that the positive lookahead pattern is not included in the match.</p>
+	 *
+	 * @param ender the pattern that needs to follow the previous pattern.
 	 * @return a new regular expression based on the current regex extended with
 	 * the positive lookahead
 	 */
@@ -1136,8 +1141,9 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * Particularly useful when deconstructing a list as it excludes the separator
 	 * from the value.</p>
 	 *
-	 * @param ender
-	 * @return
+	 * @param ender  the pattern that needs to follow the previous pattern.
+	 * @return a new regular expression based on the current regex extended with
+	 * the positive lookahead
 	 */
 	public default REGEX followedBy(String ender) {
 		return this.positiveLookAhead(ender);
