@@ -358,75 +358,40 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 		return strings;
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public THIS bracket() {
-		current = getCurrent().bracket();
-		return (THIS) this;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public THIS squareBracket() {
-		current = getCurrent().squareBracket();
-		return (THIS) this;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public THIS pipe() {
-		current = getCurrent().pipe();
-		return (THIS) this;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public THIS asterisk() {
-		current = getCurrent().asterisk();
-		return (THIS) this;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public THIS star() {
-		current = getCurrent().star();
-		return (THIS) this;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public THIS plus() {
-		current = getCurrent().plus();
-		return (THIS) this;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public THIS questionMark() {
-		current = getCurrent().questionMark();
-		return (THIS) this;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public THIS dot() {
-		current = getCurrent().dot();
-		return (THIS) this;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public THIS dollarSign() {
-		current = getCurrent().dollarSign();
-		return (THIS) this;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public THIS carat() {
-		current = getCurrent().carat();
-		return (THIS) this;
-	}
+//	@Override
+//	@SuppressWarnings("unchecked")
+//	public THIS squareBracket() {
+//		current = getCurrent().squareBracket();
+//		return (THIS) this;
+//	}
+//
+//	@Override
+//	@SuppressWarnings("unchecked")
+//	public THIS pipe() {
+//		current = getCurrent().pipe();
+//		return (THIS) this;
+//	}
+//
+//	@Override
+//	@SuppressWarnings("unchecked")
+//	public THIS star() {
+//		current = getCurrent().star();
+//		return (THIS) this;
+//	}
+//
+//	@Override
+//	@SuppressWarnings("unchecked")
+//	public THIS plus() {
+//		current = getCurrent().plus();
+//		return (THIS) this;
+//	}
+//
+//	@Override
+//	@SuppressWarnings("unchecked")
+//	public THIS questionMark() {
+//		current = getCurrent().questionMark();
+//		return (THIS) this;
+//	}
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -573,9 +538,9 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 		return new RangeBuilder<THIS>((THIS) this, literals);
 	}
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public NamedCapture<REGEX> beginNamedCapture(String name) {
-		return new NamedCapture<>((REGEX) this, name);
-	}
+//	@Override
+//	@SuppressWarnings("unchecked")
+//	public NamedCapture<REGEX> beginNamedCapture(String name) {
+//		return new NamedCapture<>((REGEX) this, name);
+//	}
 }

@@ -93,7 +93,7 @@ public class RegexTest {
 
 		final Regex allowedSeconds
 				= allowedValue.add(
-						Regex.startingAnywhere().dot().digits()
+						Regex.startingAnywhere().literal(".").digits()
 				).onceOrNotAtAll();
 
 		final Regex separator
@@ -142,7 +142,7 @@ public class RegexTest {
 						.anyCharacterBetween('0', '9').atLeastOnce()
 						.literal(':').once()
 						.literal('-').onceOrNotAtAll()
-						.anyCharacterBetween('0', '9').atLeastOnce().add(Regex.startingAnywhere().dot().digits()
+						.anyCharacterBetween('0', '9').atLeastOnce().add(Regex.startingAnywhere().literal(".").digits()
 				).onceOrNotAtAll();
 
 		assertThat(pattern.matchesWithinString("-2 days 00:00:00"), is(true));
@@ -213,6 +213,8 @@ public class RegexTest {
 		Regex pattern
 				= Regex.startingAnywhere()
 						.number().once();
+		System.out.println(pattern.getRegex());
+		assertThat(pattern.getRegex(), is("(([-+]?\\b([1-9]+\\d*|0+(?!\\d)))(\\.{1}(\\d+))?){1}"));
 
 		assertThat(pattern.matchesWithinString("before -1 after"), is(true));
 		assertThat(pattern.matchesWithinString("before -1m"), is(true));
@@ -223,10 +225,20 @@ public class RegexTest {
 		assertThat(pattern.matchesWithinString("before 4.5 after"), is(true));
 		assertThat(pattern.matchesWithinString("before -4.5 after"), is(true));
 		assertThat(pattern.matchesWithinString("before -4.05 after"), is(true));
+
 		assertThat(pattern.matchesWithinString("before 2E10"), is(true));
+		assertThat(pattern.getAllMatches("before 2E10").size(), is(1));
+		assertThat(pattern.getAllMatches("before 2E10").get(0).getEntireMatch(), is("2"));
+
 		assertThat(pattern.matchesWithinString("before 2*E10"), is(true));
+		assertThat(pattern.getAllMatches("before 2*E10").size(), is(1));
+		assertThat(pattern.getAllMatches("before 2*E10").get(0).getEntireMatch(), is("2"));
+
 		assertThat(pattern.matchesWithinString("before 0 after"), is(true));
+
 		assertThat(pattern.matchesWithinString("before 0.0 after"), is(true));
+		assertThat(pattern.getAllMatches("before 0.0 after").size(), is(1));
+		assertThat(pattern.getAllMatches("before 0.0 after").get(0).getEntireMatch(), is("0.0"));
 
 		assertThat(pattern.matchesWithinString("before 02 after"), is(false));
 		assertThat(pattern.matchesWithinString("before -0234 after"), is(false));
@@ -280,7 +292,7 @@ public class RegexTest {
 		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
 		Regex pattern
 				= Regex.startingAnywhere()
-						.charactersWrappedBy('(',')').once();
+						.charactersWrappedBy('(', ')').once();
 		System.out.println(pattern.getRegex());
 
 		assertThat(pattern.matchesWithinString("(-1) after"), is(true));
@@ -312,32 +324,54 @@ public class RegexTest {
 		// 0 days 00:00:-5.5
 		//
 		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
-		Regex pattern
+		Regex regex
 				= Regex.startingAnywhere()
-						.charactersWrappedBy("<<",">>").once();
-		System.out.println(pattern.getRegex());
+						.charactersWrappedBy("<<", ">>").once();
+		final String pattern = regex.getRegex();
+		System.out.println(pattern);
+		assertThat(pattern, is("(<<(((?!>>).)*)>>){1}"));
 
-		assertThat(pattern.matchesWithinString("<<-1>> after"), is(true));
-		assertThat(pattern.matchesWithinString("before <<-1m>>"), is(true));
-		assertThat(pattern.matchesWithinString("before <<2>> after"), is(true));
-		assertThat(pattern.matchesWithinString("before <<-234>> after"), is(true));
-		assertThat(pattern.matchesWithinString("before <<mid>> after"), is(true));
-		assertThat(pattern.matchesWithinString("before <<mid>> <<mid again>> after"), is(true));
+		assertThat(regex.matchesWithinString("<<-1>> after"), is(true));
+		assertThat(regex.matchesWithinString("before <<-1m>>"), is(true));
+		assertThat(regex.matchesWithinString("before <<2>> after"), is(true));
+		assertThat(regex.matchesWithinString("before <<-234>> after"), is(true));
+		assertThat(regex.matchesWithinString("before <<mid>> after"), is(true));
+		assertThat(regex.matchesWithinString("before <<mid>> <<mid again>> after"), is(true));
 
-		assertThat(pattern.matchesEntireString("<<mid>>"), is(true));
+		assertThat(regex.matchesEntireString("<<mid>>"), is(true));
 
-		assertThat(pattern.matchesWithinString("<<02 after"), is(false));
-		assertThat(pattern.matchesWithinString("-0234>> after"), is(false));
-		assertThat(pattern.matchesWithinString("before <<004 after"), is(false));
-		assertThat(pattern.matchesWithinString("before _4>> after"), is(false));
-		assertThat(pattern.matchesWithinString("before \"A4\" after"), is(false));
-		assertThat(pattern.matchesWithinString("before A4after"), is(false));
+		assertThat(regex.matchesWithinString("<<02 after"), is(false));
+		assertThat(regex.matchesWithinString("-0234>> after"), is(false));
+		assertThat(regex.matchesWithinString("before <<004 after"), is(false));
+		assertThat(regex.matchesWithinString("before _4>> after"), is(false));
+		assertThat(regex.matchesWithinString("before \"A4\" after"), is(false));
+		assertThat(regex.matchesWithinString("before A4after"), is(false));
 
-		assertThat(pattern.matchesEntireString("<<mid>>  "), is(false));
-		assertThat(pattern.matchesEntireString("  <<mid>>"), is(false));
-		assertThat(pattern.matchesEntireString("  <<mid>>  "), is(false));
-		pattern.testAgainst("<<beginning>><<end>>").stream().forEachOrdered(s-> System.out.println(s));
-		assertThat(pattern.matchesEntireString("<<beginning>><<end>>"), is(false));
+		assertThat(regex.matchesEntireString("<<mid>>  "), is(false));
+		assertThat(regex.matchesEntireString("  <<mid>>"), is(false));
+		assertThat(regex.matchesEntireString("  <<mid>>  "), is(false));
+		regex.testAgainst("<<beginning>><<end>>").stream().forEachOrdered(s -> System.out.println(s));
+		assertThat(regex.matchesEntireString("<<beginning>><<end>>"), is(false));
+	}
+
+	@Test
+	public void testOrGroup() {
+		Regex regex = Regex.empty().beginOrGroup().literal("alice").or().literal("bob").or().literal("carol").or().literal("dan").endOrGroup();
+
+		final String expectedRegex = "(alice|bob|carol|dan)";
+		assertThat(regex.getRegex(), is(expectedRegex));
+	}
+
+	@Test
+	public void testLiteralEscapesRegularExpressionCharacters() {
+		final String literal = "[a-b]*$(alice|bob).^?";
+		Regex regex = Regex.empty().literal(literal).once();
+
+		assertThat(regex.getRegex(), is("\\[a-b]\\*\\$\\(alice|bob\\)\\.\\^\\?{1}"));
+
+		assertThat(regex.matchesWithinString(literal), is(true));
+		assertThat(regex.matchesWithinString("abcboba^?"), is(false));
+		assertThat(regex.matchesWithinString("a"), is(false));
 	}
 
 	@Test
@@ -350,6 +384,8 @@ public class RegexTest {
 		Regex pattern
 				= Regex.startingAnywhere()
 						.numberIncludingScientificNotation().once();
+		System.out.println(pattern.getRegex());
+//		assertThat(pattern.getRegex(),is("((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))(\\.{1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}(\\.{1}(\\d+))?)?){1}"));
 
 		assertThat(pattern.matchesWithinString("before -1 after"), is(true));
 		assertThat(pattern.matchesWithinString("before 2 after"), is(true));
@@ -361,10 +397,21 @@ public class RegexTest {
 		assertThat(pattern.matchesWithinString("before -4.05after"), is(true));
 		assertThat(pattern.matchesWithinString("before 2*E10"), is(true)); // bit of an odd one: the 2 matches
 		//2E10, -2.89E-7.98, or 1.37e+15
+		assertThat(pattern.getAllMatches("before 2*E10").size(), is(1));
+		assertThat(pattern.getAllMatches("before 2*E10").get(0).getEntireMatch(), is("2"));
 
 		assertThat(pattern.matchesWithinString("before 2E10 after"), is(true));
+		assertThat(pattern.getAllMatches("before 2E10 after").size(), is(1));
+		assertThat(pattern.getAllMatches("before 2E10 after").get(0).getEntireMatch(), is("2E10"));
+
 		assertThat(pattern.matchesWithinString("before -2.89E-7.98 after"), is(true));
+		assertThat(pattern.getAllMatches("before -2.89E-7.98 after").size(), is(1));
+		assertThat(pattern.getAllMatches("before -2.89E-7.98 after").get(0).getEntireMatch(), is("-2.89E-7.98"));
+
 		assertThat(pattern.matchesWithinString("before 1.37e+15 after"), is(true));
+		assertThat(pattern.getAllMatches("before 1.37e+15 after").size(), is(1));
+		assertThat(pattern.getAllMatches("before 1.37e+15 after").get(0).getEntireMatch(), is("1.37e+15"));
+
 		assertThat(pattern.matchesWithinString("before 2E10"), is(true));
 		assertThat(pattern.matchesWithinString("before -2.89E-7.98"), is(true));
 		assertThat(pattern.matchesWithinString("before 1.37e+15"), is(true));
@@ -393,8 +440,7 @@ public class RegexTest {
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
-		//
-		//  ^((?i)interval(?-i)){1} {1}([-+]?\b[1-9]+\d*(\.{1}\d+)?(((?i)E(?-i)){1}[-+]?[1-9]+\d*(\.{1}\d+)?)?(?!\S)){1} {1}(\w+)$
+
 		Regex pattern
 				= Regex.startingFromTheBeginning()
 						.literalCaseInsensitive("interval").once()
@@ -403,6 +449,10 @@ public class RegexTest {
 						.space().once()
 						.beginOrGroup().word().endOrGroup()
 						.endOfInput();
+		System.out.println(pattern.getRegex());
+		// ^((?i)interval(?-i)){1} {1}((([-+]?\b([1-9]+\d*|0+(?!\d)))(\.{1}(\d+))?){1}([Ee][-+]?([1-9]+\d*|0+(?!\d)){1}(\.{1}(\d+))?)?){1} {1}((\w+))$
+		// ^^((?i)interval(?-i)){1} {1}((([-+]?\b([1-9]+\d*|0+(?!\d)))(\.{1}(\d+))?){1}([Ee][-+]?([1-9]+\d*|0+(?!\d)){1}(\.{1}(\d+))?)?){1} {1}((\w+))$		
+		assertThat(pattern.getRegex(), is("^((?i)interval(?-i)){1} {1}((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))(\\.{1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}(\\.{1}(\\d+))?)?){1} {1}((\\w+))$"));
 
 		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND";
 		assertThat(pattern.matchesEntireString(intervalString), is(true));
@@ -414,9 +464,12 @@ public class RegexTest {
 			Assert.fail("Match not found");
 		} else {
 			List<MatchedGroup> allGroups = firstMatch.get().allGroups();
+			allGroups.stream().forEachOrdered(s -> System.out.println(s));
 			assertThat(allGroups.size(), is(13));
 
-			final Double value = Double.valueOf(allGroups.get(3).getContents());
+			final String contents = allGroups.get(2).getContents();
+			assertThat(contents, is("-1.999999999946489E-6"));
+			final Double value = Double.valueOf(contents);
 			assertThat(value, is(Double.valueOf("-1.999999999946489E-6")));
 			assertThat(Math.round(value * 1000000), is(-2L));
 		}
@@ -447,6 +500,15 @@ public class RegexTest {
 		final Double value = Double.valueOf(allGroups.get("value"));
 		assertThat(value, is(Double.valueOf("-1.999999999946489E-6")));
 		assertThat(Math.round(value * 1000000), is(-2L));
+
+		final HashMap<String, String> allNamedCaptures = intervalRegex.getAllMatches(intervalString).get(0).getAllNamedCaptures();
+		final String intervalStr = allNamedCaptures.get("interval");
+		assertThat(intervalStr, is("INTERVAL"));
+		final String valueStr = allNamedCaptures.get("value");
+		assertThat(valueStr, is("-1.999999999946489E-6"));
+		final String unitStr = allNamedCaptures.get("unit");
+		assertThat(unitStr, is("SECOND"));
+
 	}
 
 	@Test
@@ -679,6 +741,8 @@ public class RegexTest {
 						.literalCaseInsensitive("s").onceOrNotAtAll()
 						.wordBoundary()
 						.endOfTheString();
+		System.out.println(regex.getRegex());
+		assertThat(regex.getRegex(), is("\\b((?i)day(?-i)){1}((?i)s(?-i))?\\b$"));
 
 		assertThat(regex.matchesWithinString("day"), is(true));
 		assertThat(regex.matchesWithinString("days"), is(true));
@@ -839,11 +903,11 @@ public class RegexTest {
 				assertThat(match.getNamedCapture("seconds"), is(seconds));
 				assertThat(match.getNamedCapture("nanos"), is(nanos));
 			} else {
-				regex.testAgainst(testStr).stream().forEachOrdered(s -> System.out.print(s));
+				regex.testAgainst(testStr).stream().forEachOrdered(s -> System.out.println(s));
 				Assert.fail("Match Failed");
 			}
 		} else {
-			regex.testAgainst(testStr).stream().forEachOrdered(s -> System.out.print(s));
+			regex.testAgainst(testStr).stream().forEachOrdered(s -> System.out.println(s));
 			Assert.fail("Match Failed");
 		}
 	}

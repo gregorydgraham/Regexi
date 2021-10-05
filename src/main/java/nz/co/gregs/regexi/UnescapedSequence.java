@@ -26,7 +26,7 @@ public class UnescapedSequence extends Regex {
 
 	@Override
 	public String getRegex() {
-		return "" + literal;
+		return literal;
 	}
 
 	@Override

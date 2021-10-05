@@ -37,6 +37,18 @@ package nz.co.gregs.regexi;
  */
 public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 
+	java.util.List<String> testAgainst(String testStr);
+
+	/**
+	 * Converts the Regex into a string.
+	 *
+	 * <p>
+	 * For instance
+	 * {@code Regex.startingAnywhere().charactersWrappedBy("<<",">>").once()}
+	 * might produce {@code "(<<(((?!>>).)*)>>){1}" }
+	 *
+	 * @return the Regex converted to a string pattern
+	 */
 	public String getRegex();
 
 	/**
@@ -81,9 +93,9 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 		return extend(
 				Regex.startingAnywhere()
 						.beginGroup()
-						.extend(Regex.INTEGER_REGEX)
+						.integer()
 						.add(Regex.startingAnywhere()
-								.dot().once()
+								.literal(".").once()
 								.digits()
 						).onceOrNotAtAll()
 						.endGroup()
@@ -120,7 +132,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 						.anyCharacterIn("-+").onceOrNotAtAll()
 						.digit().atLeastOnce().notFollowedBy(Regex.startingAnywhere().digit())
 						.add(Regex.startingAnywhere()
-								.dot().once()
+								.literal(".").once()
 								.digit().oneOrMore().notFollowedBy(Regex.startingAnywhere().digit())
 						).onceOrNotAtAll()
 						.endGroup()
@@ -160,7 +172,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 						.or().literal('0').oneOrMore().notFollowedBy(Regex.startingAnywhere().digit())
 						.endOrGroup().once()
 						.beginGroup()
-						.dot().once()
+						.literal(".").once()
 						.digits()
 						.endGroup().onceOrNotAtAll()
 						.endGroup().onceOrNotAtAll()
@@ -198,109 +210,600 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 		);
 	}
 
-	REGEX add(HasRegexFunctions<?> second);
+	/**
+	 * Adds the regular expression to the end of current expression as a new
+	 * group.
+	 *
+	 * <p>
+	 * For example Regex.startingAnywhere().add(allowedValue).add(separator) will
+	 * add the "separator" regular expression to the "allowedValue" expression
+	 * (the rest of the instruction adds nothing). Assuming that allowedValue is
+	 * "[0-9]" and separator is ":", the full regexp will be "([0-9])(:)".
+	 *
+	 * @param newGroup the regular expression to add to this regular expression
+	 * @return a new regular expression consisting of the current expression and
+	 * the supplied expression added together
+	 */
+	REGEX add(HasRegexFunctions<?> newGroup);
 
-	REGEX addGroup(HasRegexFunctions<?> second);
+	/**
+	 * Places the regular expression in a group and add it as one element for the
+	 * next instruction.
+	 *
+	 * <p>
+	 * capturing and grouping are the same, there are methods of both names to
+	 * capture the intent.
+	 *
+	 * @param newGroup the expression to add as a group
+	 * @return a new regexp
+	 */
+	default REGEX addGroup(HasRegexFunctions<?> newGroup) {
+		return this.add(newGroup);
+	}
 
-	REGEX anyCharacterBetween(Character lowest, Character highest);
+	/**
+	 * Adds a check for a simple range to the regular expression without grouping.
+	 *
+	 * <p>
+	 * To add more complex ranges use .add(new Regex.Range(lowest, highest)).
+	 *
+	 * @param lowest the (inclusive) start of the character range
+	 * @param highest the (inclusive) end of the character range
+	 * @return a new regexp
+	 */
+	default REGEX anyCharacterBetween(Character lowest, Character highest) {
+		return extend(Regex.startingAnywhere().beginRange(lowest, highest).endRange());
+	}
 
-	REGEX anyCharacter();
+	/**
+	 * Adds a match for any single character to the regexp without grouping it.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX anyCharacter() {
+		return extend(new UnescapedSequence("."));
+	}
 
-	REGEX anyCharacterIn(String literals);
+	/**
+	 * Adds a check for a simple range to the regular expression without grouping.
+	 *
+	 * <p>
+	 * To add more complex ranges use .add(new Regex.Range(rangeItems)).
+	 *
+	 * @param literals all the characters to be included in the range, for example
+	 * "abcdeABCDE"
+	 * @return a new regexp
+	 */
+	default REGEX anyCharacterIn(String literals) {
+		return extend(Regex.startingAnywhere().beginRange(literals).endRange());
+	}
 
-	REGEX anyOf(String literal, String... literals);
+	/**
+	 * adds the literals as a series of options.
+	 *
+	 * <p>
+	 * For instance
+	 * {@code Regex.startingAnywhere().anyOf("Amy", "Bob", "Charlie")} should
+	 * produce "(Amy|Bob|Charlie)".</p>
+	 *
+	 * @param literal the first string
+	 * @param literals the subsequent strings
+	 * @return the regex extended with the strings as options for the next match.
+	 */
+	default REGEX anyOf(String literal, String... literals) {
+		OrGroup<REGEX> temp = beginOrGroup().literal(literal);
+		for (String literal1 : literals) {
+			temp = temp.or().literal(literal1);
+		}
+		return temp.endOrGroup();
+	}
 
-	REGEX asterisk();
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly once or not at all.
+	 *
+	 * <p>
+	 * literal('a').literal('b)'.atLeastOnce() will match "ab" or "abb", but not
+	 * "a"
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX atLeastOnce() {
+		return unescaped("+");
+	}
 
-	REGEX atLeastOnce();
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position X times or more.
+	 *
+	 * @param x the minimum number of times the previous match must occur
+	 * @return a new regexp
+	 */
+	default REGEX atLeastThisManyTimes(int x) {
+		return unescaped("{" + x + ",}");
+	}
 
-	REGEX atLeastThisManyTimes(int x);
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position X or more times but no more than Y times.
+	 *
+	 * <p>
+	 * literal('a').atLeastXAndNoMoreThanYTimes(2,3) will match "aa" and "aaa" but
+	 * not "aa" nor "aaaa".
+	 *
+	 * @param x the minimum number of times the previous match must occur
+	 * @param y the maximum number of times the previous match must occur
+	 * @return a new regexp
+	 */
+	default REGEX atLeastXAndNoMoreThanYTimes(int x, int y) {
+		return extend(new UnescapedSequence("{" + x + "," + y + "}"));
+	}
 
-	REGEX atLeastXAndNoMoreThanYTimes(int x, int y);
+	/**
+	 * Adds a literal backslash(\) to the regexp without grouping it.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX backslash() {
+		return unescaped("\\\\");
+	}
 
-	REGEX backslash();
+	/**
+	 * Adds a bell character(\a) to the regexp without grouping it.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX bell() {
+		return unescaped("\\a");
+	}
 
-	REGEX bell();
+	/**
+	 * Places the regular expression in a capturing group.
+	 *
+	 * <p>
+	 * capturing and grouping are the same, there are methods of both names to
+	 * capture the intent.</p>
+	 *
+	 * <p>
+	 * You may want to use
+	 * {@link #beginNamedCapture(java.lang.String) as it is more robust and reliable method for most uses of capture.</p>
+	 *
+	 * @param regexp the regex to add to this regex as a new capturing group
+	 * @return a new regexp
+	 */
+	default REGEX capture(Regex regexp) {
+		return this.beginGroup().extend(regexp).endGroup();
+	}
 
-	REGEX bracket();
+	/**
+	 * Adds a literal carriage return (\r).
+	 *
+	 * @return the regex extended with a carriage return.
+	 */
+	default REGEX carriageReturn() {
+		return extend(new UnescapedSequence("\\r"));
+	}
 
-	REGEX capture(Regex regexp);
+	/**
+	 * Extends the regular expression with group that ignores the whether letters
+	 * are upper or lower case
+	 *
+	 * @return an extended regular expression
+	 */
+	@SuppressWarnings("unchecked")
+	default CaseInsensitiveSection<REGEX> beginCaseInsensitiveSection() {
+		return new CaseInsensitiveSection<>((REGEX) this);
+	}
 
-	REGEX carat();
+	/**
+	 * Adds a control character(\cX) to the regexp without grouping it.
+	 *
+	 * @param x the control character
+	 * @return a new regexp
+	 */
+	default REGEX controlCharacter(String x) {
+		return extend(new UnescapedSequence("\\c" + x));
+	}
 
-	REGEX carriageReturn();
+	/**
+	 * Adds a check for a digit(0123456789) to the regular expression without
+	 * grouping.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX digit() {
+		return extend(new UnescapedSequence("\\d"));
+	}
 
-	CaseInsensitiveSection<REGEX> beginCaseInsensitiveSection();
+	/**
+	 * Adds a check for one or more digits to the regular expression as a grouped
+	 * element.
+	 *
+	 * <p>
+	 * Please note that digits is not the same as a valid integer or number, use {@link #positiveInteger() }, {@link #negativeInteger() }, {@link #integer()
+	 * }, or {@link #number()} instead.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX digits() {
+		return beginGroup().digit().oneOrMore().endGroup();
+	}
 
-	REGEX controlCharacter(String x);
-
-	REGEX digit();
-
-	REGEX digits();
-
-	REGEX dollarSign();
-
-	REGEX dot();
-
+	/**
+	 * Adds a check for the end of the string to the regular expression without
+	 * grouping.
+	 *
+	 * @return a new regexp
+	 */
 	default REGEX endOfInput() {
 		return endOfTheString();
 	}
 
-	REGEX endOfTheString();
+	/**
+	 * Adds a check for the end of the string to the regular expression without
+	 * grouping.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX endOfTheString() {
+		return extend(new UnescapedSequence("$"));
+	}
 
-	REGEX escapeCharacter();
+	/**
+	 * Adds a escape character(\e) to the regexp without grouping it.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX escapeCharacter() {
+		return extend(new UnescapedSequence("\\e"));
+	}
 
+	/**
+	 * Adds the regular expression to the end of current expression without
+	 * grouping it.
+	 *
+	 * <p>
+	 * Not grouping the added regular expression can produce counter-intuitive
+	 * results and breaks encapsulation so use it carefully. In Particular
+	 * extend(myRegex).onceOrNotAtAll() will only apply the "onceOrNotAtAll" to
+	 * last element of myRegex and not the entire expression. Using
+	 * digit.extend(Regex.startAnywhere().dot().digits()).onceOrNotAtAll() will
+	 * match "0." and "0.5" but not "0". If you want grouping use add() instead.
+	 *
+	 * <p>
+	 * For example Regex.startingAnywhere().extend(allowedValue).extend(separator)
+	 * will add the "separator" regular expression to the "allowedValue"
+	 * expression (the rest of the instruction adds nothing). Assuming that
+	 * allowedValue is "[0-9]" and separator is ":", the full regexp will be
+	 * "[0-9]:".
+	 *
+	 * @param second the regular expression to extend this regular expression with
+	 * @return a new regular expression consisting of the current expression and
+	 * the supplied expression added together
+	 */
 	REGEX extend(HasRegexFunctions<?> second);
 
-	REGEX formfeed();
+	/**
+	 * Adds a formfeed character(\f) to the regexp without grouping it.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX formfeed() {
+		return extend(new UnescapedSequence("\\f"));
+	}
 
-	REGEX gapBetweenWords();
+	/**
+	 * Adds a check for one or more non-word characters(\w) to the regular
+	 * expression without grouping.
+	 *
+	 * <p>
+	 * A word character is any letter A-Z, upper or lowercase, any digit, or the
+	 * underscore character. A non-word character is any other character.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX gapBetweenWords() {
+		return nonWordCharacter().oneOrMore();
+	}
 
+	/**
+	 * Places the regular expression in a group and adds it as one element for the
+	 * next instruction.
+	 *
+	 * <p>
+	 * capturing and grouping are the same, there are methods of both names to
+	 * capture the intent.
+	 *
+	 * @return this regexp
+	 */
 	REGEX groupEverythingBeforeThis();
 
-	REGEX literal(String literals);
+	/**
+	 * Adds a literal string to the regexp without grouping it.
+	 *
+	 *
+	 * @param literals the literal value to add to this regex
+	 * @return a new regexp
+	 */
+	default REGEX literal(String literals) {
+		return extend(new LiteralSequence(literals));
+	}
 
-	REGEX literal(Character character);
+	/**
+	 * Adds a literal string to the regexp without grouping it.
+	 *
+	 *
+	 * @param character the literal value to add to this regex
+	 * @return a new regexp
+	 */
+	default REGEX literal(Character character) {
+		return extend(new LiteralSequence("" + character));
+	}
 
-	REGEX literalCaseInsensitive(String literals);
+	/**
+	 * adds the literal expression within a case insensitive section so that, for
+	 * instance, "one", "One", and "ONE" would be equivalent.
+	 *
+	 * @param literals
+	 * @return this regular expression
+	 */
+	default REGEX literalCaseInsensitive(String literals) {
+		return this.extend(Regex.empty().beginCaseInsensitiveSection().literal(literals).endCaseInsensitiveSection());
+	}
 
+	/**
+	 * adds the literal expression within a case insensitive section so that, for
+	 * instance, "one", "One", and "ONE" would be equivalent.
+	 *
+	 * @param literal
+	 * @return this regular expression
+	 */
 	default REGEX literalCaseInsensitive(Character literal) {
 		return literalCaseInsensitive("" + literal);
 	}
 
-	REGEX negativeInteger();
+	/**
+	 * Adds a check for a negative integer to the regular expression without
+	 * grouping.
+	 *
+	 * <p>
+	 * Will capture the minus so watch out for that in your calculator
+	 * application.
+	 *
+	 * @return this regexp extended with a negative integer
+	 */
+	default REGEX negativeInteger() {
+		return extend(
+				literal('-')
+						.beginOrGroup()
+						.anyCharacterBetween('1', '9').once().digit().zeroOrMore()
+						.or()
+						.literal('0').notFollowedBy(Regex.startingAnywhere().digit())
+						.endOrGroup()
+		);
+	}
 
-	REGEX newline();
+	/**
+	 * Adds a newline character(\n) to the regexp without grouping it.
+	 *
+	 * @return this regexp extended with a newline
+	 */
+	default REGEX newline() {
+		return extend(new UnescapedSequence("\\n"));
+	}
 
-	NamedCapture<?> beginNamedCapture(String name);
+	/**
+	 * Starts a capturing group that is named.
+	 *
+	 * <p>
+	 * Use similarly to
+	 * {@code Regex.empty().beginNamedCapture("unit").word().endNamedCapture()}</p>
+	 *
+	 * <p>
+	 * Named captures can be used with named back references and can be retrieved
+	 * with {@link Regex#getAllNamedCapturesOfFirstMatchWithinString() } and
+	 * {@code regex.getAllMatches(target).get(index).getAllNamedCaptures()}
+	 * </p>
+	 *
+	 * @param name
+	 * @return a NamedCapture regexp
+	 */
+	@SuppressWarnings("unchecked")
+	public default NamedCapture<REGEX> beginNamedCapture(String name) {
+		return new NamedCapture<REGEX>((REGEX) this, name);
+	}
 
-	REGEX nonWhitespace();
+	/**
+	 * Adds a check for a non-whitespace character(\\S) to the regular expression
+	 * without grouping.
+	 *
+	 * <p>
+	 * A whitespace character is [ \t\n\x0B\f\r], that is a space, tab, newline,
+	 * char(11), form-feed, or carriage return. A non-whitespace character is
+	 * anything else.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX nonWhitespace() {
+		return extend(new UnescapedSequence("\\S"));
+	}
 
-	REGEX nonWordBoundary();
+	/**
+	 * Adds a check for a non-word boundary character(\\B) to the regular
+	 * expression without grouping.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX nonWordBoundary() {
+		return extend(new UnescapedSequence("\\B"));
+	}
 
-	REGEX nonWordCharacter();
+	/**
+	 * Adds a check for a non-word character(\W) to the regular expression without
+	 * grouping.
+	 *
+	 * <p>
+	 * A word character is any letter A-Z, upper or lowercase, any digit, or the
+	 * underscore character. A non-word character is any other character.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX nonWordCharacter() {
+		return extend(new UnescapedSequence("\\W"));
+	}
 
-	REGEX nondigit();
+	/**
+	 * Adds a check for anything other than a digit(0123456789) to the regular
+	 * expression without grouping.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX nondigit() {
+		return extend(new UnescapedSequence("\\D"));
+	}
 
-	REGEX nondigits();
+	/**
+	 * Adds a check for one or more of anything other than a digit(0123456789) to
+	 * the regular expression without grouping.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX nondigits() {
+		return nondigit().oneOrMore();
+	}
 
-	REGEX noneOfTheseCharacters(String literals);
+	/**
+	 * Adds a check to exclude a simple range from the regular expression without
+	 * grouping.
+	 *
+	 * <p>
+	 * To add more complex ranges use .add(new Regex.Range(rangeItems)).
+	 *
+	 * @param literals all the characters to be included in the range, for example
+	 * "abcdeABCDE"
+	 * @return a new regexp
+	 */
+	default REGEX noneOfTheseCharacters(String literals) {
+		return extend(Regex.startingAnywhere().beginRange(literals).negated().endRange());
+	}
 
-	REGEX notFollowedBy(String literalValue);
+	/**
+	 * Adds a check for a that the next element does not have the literal value
+	 * immediately after it.
+	 *
+	 * <p>
+	 * For instance to match words but not e-mail addresses you might use
+	 * Regex.startingAnywhere().word().notFollowedBy("@").
+	 *
+	 * @param literalValue the literal string that cannot come after this regex
+	 * @return a new regexp
+	 */
+	default REGEX notFollowedBy(String literalValue) {
+		return this.notFollowedBy(new LiteralSequence(literalValue));
+	}
 
-	REGEX notFollowedBy(Regex literalValue);
+	/**
+	 * Adds a check for a that the next element does not have the literal value
+	 * immediately after it.
+	 *
+	 * <p>
+	 * For instance to match words but not e-mail addresses you might use
+	 * Regex.startingAnywhere().word().notFollowedBy("@").
+	 *
+	 * @param literalValue the literal string that cannot come after this regex
+	 * @return a new regexp
+	 */
+	default REGEX notFollowedBy(Regex literalValue) {
+		return this.unescaped("(?!").extend(literalValue).unescaped(")");
+	}
 
-	REGEX notPrecededBy(String literalValue);
+	/**
+	 * Adds a check for a that the next element does not have the literal value
+	 * before it.
+	 *
+	 * <p>
+	 * For instance a positive integer is an integer that may have a plus in front
+	 * of it but definitely isn't preceded by a minus. So it uses a notPrecededBy:
+	 * startingAnywhere().notPrecededBy("-").plus().onceOrNotAtAll()...
+	 *
+	 * @param literalValue the literal string that cannot come before this regex
+	 * @return a new regexp
+	 */
+	default REGEX notPrecededBy(String literalValue) {
+		return this.notPrecededBy(new LiteralSequence(literalValue));
+	}
 
-	REGEX notPrecededBy(Regex literalValue);
+	/**
+	 * Adds a check for a that the next element does not have the literal value
+	 * before it.
+	 *
+	 * <p>
+	 * For instance a positive integer is an integer that may have a plus in front
+	 * of it but definitely isn't preceded by a minus. So it uses a notPrecededBy:
+	 * startingAnywhere().notPrecededBy("-").plus().onceOrNotAtAll()...
+	 *
+	 * @param literalValue the literal string that cannot come before this regex
+	 * @return a new regexp
+	 */
+	default REGEX notPrecededBy(Regex literalValue) {
+		return this
+				.unescaped("(?<!")
+				.extend(literalValue)
+				.unescaped(")");
+	}
 
-	REGEX noCharacterBetween(Character lowest, Character highest);
+	/**
+	 * Adds a check to exclude a simple range from the regular expression without
+	 * grouping.
+	 *
+	 * <p>
+	 * To add more complex ranges use .add(new Regex.Range(lowest, highest)).
+	 *
+	 * @param lowest the (inclusive) start of the character range
+	 * @param highest the (inclusive) end of the character range
+	 * @return a new regexp
+	 */
+	default REGEX noCharacterBetween(Character lowest, Character highest) {
+		return extend(Regex.startingAnywhere().beginRange(lowest, highest).negated().endRange());
+	}
 
-	REGEX once();
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly once.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX once() {
+		return extend(new UnescapedSequence("{1}"));
+	}
 
-	REGEX onceOrNotAtAll();
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly once or not at all.
+	 *
+	 * <p>
+	 * literal('a').literal('b)'.onceOrNotAtAll() will match "a" or "ab", but not
+	 * "abb"
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX onceOrNotAtAll() {
+		return extend(new UnescapedSequence("?"));
+	}
 
-	REGEX oneOrMore();
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly once or not at all.
+	 *
+	 * <p>
+	 * literal('a').literal('b)'.atLeastOnce() will match "ab" or "abb", but not
+	 * "a"
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX oneOrMore() {
+		return atLeastOnce();
+	}
 
 	/**
 	 * Starts making a character range, use {@link RangeBuilder#endRange() } to
@@ -315,7 +818,10 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @param highest the last character to be included in the range
 	 * @return the start of a range.
 	 */
-	RangeBuilder<REGEX> beginRange(char lowest, char highest);
+	@SuppressWarnings("unchecked")
+	default RangeBuilder<REGEX> beginRange(char lowest, char highest) {
+		return new RangeBuilder<>((REGEX) this, lowest, highest);
+	}
 
 	/**
 	 * Starts making a character range, use {@link RangeBuilder#endRange() } to
@@ -329,15 +835,61 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @param literals all of the characters you would like included in the range
 	 * @return the start of a range.
 	 */
-	RangeBuilder<REGEX> beginRange(String literals);
+	@SuppressWarnings("unchecked")
+	default RangeBuilder<REGEX> beginRange(String literals) {
+		return new RangeBuilder<>((REGEX) this, literals);
+	}
 
-	REGEX optionalMany();
+	/**
+	 * Alters the previous element in the regexp so that it matches if the element
+	 * appears in that position or not.
+	 *
+	 * <p>
+	 * literal('a').literal('b)'.zeroOrMore().literal('c') will match "ac" or
+	 * "abc".</p>
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX optionalMany() {
+		return zeroOrMore();
+	}
 
-	REGEX pipe();
+	/**
+	 * Alters the previous element in the regexp so that it matches if the element
+	 * appears in that position or not.
+	 *
+	 * <p>
+	 * literal('a').literal('b)'.zeroOrMore().literal('c') will match "ac" or
+	 * "abc".
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX zeroOrMore() {
+		return extend(new UnescapedSequence("*"));
+	}
 
-	REGEX plus();
-
-	REGEX positiveInteger();
+	/**
+	 * Adds a check for a positive integer to the regular expression without
+	 * grouping.
+	 *
+	 * <p>
+	 * Will capture the plus so watch out for that in your calculator application.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX positiveInteger() {
+		return extend(
+				Regex.startingAnywhere()
+						.notPrecededBy("-")
+						.literal("+").onceOrNotAtAll()
+						.beginOrGroup()
+						.anyCharacterBetween('1', '9').once()
+						.digit().zeroOrMore()
+						.or()
+						.literal('0').oneOrMore().notFollowedBy(Regex.startingAnywhere().digit())
+						.endOrGroup()
+		);
+	}
 
 	/**
 	 * Extends this regular expression with an OR grouping.
@@ -357,14 +909,16 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	}
 
 	/**
-	 * Start the creation of a new group that collects one or more regular expression elements into a single element.
+	 * Start the creation of a new group that collects one or more regular
+	 * expression elements into a single element.
 	 *
 	 * <p>
 	 * for instance, use this to generate "(\d*\.\d)?".
 	 *
 	 * <p>
 	 * {@code Regex regex =  Regex.startAnywhere().literal("Project ").startGroup().literal("A").literal("B").endGroup().once();
-	 * } produces "Project (AB){1}" and will find "Project AB" but not "Project A", "Project B", nor "Project ABAB".
+	 * } produces "Project (AB){1}" and will find "Project AB" but not "Project
+	 * A", "Project B", nor "Project ABAB".
 	 *
 	 * @return a new regular expression that is an incomplete group
 	 */
@@ -373,39 +927,130 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 		return new Group<>((REGEX) this);
 	}
 
-	REGEX questionMark();
+	/**
+	 * Adds a check for a space character( ) to the regular expression without
+	 * grouping.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX space() {
+		return literal(" ");
+	}
 
-	REGEX space();
+	/**
+	 * Adds a tab character(\t) to the regexp without grouping it.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX tab() {
+		return unescaped("\\t");
+	}
 
-	REGEX squareBracket();
+	/**
+	 * Adds the beginning of input character (\A)
+	 *
+	 * @return this regular expression extends with the beginning of input
+	 * character
+	 */
+	default REGEX theBeginningOfTheInput() {
+		return unescaped("\\A");
+	}
 
-	REGEX star();
+	/**
+	 * Adds the end of input character (\z)
+	 *
+	 * @return this regular expression extends with the end of input character
+	 */
+	default REGEX theEndOfTheInput() {
+		return extend(new UnescapedSequence("\\z"));
+	}
 
-	REGEX tab();
-	
-	java.util.List<String> testAgainst(String testStr) ;
+	/**
+	 * Adds the end of input character (\Z)
+	 *
+	 * @return this regular expression extends with the end of input character
+	 */
+	default REGEX theEndOfTheInputButForTheFinalTerminator() {
+		return extend(new UnescapedSequence("\\Z"));
+	}
 
-	REGEX theBeginningOfTheInput();
+	/**
+	 * Adds the end of the previous match character (\G)
+	 *
+	 * @return this regular expression extends with the end of the previous match
+	 * character
+	 */
+	default REGEX theEndOfThePreviousMatch() {
+		return extend(new UnescapedSequence("\\G"));
+	}
 
-	REGEX theEndOfTheInput();
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly X number of times.
+	 *
+	 * @param x the number of times the previous match must occur
+	 * @return a new regexp
+	 */
+	default REGEX thisManyTimes(int x) {
+		return extend(new UnescapedSequence("{" + x + "}"));
+	}
 
-	REGEX theEndOfTheInputButForTheFinalTerminator();
+	/**
+	 * Adds an un-escaped sequence to the regexp without grouping it.
+	 *
+	 *
+	 * @param literals the literal value to add to this regex
+	 * @return a new regexp
+	 */
+	default REGEX unescaped(String literals) {
+		return extend(new UnescapedSequence(literals));
+	}
 
-	REGEX theEndOfThePreviousMatch();
+	/**
+	 * Adds a check for a whitespace character(\w) to the regular expression
+	 * without grouping.
+	 *
+	 * <p>
+	 * A whitespace character is [ \t\n\x0B\f\r], that is a space, tab, newline,
+	 * char(11), formfeed, or carriage return.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX whitespace() {
+		return this.unescaped("\\s");
+	}
 
-	REGEX thisManyTimes(int x);
+	/**
+	 * Adds a check for one or more word characters(\w+) to the regular expression
+	 * without grouping.
+	 *
+	 * <p>
+	 * A word character is any letter A-Z, upper or lowercase, any digit, or the
+	 * underscore character.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX word() {
+		return this.beginGroup().wordCharacter().oneOrMore().endGroup();
+	}
 
-	REGEX unescaped(String unescapedSequence);
+	default REGEX wordBoundary() {
+		return unescaped("\\b");
+	}
 
-	REGEX whitespace();
-
-	REGEX word();
-
-	REGEX wordBoundary();
-
-	REGEX wordCharacter();
-
-	REGEX zeroOrMore();
+	/**
+	 * Adds a check for a word character(\w) to the regular expression without
+	 * grouping.
+	 *
+	 * <p>
+	 * A word character is any letter A-Z, upper or lowercase, any digit, or the
+	 * underscore character.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX wordCharacter() {
+		return unescaped("\\w");
+	}
 
 	/**
 	 * Alters the previous element in the regexp so that it only matches if the
@@ -420,6 +1065,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	public default REGEX zeroOrOnce() {
 		return onceOrNotAtAll();
 	}
+
 	public default REGEX namedBackReference(String name) {
 		return extend(new NamedBackReference(name));
 	}
@@ -434,12 +1080,69 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 
 	public default REGEX charactersWrappedBy(Character starter, Character ender) {
 		return this.add(Regex.startingAnywhere().literal(starter).noneOfThisCharacter(ender).optionalMany().literal(ender));
-	}	
+	}
 
 	public default REGEX charactersWrappedBy(String starter, String ender) {
-		return this.add(Regex.startingAnywhere().literal(starter).unescaped("(((?!").literal(ender).unescaped(").)*)").literal(ender));
-	}	
-	
+		return charactersWrappedBy(new LiteralSequence(starter), new LiteralSequence(ender));
+	}
+
+	public default REGEX charactersWrappedBy(HasRegexFunctions starter, HasRegexFunctions ender) {
+		return this.add(Regex.startingAnywhere().extend(starter).anythingButThis(ender).extend(ender));
+	}
+
+	public default REGEX negativeLookAhead(String ender) {
+		return this.negativeLookAhead(new LiteralSequence(ender));
+	}
+
+	public default REGEX negativeLookAhead(HasRegexFunctions<?> ender) {
+		return this.extend(Regex.empty().beginGroup().unescaped("?!").extend(ender).endGroup());
+	}
+
+	public default REGEX anythingButThis(String ender) {
+		return this.add(
+				Regex.empty().add(
+						Regex.empty().negativeLookAhead(ender).anyCharacter()
+				).optionalMany()
+		);
+	}
+
+	public default REGEX anythingButThis(HasRegexFunctions ender) {
+		return this.add(
+				Regex.empty().add(
+						Regex.empty().negativeLookAhead(ender).anyCharacter()
+				).optionalMany()
+		);
+	}
+
+	public default REGEX positiveLookAhead(String ender) {
+		return this.positiveLookAhead(new LiteralSequence(ender));
+	}
+
+	/**
+	 * Implements
+	 *
+	 * @param ender
+	 * @return a new regular expression based on the current regex extended with
+	 * the positive lookahead
+	 */
+	public default REGEX positiveLookAhead(HasRegexFunctions<?> ender) {
+		return this.extend(Regex.startingAnywhere().unescaped("(?=").extend(ender).unescaped(")"));
+	}
+
+	/**
+	 * Uses positive lookahead to match the ender without capturing it.
+	 *
+	 * <p>
+	 * Particularly useful when deconstructing a list as it excludes the separator
+	 * from the value.</p>
+	 *
+	 * @param ender
+	 * @return
+	 */
+	public default REGEX followedBy(String ender) {
+		return this.positiveLookAhead(ender);
+	}
+
 	/**
 	 * Adds a check to exclude a character from the regular expression without
 	 * grouping.
@@ -451,9 +1154,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @return a new regexp
 	 */
 	public default REGEX noneOfThisCharacter(Character literal) {
-		return extend(Regex.startingAnywhere().beginRange(""+literal).negated().endRange());
+		return extend(Regex.startingAnywhere().beginRange("" + literal).negated().endRange());
 	}
-
-
 
 }
