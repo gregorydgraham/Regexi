@@ -523,10 +523,7 @@ public class RegexTest {
 						.beginOrGroup().word().endOrGroup()
 						.endOfInput().toRegex();
 		System.out.println(pattern.getRegex());
-		// ^((?i)interval(?-i)){1} {1}((([-+]?\b([1-9]+\d*|0+(?!\d)))(\.{1}(\d+))?){1}([Ee][-+]?([1-9]+\d*|0+(?!\d)){1}(\.{1}(\d+))?)?){1} {1}((\w+))$
-//		assertThat(pattern.getRegex(), is("^((?i)interval(?-i)){1} {1}((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))(\\.{1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}(\\.{1}(\\d+))?)?){1} {1}((\\w+))$"));
-		// ^((?i)(interval)(?-i)){1}( ){1}((([-+]?\b([1-9]+\d*|0+(?!\d)))((\.){1}(\d+))?){1}([Ee][-+]?([1-9]+\d*|0+(?!\d)){1}((\.){1}(\d+))?)?){1}( ){1}((\w+))$
-		assertThat(pattern.getRegex(), is("^((?i)(interval)(?-i)){1}( ){1}((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))((\\.){1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}((\\.){1}(\\d+))?)?){1}( ){1}((\\w+))$"));
+		assertThat(pattern.getRegex(), is("^((?i)(interval)(?-i)){1} {1}((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))((\\.){1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}((\\.){1}(\\d+))?)?){1} {1}((\\w+))$"));
 
 		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND";
 		assertThat(pattern.matchesEntireString(intervalString), is(true));
@@ -539,9 +536,9 @@ public class RegexTest {
 		} else {
 			List<MatchedGroup> allGroups = firstMatch.get().allGroups();
 			allGroups.stream().forEachOrdered(s -> System.out.println(s));
-			assertThat(allGroups.size(), is(18));
+			assertThat(allGroups.size(), is(16));
 
-			final String contents = allGroups.get(4).getContents();
+			final String contents = allGroups.get(3).getContents();
 			assertThat(contents, is("-1.999999999946489E-6"));
 			final Double value = Double.valueOf(contents);
 			assertThat(value, is(Double.valueOf("-1.999999999946489E-6")));
@@ -663,11 +660,57 @@ public class RegexTest {
 		final Double secondValue = Double.valueOf(allNamedCaptures.get(VALUE_NAME));
 		assertThat(secondValue, is(Double.valueOf("-1.999999999946489E-6")));
 		assertThat(Math.round(secondValue * 1000000), is(-2L));
+
+	}
+
+	@Test
+	public void testGroupsRemainConsistent() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testGroupsRemainConsistent()");
+		String string = "INTERVAL -1.999999999946489E-6 SECOND -1.999999999946489E-6";
+		List<MatchedGroup> groups
+				= Regex.startingFromTheBeginning()
+						.beginNamedCapture("interval").literalCaseInsensitive("interval").once().endNamedCapture()
+						.space().once()
+						.beginNamedCapture("value").numberIncludingScientificNotation().once().endNamedCapture()
+						.space().once()
+						.beginNamedCapture("unit").word().endNamedCapture()
+						.space().once().toRegex().getFirstMatchFrom(string).get().allGroups();
+		groups.stream().forEachOrdered(g -> System.out.println(g));
+
+		assertThat(groups.get(0).toString(), is("MatchedGroup{ index=0, string=INTERVAL -1.999999999946489E-6 SECOND }"));
+		assertThat(groups.get(1).toString(), is("MatchedGroup{ index=1, string=INTERVAL}"));
+		assertThat(groups.get(2).toString(), is("MatchedGroup{ index=2, string=INTERVAL}"));
+		assertThat(groups.get(3).toString(), is("MatchedGroup{ index=3, string=INTERVAL}"));
+		assertThat(groups.get(4).toString(), is("MatchedGroup{ index=4, string=-1.999999999946489E-6}"));
+		assertThat(groups.get(5).toString(), is("MatchedGroup{ index=5, string=-1.999999999946489E-6}"));
+		assertThat(groups.get(6).toString(), is("MatchedGroup{ index=6, string=-1.999999999946489}"));
+		assertThat(groups.get(7).toString(), is("MatchedGroup{ index=7, string=-1}"));
+		assertThat(groups.get(8).toString(), is("MatchedGroup{ index=8, string=1}"));
+		assertThat(groups.get(9).toString(), is("MatchedGroup{ index=9, string=.999999999946489}"));
+		assertThat(groups.get(10).toString(), is("MatchedGroup{ index=10, string=.}"));
+		assertThat(groups.get(11).toString(), is("MatchedGroup{ index=11, string=999999999946489}"));
+		assertThat(groups.get(12).toString(), is("MatchedGroup{ index=12, string=E-6}"));
+		assertThat(groups.get(13).toString(), is("MatchedGroup{ index=13, string=6}"));
+		assertThat(groups.get(14).toString(), is("MatchedGroup{ index=14, string=null}"));
+		assertThat(groups.get(15).toString(), is("MatchedGroup{ index=15, string=null}"));
+		assertThat(groups.get(16).toString(), is("MatchedGroup{ index=16, string=null}"));
+		assertThat(groups.get(17).toString(), is("MatchedGroup{ index=17, string=SECOND}"));
 	}
 
 	@Test
 	public void testNumberedBackReferencesWithManyGroups() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testNumberedBackReferencesWithManyGroups()");
+		String string = "INTERVAL -1.999999999946489E-6 SECOND -1.999999999946489E-6";
+		List<MatchedGroup> groups
+				= Regex.startingFromTheBeginning()
+						.beginNamedCapture("interval").literalCaseInsensitive("interval").once().endNamedCapture()
+						.space().once()
+						.beginNamedCapture("value").numberIncludingScientificNotation().once().endNamedCapture()
+						.space().once()
+						.beginNamedCapture("unit").word().endNamedCapture()
+						.space().once().toRegex().getFirstMatchFrom(string).get().allGroups();
+		groups.stream().forEachOrdered(g -> System.out.println(g));
+
 		Regex regex
 				= Regex.startingFromTheBeginning()
 						.beginNamedCapture("interval").literalCaseInsensitive("interval").once().endNamedCapture()
@@ -676,14 +719,13 @@ public class RegexTest {
 						.space().once()
 						.beginNamedCapture("unit").word().endNamedCapture()
 						.space().once()
-						.beginNamedCapture("secondValue").numberedBackReference(6).endNamedCapture().optionalMany()
+						.beginNamedCapture("secondValue").numberedBackReference(4).endNamedCapture().optionalMany()
 						.endOfInput().toRegex();
 
 		System.out.println(regex.getRegex());
-		assertThat(regex.getRegex(), is("^(?<interval>((?i)(interval)(?-i)){1})( ){1}(?<value>((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))((\\.){1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}((\\.){1}(\\d+))?)?){1})( ){1}(?<unit>(\\w+))( ){1}(?<secondValue>\\6)*$"));
+		assertThat(regex.getRegex(), is("^(?<interval>((?i)(interval)(?-i)){1}) {1}(?<value>((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))((\\.){1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}((\\.){1}(\\d+))?)?){1}) {1}(?<unit>(\\w+)) {1}(?<secondValue>\\4)*$"));
 
-		String string = "INTERVAL -1.999999999946489E-6 SECOND -1.999999999946489E-6";
-		regex.testAgainst(string).stream().forEachOrdered(s->System.out.println(s));
+		regex.testAgainst(string).stream().forEachOrdered(s -> System.out.println(s));
 		assertThat(regex.matchesEntireString(string), is(true));
 
 		final HashMap<String, String> allGroups = regex.getAllNamedCapturesOfFirstMatchWithinString(string);

@@ -119,11 +119,11 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 	 * the string.
 	 *
 	 * The method works by combining {@link Regex#startingFromTheBeginning()
-	 * } with this toRegex and calling {@link #matchesWithinString(java.lang.String)
+	 * } with this regex and calling {@link #matchesWithinString(java.lang.String)
 	 * }.
 	 *
-	 * @param string the string to test with this toRegex
-	 * @return true if the beginning of the string matches this toRegex.
+	 * @param string the string to test with this regex
+	 * @return true if the beginning of the string matches this regex.
 	 */
 	protected boolean matchesBeginningOf(String string) {
 		return Regex.startingFromTheBeginning().add(this).matchesWithinString(string);
@@ -136,8 +136,8 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 	 * The method works by combining this regex with {@link #endOfTheString() }
 	 * and calling {@link #matchesWithinString(java.lang.String) }.
 	 *
-	 * @param string the string to test with this toRegex
-	 * @return true if the end of the string matches this toRegex.
+	 * @param string the string to test with this regex
+	 * @return true if the end of the string matches this regex.
 	 */
 	protected boolean matchesEndOf(String string) {
 		return endOfTheString().matchesWithinString(string);

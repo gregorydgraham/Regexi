@@ -17,7 +17,7 @@ import java.util.regex.MatchResult;
 public class Match {
 
 	static Match from(PartialRegex aThis, MatchResult m) {
-		return new Match(aThis, /*matcher,*/ m);
+		return new Match(aThis, m);
 	}
 
 	private final String match;
@@ -56,6 +56,11 @@ public class Match {
 
 	public String getNamedCapture(String name) {
 		return getAllNamedCaptures().get(name);
+	}
+
+	@Override
+	public String toString() {
+		return "MATCH :"+getEntireMatch();
 	}
 
 }

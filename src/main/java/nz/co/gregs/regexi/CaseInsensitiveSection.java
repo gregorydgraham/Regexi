@@ -5,13 +5,10 @@
  */
 package nz.co.gregs.regexi;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  *
  * @author gregorygraham
- * @param <REGEX> the toRegex to return after closing this class, the type
+ * @param <REGEX> the regex to return after closing this class, the type
  returned by {@link #endCaseInsensitiveSection() }
  */
 public class CaseInsensitiveSection<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<CaseInsensitiveSection<REGEX>, REGEX> {

@@ -9,9 +9,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -26,7 +28,7 @@ public class Regex {
 	 * @return a new empty regular expression
 	 */
 	public static PartialRegex startingAnywhere() {
-		return new UnescapedSequence("");
+		return new UntestableSequence("");
 	}
 
 	/**
@@ -35,7 +37,7 @@ public class Regex {
 	 * @return a new empty regular expression
 	 */
 	public static PartialRegex empty() {
-		return new UnescapedSequence("");
+		return new UntestableSequence("");
 	}
 
 	/**
@@ -56,8 +58,8 @@ public class Regex {
 	 * for instance, use this to generate "(FRED|EMILY|GRETA|DONALD)".
 	 *
 	 * <p>
-	 * {@code Regex toRegex =  Regex.startOrGroup().literal("A").or().literal("B").endOrGroup().toRegex();
- } produces "(A|B)".
+	 * {@code Regex regex =  Regex.startOrGroup().literal("A").or().literal("B").endOrGroup().toRegex();
+	 * } produces "(A|B)".
 	 *
 	 * @return a new regular expression
 	 */
@@ -119,24 +121,29 @@ public class Regex {
 		List<PartialRegex> partials = new ArrayList<>();
 		partials.add(partial);
 		partials.addAll(this.partial.getRegexParts());
-		List<String> strings =  new ArrayList<>();
-		strings.addAll(testAgainstEntireString(testStr, partials));
+		List<String> strings = new ArrayList<>();
 		strings.addAll(testAgainstAnywhereInString(testStr, partials));
-		strings.addAll(testAgainstBeginningOfString(testStr, partials));
-		strings.addAll(testAgainstEndOfString(testStr, partials));
+//		strings.addAll(testAgainstAnywhereInString(testStr, partials));
+//		strings.addAll(testAgainstBeginningOfString(testStr, partials));
+//		strings.addAll(testAgainstEndOfString(testStr, partials));
 		return strings;
 	}
 
-	private List<String> testAgainstEndOfString(String testStr, List<PartialRegex> patterns) {
+	private List<String> testAgainstGeneric(String testStr, List<PartialRegex> patterns, String descriptionStart, BiFunction<Regex, String, Boolean> matcher) {
 		List<String> strings = new ArrayList<String>(0);
 		strings.add("TESTING: " + getRegex());
-		strings.add("AT END OF: " + testStr);
+		strings.add(descriptionStart + ": " + testStr);
 		for (PartialRegex pattern : patterns) {
 			try {
-				strings.add("TESTING: "+pattern.getRegex());
+				strings.add("TESTING: " + pattern.getRegex());
 				final Regex regex = pattern.toRegex();
-				final boolean result = regex.matchesEndOf(testStr);
+				final boolean result = matcher.apply(regex, testStr);
 				strings.add("RESULT: " + (result ? "found" : "FAILED"));
+				if (result) {
+					strings.addAll(regex.getAllMatches(testStr).stream().map(Match::toString).collect(Collectors.toList()));
+					regex.getAllMatches(testStr).stream().forEachOrdered(m -> m.allGroups().stream().forEachOrdered(g -> strings.add(g.toString())));
+				}
+
 			} catch (Exception ex) {
 				strings.add("Skipping invalid regex: " + ex.getLocalizedMessage());
 			}
@@ -144,55 +151,20 @@ public class Regex {
 		return strings;
 	}
 
-	private List<String> testAgainstBeginningOfString(String testStr, List<PartialRegex> patterns) {
-		List<String> strings = new ArrayList<String>(0);
-		strings.add("TESTING: " + getRegex());
-		strings.add("FROM START OF: " + testStr);
-		for (PartialRegex pattern : patterns) {
-			try {
-				strings.add("TESTING: "+pattern.getRegex());
-				final Regex regex = pattern.toRegex();
-				final boolean result = regex.matchesBeginningOf(testStr);
-				strings.add("RESULT: " + (result ? "found" : "FAILED"));
-			} catch (Exception ex) {
-				strings.add("Skipping invalid regex: " + ex.getLocalizedMessage());
-			}
-		}
-		return strings;
+	public List<String> testAgainstEndOfString(String testStr, List<PartialRegex> patterns) {
+		return testAgainstGeneric(testStr, patterns, "AT END OF", (r, s) -> r.matchesEndOf(s));
 	}
 
-	private List<String> testAgainstAnywhereInString(String testStr, List<PartialRegex> patterns) {
-		List<String> strings = new ArrayList<String>(0);
-		strings.add("TESTING: " + getRegex());
-		strings.add("ANYWHERE IN: " + testStr);
-		for (PartialRegex pattern : patterns) {
-			try {
-				strings.add("TESTING: "+pattern.getRegex());
-				final Regex regex = pattern.toRegex();
-				final boolean result = regex.matchesWithinString(testStr);
-				strings.add("RESULT: " + (result ? "found" : "FAILED"));
-			} catch (Exception ex) {
-				strings.add("Skipping invalid regex: " + ex.getLocalizedMessage());
-			}
-		}
-		return strings;
+	public List<String> testAgainstBeginningOfString(String testStr, List<PartialRegex> patterns) {
+		return testAgainstGeneric(testStr, patterns, "FROM START OF", (r, s) -> r.matchesBeginningOf(s));
 	}
 
-	private List<String> testAgainstEntireString(String testStr, List<PartialRegex> patterns) {
-		List<String> strings = new ArrayList<String>(0);
-		strings.add("TESTING: " + getRegex());
-		strings.add("AGAINST ALL OF: " + testStr);
-		for (PartialRegex pattern : patterns) {
-			try {
-				strings.add("TESTING: "+pattern.getRegex());
-				final Regex regex = pattern.toRegex();
-				final boolean result = regex.matchesEntireString(testStr);
-				strings.add("RESULT: " + (result ? "found" : "FAILED"));
-			} catch (Exception ex) {
-				strings.add("Skipping invalid regex: " + ex.getLocalizedMessage());
-			}
-		}
-		return strings;
+	public List<String> testAgainstAnywhereInString(String testStr, List<PartialRegex> patterns) {
+		return testAgainstGeneric(testStr, patterns, "WITHIN", (r, s) -> r.matchesWithinString(s));
+	}
+
+	public List<String> testAgainstEntireString(String testStr, List<PartialRegex> patterns) {
+		return testAgainstGeneric(testStr, patterns, "MATCHES ENTIRE STRING", (r, s) -> r.matchesEntireString(s));
 	}
 
 }

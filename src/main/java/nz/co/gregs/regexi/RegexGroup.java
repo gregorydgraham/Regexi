@@ -37,7 +37,7 @@ import java.util.List;
  * @author gregorygraham
  * @param <THIS> the class of this PartialRegex, returned by most methods to
  * maintain type safety
- * @param <REGEX> the toRegex to return to after ending this group
+ * @param <REGEX> the regex to return to after ending this group
  */
 public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX extends HasRegexFunctions<REGEX>> implements HasRegexFunctions<THIS> {
 

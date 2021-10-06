@@ -21,7 +21,7 @@ public class RegexBuilder {
 	 */
 	@Deprecated
 	public static PartialRegex startingAnywhere() {
-		return new UnescapedSequence("");
+		return new UntestableSequence("");
 	}
 
 	/**
