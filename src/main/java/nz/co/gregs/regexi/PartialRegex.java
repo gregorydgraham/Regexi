@@ -118,7 +118,7 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 	 * Tests whether the supplied string matches this regex at the beginning of
 	 * the string.
 	 *
-	 * The method works by combining {@link PartialRegex#startingFromTheBeginning() ()
+	 * The method works by combining {@link Regex#startingFromTheBeginning()
 	 * } with this toRegex and calling {@link #matchesWithinString(java.lang.String)
 	 * }.
 	 *
