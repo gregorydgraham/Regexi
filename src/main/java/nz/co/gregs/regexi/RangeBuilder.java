@@ -88,7 +88,7 @@ public class RangeBuilder<REGEX extends HasRegexFunctions<REGEX>> {
 	}
 
 	public REGEX endRange() {
-		return origin.extend(new UnescapedSequence(encloseInBrackets()));
+		return origin.add(new UnescapedSequence(encloseInBrackets()));
 	}
 	
 }

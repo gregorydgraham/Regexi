@@ -5,18 +5,19 @@
  */
 package nz.co.gregs.regexi;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  *
  * @author gregorygraham
  */
-class RegexCombination extends Regex {
+class RegexCombination extends PartialRegex {
 
-	private final HasRegexFunctions<?> first;
-	private final HasRegexFunctions<?> second;
+	private final PartialRegex first;
+	private final PartialRegex second;
 
-	protected RegexCombination(HasRegexFunctions<?> first, HasRegexFunctions<?> second) {
+	protected RegexCombination(PartialRegex first, PartialRegex second) {
 		this.first = first;
 		this.second = second;
 	}
@@ -27,10 +28,11 @@ class RegexCombination extends Regex {
 	}
 
 	@Override
-	public List<String> testAgainst(String testStr) {
-		List<String> strings = first.testAgainst(testStr);
-		strings.addAll(second.testAgainst(testStr));
-		strings.addAll(super.testAgainst(testStr));
-		return strings;
+	public List<PartialRegex> getRegexParts() {
+		List<PartialRegex> result = new ArrayList<PartialRegex>(1);
+		result.addAll(first.getRegexParts());
+		result.addAll(second.getRegexParts());
+		return result;
 	}
+
 }

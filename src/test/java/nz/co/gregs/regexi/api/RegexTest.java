@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import org.junit.Assert;
 import nz.co.gregs.regexi.Match;
 import nz.co.gregs.regexi.MatchedGroup;
+import nz.co.gregs.regexi.PartialRegex;
 import nz.co.gregs.regexi.Regex;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -52,7 +53,8 @@ public class RegexTest {
 
 	@Test
 	public void testFindingANegativeNumber() {
-		Regex negativeInteger = Regex.startingAnywhere().negativeInteger();
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testFindingANegativeNumber()");
+		Regex negativeInteger = Regex.startingAnywhere().negativeInteger().toRegex();
 		Assert.assertTrue(negativeInteger.matchesEntireString("-1"));
 		Assert.assertTrue(negativeInteger.matchesWithinString("-1"));
 		Assert.assertFalse(negativeInteger.matchesEntireString("1"));
@@ -63,7 +65,8 @@ public class RegexTest {
 
 	@Test
 	public void testFindingAPositiveNumber() {
-		Regex positiveInteger = Regex.startingAnywhere().positiveInteger();
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testFindingAPositiveNumber()");
+		Regex positiveInteger = Regex.startingAnywhere().positiveInteger().toRegex();
 		assertThat(positiveInteger.matchesEntireString("-1"), is(false));
 		assertThat(positiveInteger.matchesWithinString("-1"), is(false));
 		assertThat(positiveInteger.matchesEntireString("1"), is(true));
@@ -80,31 +83,33 @@ public class RegexTest {
 
 	@Test
 	public void testFindingPostgresIntervalValues() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testFindingPostgresIntervalValues()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
 		//
 		//(-?[0-9]+)([^-0-9]+)(-?[0-9]+):(-?[0-9]+):(-?[0-9]+)(\.\d+)?
 
-		final Regex allowedValue
+		final PartialRegex allowedValue
 				= Regex.startingAnywhere()
 						.literal('-').onceOrNotAtAll()
 						.anyCharacterBetween('0', '9').atLeastOnce();
 
-		final Regex allowedSeconds
-				= allowedValue.add(
+		final PartialRegex allowedSeconds
+				= allowedValue.addGroup(
 						Regex.startingAnywhere().literal(".").digits()
 				).onceOrNotAtAll();
 
-		final Regex separator
+		final PartialRegex separator
 				= Regex.startingAnywhere().beginRange('0', '9').includeMinus().negated().endRange().atLeastOnce();
 
 		Regex pattern
 				= Regex.startingAnywhere()
-						.add(allowedValue).add(separator)
-						.add(allowedValue).literal(':')
-						.add(allowedValue).literal(':')
-						.add(allowedSeconds);
+						.addGroup(allowedValue).addGroup(separator)
+						.addGroup(allowedValue).literal(':')
+						.addGroup(allowedValue).literal(':')
+						.addGroup(allowedSeconds)
+						.toRegex();
 
 		assertThat(pattern.matchesWithinString("-2 days 00:00:00"), is(true));
 		assertThat(pattern.matchesWithinString("2 days 00:00:00"), is(true));
@@ -121,6 +126,7 @@ public class RegexTest {
 
 	@Test
 	public void testFindingPostgresIntervalValuesWithAOneliner() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testFindingPostgresIntervalValuesWithAOneliner()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -142,8 +148,9 @@ public class RegexTest {
 						.anyCharacterBetween('0', '9').atLeastOnce()
 						.literal(':').once()
 						.literal('-').onceOrNotAtAll()
-						.anyCharacterBetween('0', '9').atLeastOnce().add(Regex.startingAnywhere().literal(".").digits()
-				).onceOrNotAtAll();
+						.anyCharacterBetween('0', '9').atLeastOnce().addGroup(Regex.startingAnywhere().literal(".").digits()
+				).onceOrNotAtAll()
+						.toRegex();
 
 		assertThat(pattern.matchesWithinString("-2 days 00:00:00"), is(true));
 		assertThat(pattern.matchesWithinString("2 days 00:00:00"), is(true));
@@ -160,9 +167,16 @@ public class RegexTest {
 
 	@Test
 	public void testGroupBuilding() {
-
-		Regex regex
-				= Regex.startOrGroup().literal("Amy").or().literal("Bob").or().literal("Charlie").endOrGroup();
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testGroupBuilding()");
+		Regex regex = Regex
+				.startOrGroup()
+				.literal("Amy").or()
+				.literal("Bob").or()
+				.literal("Charlie")
+				.endOrGroup()
+				.toRegex();
+		System.out.println(regex.getRegex());
+		assertThat(regex.getRegex(), is("((Amy)|(Bob)|(Charlie))"));
 
 		assertThat(regex.matchesWithinString("Amy"), is(true));
 		assertThat(regex.matchesWithinString("Bob"), is(true));
@@ -182,7 +196,7 @@ public class RegexTest {
 		assertThat(regex.matchesWithinString("Emma doesn't do any better"), is(false));
 
 		// Check that Regex.anyOf() is the same
-		regex = Regex.startingAnywhere().anyOf("Amy", "Bob", "Charlie");
+		regex = Regex.startingAnywhere().anyOf("Amy", "Bob", "Charlie").toRegex();
 
 		assertThat(regex.matchesWithinString("Amy"), is(true));
 		assertThat(regex.matchesWithinString("Bob"), is(true));
@@ -205,6 +219,7 @@ public class RegexTest {
 
 	@Test
 	public void testNumberElement() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testNumberElement()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -212,9 +227,10 @@ public class RegexTest {
 		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
 		Regex pattern
 				= Regex.startingAnywhere()
-						.number().once();
+						.number().once().toRegex();
 		System.out.println(pattern.getRegex());
-		assertThat(pattern.getRegex(), is("(([-+]?\\b([1-9]+\\d*|0+(?!\\d)))(\\.{1}(\\d+))?){1}"));
+//		assertThat(pattern.getRegex(), is("(([-+]?\\b([1-9]+\\d*|0+(?!\\d)))(\\.{1}(\\d+))?){1}"));
+		assertThat(pattern.getRegex(), is("(([-+]?\\b([1-9]+\\d*|0+(?!\\d)))((\\.){1}(\\d+))?){1}"));
 
 		assertThat(pattern.matchesWithinString("before -1 after"), is(true));
 		assertThat(pattern.matchesWithinString("before -1m"), is(true));
@@ -251,6 +267,7 @@ public class RegexTest {
 
 	@Test
 	public void testCharactersWrappedBy() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testCharactersWrappedBy()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -258,7 +275,7 @@ public class RegexTest {
 		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
 		Regex pattern
 				= Regex.startingAnywhere()
-						.charactersWrappedBy('\'').once();
+						.charactersWrappedBy('\'').once().toRegex();
 		System.out.println(pattern.getRegex());
 
 		assertThat(pattern.matchesWithinString("'-1' after"), is(true));
@@ -285,6 +302,7 @@ public class RegexTest {
 
 	@Test
 	public void testCharactersWrappedByWithStarterAndEnder() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testCharactersWrappedByWithStarterAndEnder()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -292,7 +310,7 @@ public class RegexTest {
 		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
 		Regex pattern
 				= Regex.startingAnywhere()
-						.charactersWrappedBy('(', ')').once();
+						.charactersWrappedBy('(', ')').once().toRegex();
 		System.out.println(pattern.getRegex());
 
 		assertThat(pattern.matchesWithinString("(-1) after"), is(true));
@@ -319,6 +337,7 @@ public class RegexTest {
 
 	@Test
 	public void testCharactersWrappedByWithStringStarterAndEnder() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testCharactersWrappedByWithStringStarterAndEnder()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -326,7 +345,7 @@ public class RegexTest {
 		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
 		Regex regex
 				= Regex.startingAnywhere()
-						.charactersWrappedBy("<<", ">>").once();
+						.charactersWrappedBy("<<", ">>").once().toRegex();
 		final String pattern = regex.getRegex();
 		System.out.println(pattern);
 		assertThat(pattern, is("(<<(((?!>>).)*)>>){1}"));
@@ -338,14 +357,14 @@ public class RegexTest {
 		assertThat(regex.matchesWithinString("before <<mid>> after"), is(true));
 		assertThat(regex.matchesWithinString("before <<mid>> <<mid again>> after"), is(true));
 
-		assertThat(regex.matchesEntireString("<<mid>>"), is(true));
-
 		assertThat(regex.matchesWithinString("<<02 after"), is(false));
 		assertThat(regex.matchesWithinString("-0234>> after"), is(false));
 		assertThat(regex.matchesWithinString("before <<004 after"), is(false));
 		assertThat(regex.matchesWithinString("before _4>> after"), is(false));
 		assertThat(regex.matchesWithinString("before \"A4\" after"), is(false));
 		assertThat(regex.matchesWithinString("before A4after"), is(false));
+
+		assertThat(regex.matchesEntireString("<<mid>>"), is(true));
 
 		assertThat(regex.matchesEntireString("<<mid>>  "), is(false));
 		assertThat(regex.matchesEntireString("  <<mid>>"), is(false));
@@ -356,18 +375,39 @@ public class RegexTest {
 
 	@Test
 	public void testOrGroup() {
-		Regex regex = Regex.empty().beginOrGroup().literal("alice").or().literal("bob").or().literal("carol").or().literal("dan").endOrGroup();
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testOrGroup()");
+		Regex regex = Regex.empty().beginOrGroup().literal("alice").or().literal("bob").or().literal("carol").or().literal("dan").endOrGroup().toRegex();
 
-		final String expectedRegex = "(alice|bob|carol|dan)";
+		final String expectedRegex = "((alice)|(bob)|(carol)|(dan))";
 		assertThat(regex.getRegex(), is(expectedRegex));
+		assertThat(regex.matchesWithinString("alice"), is(true));
+		assertThat(regex.matchesWithinString("bob"), is(true));
+		assertThat(regex.matchesWithinString("carol"), is(true));
+		assertThat(regex.matchesWithinString("dan"), is(true));
+		assertThat(regex.matchesWithinString("alicia"), is(false));
+	}
+
+	@Test
+	public void testOrGroupWithComplexOptions() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testOrGroup()");
+		Regex regex = Regex.empty().beginOrGroup().literal("alic").beginOrGroup().literal("e").or().literal("ia").endOrGroup().or().literal("bob").or().literal("carol").or().literal("dan").endOrGroup().toRegex();
+
+		final String expectedRegex = "((alic)((e)|(ia))|(bob)|(carol)|(dan))";
+		assertThat(regex.getRegex(), is(expectedRegex));
+		assertThat(regex.matchesWithinString("alice"), is(true));
+		assertThat(regex.matchesWithinString("bob"), is(true));
+		assertThat(regex.matchesWithinString("carol"), is(true));
+		assertThat(regex.matchesWithinString("dan"), is(true));
+		assertThat(regex.matchesWithinString("alicia"), is(true));
 	}
 
 	@Test
 	public void testLiteralEscapesRegularExpressionCharacters() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testLiteralEscapesRegularExpressionCharacters()");
 		final String literal = "[a-b]*$(alice|bob).^?";
-		Regex regex = Regex.empty().literal(literal).once();
+		Regex regex = Regex.empty().literal(literal).once().toRegex();
 
-		assertThat(regex.getRegex(), is("\\[a-b]\\*\\$\\(alice|bob\\)\\.\\^\\?{1}"));
+		assertThat(regex.getRegex(), is("(\\[a-b]\\*\\$\\(alice|bob\\)\\.\\^\\?){1}"));
 
 		assertThat(regex.matchesWithinString(literal), is(true));
 		assertThat(regex.matchesWithinString("abcboba^?"), is(false));
@@ -375,7 +415,39 @@ public class RegexTest {
 	}
 
 	@Test
+	public void testLiteralMatches() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testLiteralMatches()");
+		final String literal = "alice";
+		Regex regex = Regex.empty().literal(literal).toRegex();
+
+		assertThat(regex.getRegex(), is("(alice)"));
+
+		assertThat(regex.matchesWithinString(literal), is(true));
+		assertThat(regex.matchesWithinString("abcboba^?"), is(false));
+		assertThat(regex.matchesWithinString("a"), is(false));
+	}
+
+	@Test
+	public void testLiteralMatchesMoreThanOnce() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testLiteralMatchesMoreThanOnce()");
+		final String literal = "alice";
+		Regex regex = Regex.empty().literal(literal).atLeastThisManyTimes(2).toRegex();
+
+		final String regex1 = regex.getRegex();
+		System.out.println(regex1);
+		assertThat(regex1, is("(alice){2,}"));
+
+		assertThat(regex.matchesWithinString(literal + literal), is(true));
+		assertThat(regex.matchesWithinString("yada" + literal + literal + "blah"), is(true));
+		assertThat(regex.matchesWithinString(literal), is(false));
+		assertThat(regex.matchesWithinString(literal + literal + literal), is(true));
+		assertThat(regex.matchesWithinString("abcboba^?"), is(false));
+		assertThat(regex.matchesWithinString("a"), is(false));
+	}
+
+	@Test
 	public void testNumberIncludingScientificNotationElement() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testNumberIncludingScientificNotationElement()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -383,7 +455,7 @@ public class RegexTest {
 		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
 		Regex pattern
 				= Regex.startingAnywhere()
-						.numberIncludingScientificNotation().once();
+						.numberIncludingScientificNotation().once().toRegex();
 		System.out.println(pattern.getRegex());
 //		assertThat(pattern.getRegex(),is("((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))(\\.{1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}(\\.{1}(\\d+))?)?){1}"));
 
@@ -437,6 +509,7 @@ public class RegexTest {
 
 	@Test
 	public void testAllGroups() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testAllGroups()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -448,11 +521,12 @@ public class RegexTest {
 						.numberIncludingScientificNotation().once()
 						.space().once()
 						.beginOrGroup().word().endOrGroup()
-						.endOfInput();
+						.endOfInput().toRegex();
 		System.out.println(pattern.getRegex());
 		// ^((?i)interval(?-i)){1} {1}((([-+]?\b([1-9]+\d*|0+(?!\d)))(\.{1}(\d+))?){1}([Ee][-+]?([1-9]+\d*|0+(?!\d)){1}(\.{1}(\d+))?)?){1} {1}((\w+))$
-		// ^^((?i)interval(?-i)){1} {1}((([-+]?\b([1-9]+\d*|0+(?!\d)))(\.{1}(\d+))?){1}([Ee][-+]?([1-9]+\d*|0+(?!\d)){1}(\.{1}(\d+))?)?){1} {1}((\w+))$		
-		assertThat(pattern.getRegex(), is("^((?i)interval(?-i)){1} {1}((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))(\\.{1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}(\\.{1}(\\d+))?)?){1} {1}((\\w+))$"));
+//		assertThat(pattern.getRegex(), is("^((?i)interval(?-i)){1} {1}((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))(\\.{1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}(\\.{1}(\\d+))?)?){1} {1}((\\w+))$"));
+		// ^((?i)(interval)(?-i)){1}( ){1}((([-+]?\b([1-9]+\d*|0+(?!\d)))((\.){1}(\d+))?){1}([Ee][-+]?([1-9]+\d*|0+(?!\d)){1}((\.){1}(\d+))?)?){1}( ){1}((\w+))$
+		assertThat(pattern.getRegex(), is("^((?i)(interval)(?-i)){1}( ){1}((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))((\\.){1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}((\\.){1}(\\d+))?)?){1}( ){1}((\\w+))$"));
 
 		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND";
 		assertThat(pattern.matchesEntireString(intervalString), is(true));
@@ -465,9 +539,9 @@ public class RegexTest {
 		} else {
 			List<MatchedGroup> allGroups = firstMatch.get().allGroups();
 			allGroups.stream().forEachOrdered(s -> System.out.println(s));
-			assertThat(allGroups.size(), is(13));
+			assertThat(allGroups.size(), is(18));
 
-			final String contents = allGroups.get(2).getContents();
+			final String contents = allGroups.get(4).getContents();
 			assertThat(contents, is("-1.999999999946489E-6"));
 			final Double value = Double.valueOf(contents);
 			assertThat(value, is(Double.valueOf("-1.999999999946489E-6")));
@@ -477,6 +551,7 @@ public class RegexTest {
 
 	@Test
 	public void testNamedCaptures() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testNamedCaptures()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -489,7 +564,7 @@ public class RegexTest {
 						.beginNamedCapture("value").numberIncludingScientificNotation().once().endNamedCapture()
 						.space().once()
 						.beginNamedCapture("unit").word().endNamedCapture()
-						.endOfInput();
+						.endOfInput().toRegex();
 
 		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND";
 		assertThat(intervalRegex.matchesEntireString(intervalString), is(true));
@@ -513,6 +588,7 @@ public class RegexTest {
 
 	@Test
 	public void testNamedBackReferences() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testNamedBackReferences()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -527,7 +603,7 @@ public class RegexTest {
 						.beginNamedCapture("unit").word().endNamedCapture()
 						.space().once()
 						.beginNamedCapture("secondValue").namedBackReference("value").endNamedCapture()
-						.endOfInput();
+						.endOfInput().toRegex();
 
 		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND";
 		assertThat(intervalRegex.matchesEntireString(intervalString), is(false));
@@ -549,6 +625,7 @@ public class RegexTest {
 
 	@Test
 	public void testNumberedBackReferencesWithSimpleCase() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testNumberedBackReferencesWithSimpleCase()");
 		final String VALUE_NAME = "value";
 		final String INTERVAL_NAME = "interval";
 		final String UNIT_NAME = "unit";
@@ -567,7 +644,7 @@ public class RegexTest {
 						.beginNamedCapture(UNIT_NAME).word().endNamedCapture()
 						.space().once()
 						.beginNamedCapture(BACKREFERENCE_NAME).numberedBackReference(1).endNamedCapture()
-						.endOfInput();
+						.endOfInput().toRegex();
 
 		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND";
 		assertThat(intervalRegex.matchesEntireString(intervalString), is(false));
@@ -590,6 +667,7 @@ public class RegexTest {
 
 	@Test
 	public void testNumberedBackReferencesWithManyGroups() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testNumberedBackReferencesWithManyGroups()");
 		Regex regex
 				= Regex.startingFromTheBeginning()
 						.beginNamedCapture("interval").literalCaseInsensitive("interval").once().endNamedCapture()
@@ -598,10 +676,14 @@ public class RegexTest {
 						.space().once()
 						.beginNamedCapture("unit").word().endNamedCapture()
 						.space().once()
-						.beginNamedCapture("secondValue").numberedBackReference(4).endNamedCapture().optionalMany()
-						.endOfInput();
+						.beginNamedCapture("secondValue").numberedBackReference(6).endNamedCapture().optionalMany()
+						.endOfInput().toRegex();
+
+		System.out.println(regex.getRegex());
+		assertThat(regex.getRegex(), is("^(?<interval>((?i)(interval)(?-i)){1})( ){1}(?<value>((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))((\\.){1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}((\\.){1}(\\d+))?)?){1})( ){1}(?<unit>(\\w+))( ){1}(?<secondValue>\\6)*$"));
 
 		String string = "INTERVAL -1.999999999946489E-6 SECOND -1.999999999946489E-6";
+		regex.testAgainst(string).stream().forEachOrdered(s->System.out.println(s));
 		assertThat(regex.matchesEntireString(string), is(true));
 
 		final HashMap<String, String> allGroups = regex.getAllNamedCapturesOfFirstMatchWithinString(string);
@@ -618,6 +700,7 @@ public class RegexTest {
 
 	@Test
 	public void testNumberLike() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testNumberLike()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -625,7 +708,7 @@ public class RegexTest {
 		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
 		Regex pattern
 				= Regex.startingAnywhere()
-						.numberLike().once();
+						.numberLike().once().toRegex();
 
 		assertThat(pattern.matchesWithinString("before -1 after"), is(true));
 		assertThat(pattern.matchesWithinString("before 2 after"), is(true));
@@ -647,6 +730,7 @@ public class RegexTest {
 
 	@Test
 	public void testGetAllMatches() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testGetAllMatches()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -654,7 +738,7 @@ public class RegexTest {
 		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
 		Regex numberlikeRegex
 				= Regex.startingAnywhere()
-						.numberLike().once();
+						.numberLike().once().toRegex();
 
 		List<Match> matches = numberlikeRegex.getAllMatches("-1 2 -234 +4 -4 4.5 FAIL 02 -0234 004 _4 A4");
 		assertThat(matches.size(), is(11));
@@ -676,7 +760,7 @@ public class RegexTest {
 
 		Regex numberRegex
 				= Regex.startingAnywhere()
-						.number().once();
+						.number().once().toRegex();
 
 		matches = numberRegex.getAllMatches("-1 2 -234 +4 -4 4.5 0 0.0 FAIL 02 -0234 004 _4 A4");
 		assertThat(matches.size(), is(8));
@@ -697,6 +781,7 @@ public class RegexTest {
 
 	@Test
 	public void testCaseInsensitiveAndEndOfString() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testCaseInsensitiveAndEndOfString()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -710,7 +795,8 @@ public class RegexTest {
 						.literal("s").onceOrNotAtAll()
 						.endCaseInsensitiveSection()
 						.wordBoundary()
-						.endOfTheString();
+						.endOfTheString()
+						.toRegex();
 
 		assertThat(regex.matchesWithinString("day"), is(true));
 		assertThat(regex.matchesWithinString("days"), is(true));
@@ -729,6 +815,7 @@ public class RegexTest {
 
 	@Test
 	public void testLiteralCaseInsensitive() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testLiteralCaseInsensitive()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -740,9 +827,10 @@ public class RegexTest {
 						.literalCaseInsensitive("day").once()
 						.literalCaseInsensitive("s").onceOrNotAtAll()
 						.wordBoundary()
-						.endOfTheString();
+						.endOfTheString().toRegex();
 		System.out.println(regex.getRegex());
-		assertThat(regex.getRegex(), is("\\b((?i)day(?-i)){1}((?i)s(?-i))?\\b$"));
+//		assertThat(toRegex.getRegex(), is("\\b((?i)day(?-i)){1}((?i)s(?-i))?\\b$"));
+		assertThat(regex.getRegex(), is("\\b((?i)(day)(?-i)){1}((?i)(s)(?-i))?\\b$"));
 
 		assertThat(regex.matchesWithinString("day"), is(true));
 		assertThat(regex.matchesWithinString("days"), is(true));
@@ -761,6 +849,7 @@ public class RegexTest {
 
 	@Test
 	public void testLotsOfMatchesAndNamedGroups() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testLotsOfMatchesAndNamedGroups()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -776,7 +865,7 @@ public class RegexTest {
 						.beginCaseInsensitiveSection()
 						.anyOf("DAY", "HOUR", "MINUTE", "SECOND").once().literal("S").onceOrNotAtAll()
 						.endCaseInsensitiveSection()
-						.endNamedCapture();
+						.endNamedCapture().toRegex();
 
 		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND, INTERVAL 4 YEARS, INTERVAL 2 DAY, interval -34 hour, interval 56 minutes";
 		assertThat(regex.matchesWithinString(intervalString), is(true));
@@ -795,6 +884,7 @@ public class RegexTest {
 
 	@Test
 	public void testEasyEndsWithMethod() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testEasyEndsWithMethod()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -807,7 +897,7 @@ public class RegexTest {
 						.literal("day").once()
 						.literal("s").onceOrNotAtAll()
 						.endCaseInsensitiveSection()
-						.wordBoundary();
+						.wordBoundary().toRegex();
 
 		assertThat(regex.matchesEndOf("day"), is(true));
 		assertThat(regex.matchesEndOf("days"), is(true));
@@ -826,6 +916,7 @@ public class RegexTest {
 
 	@Test
 	public void testEasyBeginsWithMethod() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testEasyBeginsWithMethod()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -838,7 +929,7 @@ public class RegexTest {
 						.literal("day").once()
 						.literal("s").onceOrNotAtAll()
 						.endCaseInsensitiveSection()
-						.wordBoundary();
+						.wordBoundary().toRegex();
 
 		assertThat(regex.matchesBeginningOf("day"), is(true));
 		assertThat(regex.matchesBeginningOf("days"), is(true));
@@ -858,6 +949,7 @@ public class RegexTest {
 
 	@Test
 	public void testShouldMatch() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testShouldMatch()");
 		Regex regex
 				= Regex.startingAnywhere()
 						.beginCaseInsensitiveSection().literal("INTERVAL ").endCaseInsensitiveSection().onceOrNotAtAll()
@@ -872,7 +964,7 @@ public class RegexTest {
 						.literal(":")
 						.beginNamedCapture("seconds").numberLikeIncludingScientificNotation().once().endNamedCapture()
 						.beginNamedCapture("nanos").number().onceOrNotAtAll().endNamedCapture()
-						.literal("'").onceOrNotAtAll();
+						.literal("'").onceOrNotAtAll().toRegex();
 
 		shouldMatchTests(regex, "0 -2:0:0.0 DAY TO SECOND", "0", "-2", "0", "0.0", "");
 		shouldMatchTests(regex, "0 day -2:0:0.0 DAY TO SECOND", "0", "-2", "0", "0.0", "");
@@ -891,7 +983,7 @@ public class RegexTest {
 	}
 
 	private void shouldMatchTests(final Regex regex, String testStr, String days, String hours, String minutes, String seconds, String nanos) {
-//		assertThat(regex.matchesWithinString(testStr), is(true));
+//		assertThat(toRegex.matchesWithinString(testStr), is(true));
 		if (regex.matchesWithinString(testStr)) {
 			Optional<Match> optional = regex.getFirstMatchFrom(testStr);
 			if (optional.isPresent()) {

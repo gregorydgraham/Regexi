@@ -10,21 +10,20 @@ package nz.co.gregs.regexi;
  * @author gregorygraham
  * @param <REGEX> the type returned by {@link #endGroup() }
  */
-public class Group<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<Group<REGEX>, REGEX> {
+public class PositiveLookahead<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<PositiveLookahead<REGEX>, REGEX> {
 	
 
-	protected Group(REGEX original) {
+	protected PositiveLookahead(REGEX original) {
 		super(original);
 	}
 
 	@Override
 	public String getRegex() {
 		final String regexp = getCurrent().getRegex();
-		return "("+regexp+")";
+		return "(?="+regexp+")";
 	}
 
-	@Override
-	public REGEX endGroup() {
+	public REGEX endLookahead() {
 		return super.endGroup();
 	}
 	

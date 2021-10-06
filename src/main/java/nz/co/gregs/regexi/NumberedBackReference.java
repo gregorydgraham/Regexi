@@ -5,11 +5,14 @@
  */
 package nz.co.gregs.regexi;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author gregorygraham
  */
-public class NumberedBackReference extends Regex {
+public class NumberedBackReference extends PartialRegex {
 
 	private final String literal;
 
@@ -20,7 +23,14 @@ public class NumberedBackReference extends Regex {
 
 	@Override
 	public String getRegex() {
-		return "" + literal;
+		return literal;
+	}
+
+	@Override
+	public List<PartialRegex> getRegexParts() {
+		List<PartialRegex> result = new ArrayList<>(1);
+		result.add(this);
+		return result;
 	}
 
 }

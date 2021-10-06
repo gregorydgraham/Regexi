@@ -20,7 +20,7 @@ public class RegexBuilder {
 	 * @deprecated use {@link Regex#startingAnywhere() } instead
 	 */
 	@Deprecated
-	public static Regex startingAnywhere() {
+	public static PartialRegex startingAnywhere() {
 		return new UnescapedSequence("");
 	}
 
@@ -32,7 +32,7 @@ public class RegexBuilder {
 	 * @deprecated use {@link Regex#startingFromTheBeginning() } instead
 	 */
 	@Deprecated
-	public static Regex startingFromTheBeginning() {
+	public static PartialRegex startingFromTheBeginning() {
 		return new UnescapedSequence("^");
 	}
 
@@ -44,15 +44,15 @@ public class RegexBuilder {
 	 * for instance, use this to generate "(FRED|EMILY|GRETA|DONALD)".
 	 *
 	 * <p>
-	 * {@code Regex regex =  Regex.startOrGroup().literal("A").or().literal("B").endGroup();
-	 * } produces "(A|B)".
+	 * {@code PartialRegex regex =  PartialRegex.startOrGroup().literal("A").or().literal("B").endGroup();
+ } produces "(A|B)".
 	 *
 	 * @return a new regular expression
 	 * @deprecated use {@link Regex#startOrGroup() } instead
 	 */
 	@Deprecated
 
-	public static OrGroup<Regex> startOrGroup() {
+	public static OrGroup<PartialRegex> startOrGroup() {
 		return startingAnywhere().beginOrGroup();
 	}
 

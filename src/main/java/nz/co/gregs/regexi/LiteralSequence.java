@@ -5,13 +5,16 @@
  */
 package nz.co.gregs.regexi;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Implements literal sequences by replacing all protected characters as
  * required.
  *
  * @author gregorygraham
  */
-public class LiteralSequence extends Regex {
+public class LiteralSequence extends PartialRegex {
 
 	private final String literal;
 
@@ -23,7 +26,7 @@ public class LiteralSequence extends Regex {
 	 * All characters are escaped as required to avoid them acting as regular
 	 * expression commands.<p>
 	 *
-	 * @param literals the literal charcters to be added to the pattern
+	 * @param literals the literal characters to be added to the pattern
 	 */
 	public LiteralSequence(String literals) {
 		if (literals == null) {
@@ -47,6 +50,13 @@ public class LiteralSequence extends Regex {
 	@Override
 	public String getRegex() {
 		return "" + literal;
+	}
+
+	@Override
+	public List<PartialRegex> getRegexParts() {
+		List<PartialRegex> result = new ArrayList<PartialRegex>(1);
+		result.add(this);
+		return result;
 	}
 
 }

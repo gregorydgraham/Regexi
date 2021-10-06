@@ -12,8 +12,8 @@ import java.util.List;
  *
  * @author gregorygraham
  */
-public class UnescapedSequence extends Regex {
-	
+public class UnescapedSequence extends PartialRegex {
+
 	private final String literal;
 
 	protected UnescapedSequence(String literals) {
@@ -30,8 +30,13 @@ public class UnescapedSequence extends Regex {
 	}
 
 	@Override
-	public List<String> testAgainst(String testStr) {
-		// these are general regex control sequences and shouldn't be dismantled
-		return new ArrayList<String>(0);
+	public List<PartialRegex> getRegexParts() {
+		ArrayList<PartialRegex> arrayList = new ArrayList<PartialRegex>(1);
+		if (literal != null) {
+			if (!literal.isEmpty()) {
+				arrayList.add(this);
+			}
+		}
+		return arrayList;
 	}
 }

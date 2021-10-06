@@ -35,22 +35,28 @@ import java.util.List;
 /**
  *
  * @author gregorygraham
- * @param <THIS> the class of this Regex, returned by most methods to maintain type safety
- * @param <REGEX> the regex to return to after ending this group
+ * @param <THIS> the class of this PartialRegex, returned by most methods to
+ * maintain type safety
+ * @param <REGEX> the toRegex to return to after ending this group
  */
 public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX extends HasRegexFunctions<REGEX>> implements HasRegexFunctions<THIS> {
 
 	private final REGEX origin;
-	private Regex current = Regex.startingAnywhere();
+	private PartialRegex current = Regex.empty();
 
 	public RegexGroup(REGEX original) {
 		this.origin = original;
 	}
 
+	@Override
+	public List<PartialRegex> getRegexParts() {
+		return getCurrent().getRegexParts();
+	}
+
 	/**
 	 * @return the current
 	 */
-	public Regex getCurrent() {
+	public PartialRegex getCurrent() {
 		return current;
 	}
 
@@ -137,7 +143,7 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public THIS capture(Regex regexp) {
+	public THIS capture(PartialRegex regexp) {
 		current = getCurrent().capture(regexp);
 		return (THIS) this;
 	}
@@ -277,13 +283,6 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public THIS thisManyTimes(int x) {
-		current = getCurrent().thisManyTimes(x);
-		return (THIS) this;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
 	public THIS once() {
 		current = getCurrent().once();
 		return (THIS) this;
@@ -350,48 +349,6 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 		current = getCurrent().tab();
 		return (THIS) this;
 	}
-	
-	@Override
-	public List<String> testAgainst(String testStr) {
-		List<String> strings = getOrigin().testAgainst(testStr);
-		strings.addAll(getCurrent().testAgainst(testStr));
-		return strings;
-	}
-
-//	@Override
-//	@SuppressWarnings("unchecked")
-//	public THIS squareBracket() {
-//		current = getCurrent().squareBracket();
-//		return (THIS) this;
-//	}
-//
-//	@Override
-//	@SuppressWarnings("unchecked")
-//	public THIS pipe() {
-//		current = getCurrent().pipe();
-//		return (THIS) this;
-//	}
-//
-//	@Override
-//	@SuppressWarnings("unchecked")
-//	public THIS star() {
-//		current = getCurrent().star();
-//		return (THIS) this;
-//	}
-//
-//	@Override
-//	@SuppressWarnings("unchecked")
-//	public THIS plus() {
-//		current = getCurrent().plus();
-//		return (THIS) this;
-//	}
-//
-//	@Override
-//	@SuppressWarnings("unchecked")
-//	public THIS questionMark() {
-//		current = getCurrent().questionMark();
-//		return (THIS) this;
-//	}
 
 	@Override
 	@SuppressWarnings("unchecked")
@@ -416,15 +373,15 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public THIS extend(HasRegexFunctions<?> second) {
-		current = getCurrent().extend(second);
+	public THIS add(PartialRegex second) {
+		current = getCurrent().add(second);
 		return (THIS) this;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public THIS add(HasRegexFunctions<?> second) {
-		current = getCurrent().add(second);
+	public THIS addGroup(PartialRegex second) {
+		current = getCurrent().addGroup(second);
 		return (THIS) this;
 	}
 
@@ -472,7 +429,7 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public THIS notPrecededBy(Regex literalValue) {
+	public THIS notPrecededBy(PartialRegex literalValue) {
 		current = getCurrent().notPrecededBy(literalValue);
 		return (THIS) this;
 	}
@@ -486,22 +443,8 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public THIS notFollowedBy(Regex literalValue) {
+	public THIS notFollowedBy(PartialRegex literalValue) {
 		current = getCurrent().notFollowedBy(literalValue);
-		return (THIS) this;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public THIS addGroup(HasRegexFunctions<?> second) {
-		current = getCurrent().addGroup(second);
-		return (THIS) this;
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public THIS groupEverythingBeforeThis() {
-		current = getCurrent().groupEverythingBeforeThis();
 		return (THIS) this;
 	}
 
@@ -537,10 +480,4 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 	public RangeBuilder<THIS> beginRange(String literals) {
 		return new RangeBuilder<THIS>((THIS) this, literals);
 	}
-
-//	@Override
-//	@SuppressWarnings("unchecked")
-//	public NamedCapture<REGEX> beginNamedCapture(String name) {
-//		return new NamedCapture<>((REGEX) this, name);
-//	}
 }
