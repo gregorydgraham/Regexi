@@ -116,12 +116,12 @@ public abstract class Regex implements HasRegexFunctions<Regex> {
 	 */
 	@Override
 	public Regex add(HasRegexFunctions<?> second) {
-		return new RegexpCombination(this, second.groupEverythingBeforeThis());
+		return new RegexCombination(this, second.groupEverythingBeforeThis());
 	}
 
 	@Override
 	public Regex extend(HasRegexFunctions<?> second) {
-		return new RegexpCombination(this, second);
+		return new RegexCombination(this, second);
 	}
 
 	@Override
