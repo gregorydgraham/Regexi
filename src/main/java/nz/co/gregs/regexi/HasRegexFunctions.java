@@ -1301,7 +1301,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * }
 	 * </p>
 	 *
-	 * @return
+	 * @return the start of a negative lookahead.
 	 */
 	@SuppressWarnings("unchecked")
 	public default NegativeLookahead<REGEX> negativeLookAhead() {
