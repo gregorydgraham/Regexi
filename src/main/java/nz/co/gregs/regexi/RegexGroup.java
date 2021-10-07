@@ -468,16 +468,4 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 		current = getCurrent().unescaped(unescapedSequence);
 		return (THIS) this;
 	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public RangeBuilder<THIS> beginRange(char lowest, char highest) {
-		return new RangeBuilder<THIS>((THIS) this, lowest, highest);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public RangeBuilder<THIS> beginRange(String literals) {
-		return new RangeBuilder<THIS>((THIS) this, literals);
-	}
 }

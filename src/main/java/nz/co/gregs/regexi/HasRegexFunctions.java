@@ -271,7 +271,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @return a new regexp
 	 */
 	default REGEX anyCharacterBetween(Character lowest, Character highest) {
-		return add(Regex.startingAnywhere().beginRange(lowest, highest).endRange());
+		return add(Regex.startingAnywhere().range(lowest, highest));
 	}
 
 	/**
@@ -295,7 +295,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @return a new regexp
 	 */
 	default REGEX anyCharacterIn(String literals) {
-		return add(Regex.startingAnywhere().beginRange(literals).endRange());
+		return range(literals);
 	}
 
 	/**
@@ -402,6 +402,17 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	default REGEX carriageReturn() {
 		return add(new UnescapedSequence("\\r"));
+	}
+
+	/**
+	 * Extends the regular expression with group that ignores the whether letters
+	 * are upper or lower case
+	 *
+	 * @return an extended regular expression
+	 */
+	@SuppressWarnings("unchecked")
+	default CaseInsensitiveSection<REGEX> caseInsensitiveSection() {
+		return beginCaseInsensitiveSection();
 	}
 
 	/**
@@ -595,6 +606,28 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @return a NamedCapture regexp
 	 */
 	@SuppressWarnings("unchecked")
+	public default NamedCapture<REGEX> namedCapture(String name) {
+		return beginNamedCapture(name);
+	}
+
+	/**
+	 * Starts a capturing group that is named.
+	 *
+	 * <p>
+	 * Use similarly to
+	 * {@code PartialRegex.empty().beginNamedCapture("unit").word().endNamedCapture()}</p>
+	 *
+	 * <p>
+	 * Named captures can be used with named back references and can be retrieved
+	 * with {@link PartialRegex#getAllNamedCapturesOfFirstMatchWithinString(java.lang.String)
+	 * } and {@code Regex.getAllMatches(target).get(index).getAllNamedCaptures()}
+	 * </p>
+	 *
+	 * @param name the name for this capture so it can be used in back references
+	 * and processing of the parts of the match
+	 * @return a NamedCapture regexp
+	 */
+	@SuppressWarnings("unchecked")
 	public default NamedCapture<REGEX> beginNamedCapture(String name) {
 		return new NamedCapture<REGEX>((REGEX) this, name);
 	}
@@ -671,7 +704,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @return a new regexp
 	 */
 	default REGEX noneOfTheseCharacters(String literals) {
-		return add(Regex.startingAnywhere().beginRange(literals).negated().endRange());
+		return add(Regex.startingAnywhere().beginRange().addLiterals(literals).negated().endRange());
 	}
 
 	/**
@@ -759,7 +792,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @return a new regexp
 	 */
 	default REGEX noCharacterBetween(Character lowest, Character highest) {
-		return add(Regex.startingAnywhere().beginRange(lowest, highest).negated().endRange());
+		return add(Regex.startingAnywhere().beginRange().addRange(lowest, highest).negated().endRange());
 	}
 
 	/**
@@ -801,21 +834,49 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	}
 
 	/**
-	 * Starts making a character range, use {@link RangeBuilder#endRange() } to
-	 * return to the regex.
-	 *
-	 * <p>
-	 * This provides more options than the {@link #anyCharacterBetween(java.lang.Character, java.lang.Character)
-	 * } and {@link #anyCharacterIn(java.lang.String) } methods for creating
-	 * ranges.
+	 * Make a character range.
 	 *
 	 * @param lowest the first character to be included in the range
 	 * @param highest the last character to be included in the range
 	 * @return the start of a range.
 	 */
 	@SuppressWarnings("unchecked")
-	default RangeBuilder<REGEX> beginRange(char lowest, char highest) {
-		return new RangeBuilder<>((REGEX) this, lowest, highest);
+	default REGEX range(char lowest, char highest) {
+		return beginRange().addRange(lowest, highest).endRange();
+	}
+
+	/**
+	 * Make a character range.
+	 *
+	 * @param literals all of the characters you would like included in the range
+	 * @return the start of a range.
+	 */
+	@SuppressWarnings("unchecked")
+	default REGEX range(String literals) {
+		return beginRange().addLiterals(literals).endRange();
+	}
+
+	/**
+	 * Make a character range to exclude characters.
+	 *
+	 * @param lowest the first character to be included in the range
+	 * @param highest the last character to be included in the range
+	 * @return the start of a range.
+	 */
+	@SuppressWarnings("unchecked")
+	default REGEX excludeRange(char lowest, char highest) {
+		return beginRange().excluding(lowest, highest).endRange();
+	}
+
+	/**
+	 * Make a character range to exclude characters.
+	 *
+	 * @param literals all of the characters you would like included in the range
+	 * @return the start of a range.
+	 */
+	@SuppressWarnings("unchecked")
+	default REGEX excludeRange(String literals) {
+		return beginRange().excluding(literals).endRange();
 	}
 
 	/**
@@ -827,12 +888,43 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * } and {@link #anyCharacterIn(java.lang.String) } methods for creating
 	 * ranges.
 	 *
-	 * @param literals all of the characters you would like included in the range
 	 * @return the start of a range.
 	 */
 	@SuppressWarnings("unchecked")
-	default RangeBuilder<REGEX> beginRange(String literals) {
-		return new RangeBuilder<>((REGEX) this, literals);
+	default RangeBuilder<REGEX> range() {
+		return new RangeBuilder<REGEX>((REGEX) this);
+	}
+
+	/**
+	 * Starts making a character range, use {@link RangeBuilder#endRange() } to
+	 * return to the regex.
+	 *
+	 * <p>
+	 * This provides more options than the {@link #anyCharacterBetween(java.lang.Character, java.lang.Character)
+	 * } and {@link #anyCharacterIn(java.lang.String) } methods for creating
+	 * ranges.
+	 *
+	 * @return the start of a range.
+	 */
+	@SuppressWarnings("unchecked")
+	default RangeBuilder<REGEX> beginRange() {
+		return new RangeBuilder<REGEX>((REGEX) this);
+	}
+
+	/**
+	 * Starts making a character range, use {@link RangeBuilder#endRange() } to
+	 * return to the regex.
+	 *
+	 * <p>
+	 * This provides more options than the {@link #anyCharacterBetween(java.lang.Character, java.lang.Character)
+	 * } and {@link #anyCharacterIn(java.lang.String) } methods for creating
+	 * ranges.
+	 *
+	 * @return the start of a range.
+	 */
+	@SuppressWarnings("unchecked")
+	default RangeBuilder<REGEX> excludeRange() {
+		return beginRange().negated();
 	}
 
 	/**
@@ -898,8 +990,44 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @return a new regular expression
 	 */
 	@SuppressWarnings("unchecked")
+	public default OrGroup<REGEX> orGroup() {
+		return beginOrGroup();
+	}
+
+	/**
+	 * Extends this regular expression with an OR grouping.
+	 *
+	 * <p>
+	 * for instance, use this to generate "(FRED|EMILY|GRETA|DONALD)".
+	 *
+	 * <p>
+	 * {@code Regex regex =  Regex.startAnywhere().literal("Project ").startOrGroup().literal("A").or().literal("B").endOrGroup().toRegex();
+	 * } produces "Project (A|B)".
+	 *
+	 * @return a new regular expression
+	 */
+	@SuppressWarnings("unchecked")
 	public default OrGroup<REGEX> beginOrGroup() {
 		return new OrGroup<>((REGEX) this);
+	}
+
+	/**
+	 * Start the creation of a new group that collects one or more regular
+	 * expression elements into a single element.
+	 *
+	 * <p>
+	 * for instance, use this to generate "(\d*\.\d)?".
+	 *
+	 * <p>
+	 * {@code PartialRegex regex =  PartialRegex.startAnywhere().literal("Project ").startGroup().literal("A").literal("B").endGroup().once();
+	 * } produces "Project (AB){1}" and will find "Project AB" but not "Project
+	 * A", "Project B", nor "Project ABAB".
+	 *
+	 * @return a new regular expression that is an incomplete group
+	 */
+	@SuppressWarnings("unchecked")
+	public default Group<REGEX> group() {
+		return beginGroup();
 	}
 
 	/**
@@ -1070,26 +1198,111 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 		return add(new NamedBackReference(name));
 	}
 
+	/**
+	 * Numbered back references are unreliable, use named back references instead.
+	 *
+	 * @param number the group numbered from the start of the matching that should
+	 * appear again
+	 * @return a new regex
+	 */
 	public default REGEX numberedBackReference(int number) {
 		return add(new NumberedBackReference(number));
 	}
 
+	/**
+	 * Add a match for any number of characters (.*) that are enclosed in the
+	 * literal.
+	 *
+	 * <p>
+	 * This is most useful for capturing the words in quotes and similar
+	 * things.</p>
+	 *
+	 * <p>
+	 * {@code charactersWrappedBy('~')} will return "~[^~]*~"</p>
+	 *
+	 * @param literal the character to be found either side of a block of random
+	 * characters
+	 * @return a new regex
+	 */
 	public default REGEX charactersWrappedBy(Character literal) {
 		return this.addGroup(Regex.startingAnywhere().literal(literal).noneOfThisCharacter(literal).optionalMany().literal(literal));
 	}
 
+	/**
+	 * Add a match for any number of characters (.*) that are enclosed in the
+	 * literal.
+	 *
+	 * <p>
+	 * This is most useful for capturing the words in quotes and similar
+	 * things.</p>
+	 *
+	 * <p>
+	 * {@code charactersWrappedBy('(', ')')} will return "\([^\)]*\)"</p>
+	 *
+	 * @param starter the character expected at the start of a block of random
+	 * characters
+	 * @param ender the character expected at the end of a block of random
+	 * characters
+	 * @return a new regex
+	 */
 	public default REGEX charactersWrappedBy(Character starter, Character ender) {
 		return this.addGroup(Regex.startingAnywhere().literal(starter).noneOfThisCharacter(ender).optionalMany().literal(ender));
 	}
 
+	/**
+	 * Add a match for any number of characters (.*) that are enclosed in the
+	 * literal.
+	 *
+	 * <p>
+	 * This is most useful for capturing the words in quotes and similar
+	 * things.</p>
+	 *
+	 * <p>
+	 * {@code charactersWrappedBy('(', ')')} will return "\([^\)]*\)"</p>
+	 *
+	 * @param starter the character expected at the start of a block of random
+	 * characters
+	 * @param ender the character expected at the end of a block of random
+	 * characters
+	 * @return a new regex
+	 */
 	public default REGEX charactersWrappedBy(String starter, String ender) {
 		return charactersWrappedBy(new LiteralSequence(starter), new LiteralSequence(ender));
 	}
 
+	/**
+	 * Add a match for any number of characters (.*) that are enclosed in the
+	 * literal.
+	 *
+	 * <p>
+	 * This is most useful for capturing the words in quotes and similar
+	 * things.</p>
+	 *
+	 * <p>
+	 * {@code charactersWrappedBy('(', ')')} will return "\([^\)]*\)"</p>
+	 *
+	 * @param starter the regex expected at the start of a block of random
+	 * characters
+	 * @param ender the regex expected at the end of a block of random characters
+	 * @return a new regex
+	 */
 	public default REGEX charactersWrappedBy(PartialRegex starter, PartialRegex ender) {
 		return this.addGroup(Regex.startingAnywhere().add(starter).anythingButThis(ender).add(ender));
 	}
 
+	/**
+	 * Negative lookahead looks past the current match to check that it is NOT
+	 * followed by the lookahead expression.
+	 *
+	 * <p>
+	 * This is similar to adding an excluding expression, @{code "[^~].} for
+	 * instance, but doesn't include the excluded expression in the match. Used
+	 * with named captures, this is very useful to strip delimiters. For example {@code literal("{").beginNamedCapture("cap").anyCharacter().xeroOrMore().negativeLookAhead().literal("}").endLookAhead().endNamedCapture()
+	 * }
+	 * </p>
+	 *
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public default NegativeLookahead<REGEX> negativeLookAhead() {
 		return new NegativeLookahead<REGEX>((REGEX) this);
@@ -1177,7 +1390,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @return a new regexp
 	 */
 	public default REGEX noneOfThisCharacter(Character literal) {
-		return add(Regex.startingAnywhere().beginRange("" + literal).negated().endRange());
+		return add(Regex.empty().beginRange().addLiterals("" + literal).negated().endRange());
 	}
 
 }

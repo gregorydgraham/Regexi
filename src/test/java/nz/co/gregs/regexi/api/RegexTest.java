@@ -101,7 +101,7 @@ public class RegexTest {
 				).onceOrNotAtAll();
 
 		final PartialRegex separator
-				= Regex.startingAnywhere().beginRange('0', '9').includeMinus().negated().endRange().atLeastOnce();
+				= Regex.startingAnywhere().beginRange().addRange('0', '9').includeMinus().negated().endRange().atLeastOnce();
 
 		Regex pattern
 				= Regex.startingAnywhere()
@@ -136,7 +136,8 @@ public class RegexTest {
 				= Regex.startingAnywhere()
 						.literal('-').onceOrNotAtAll()
 						.anyCharacterBetween('0', '9').atLeastOnce()
-						.beginRange('0', '9')
+						.beginRange()
+						.addRange('0', '9')
 						.includeMinus()
 						.negated()
 						.endRange()

@@ -11,9 +11,9 @@ package nz.co.gregs.regexi;
  * @param <REGEX> the type returned by {@link #endRange() }
  */
 public class RangeBuilder<REGEX extends HasRegexFunctions<REGEX>> {
-	
+
 	private final REGEX origin;
-	private String literals;
+	private String literals = "";
 	private boolean negated = false;
 	private boolean includeMinus = false;
 	private boolean includeOpenBracket = false;
@@ -23,26 +23,26 @@ public class RangeBuilder<REGEX extends HasRegexFunctions<REGEX>> {
 		this.origin = original;
 	}
 
-	public RangeBuilder(REGEX original, Character lowest, Character highest) {
+	private RangeBuilder(REGEX original, Character lowest, Character highest) {
 		this(original);
 		addRange(lowest, highest);
 	}
 
-	public RangeBuilder(REGEX original, String literals) {
+	private RangeBuilder(REGEX original, String literals) {
 		this(original);
 		addLiterals(literals);
 	}
 
-	protected final RangeBuilder<REGEX> addRange(Character lowest, Character highest) {
-		this.literals = lowest + "-" + highest;
+	public final RangeBuilder<REGEX> addRange(Character lowest, Character highest) {
+		this.literals += lowest + "-" + highest;
 		return this;
 	}
 
-	protected final RangeBuilder<REGEX> addLiterals(String literals1) {
-		this.literals = literals1.replaceAll("-", "").replaceAll("]", "");
-		this.includeMinus = literals1.contains("-");
-		this.includeOpenBracket = literals1.contains("[");
-		this.includeCloseBracket = literals1.contains("]");
+	public final RangeBuilder<REGEX> addLiterals(String literals) {
+		this.literals += literals.replaceAll("-", "").replaceAll("]", "");
+		this.includeMinus = this.includeMinus || literals.contains("-");
+		this.includeOpenBracket = includeOpenBracket || literals.contains("[");
+		this.includeCloseBracket = includeCloseBracket || literals.contains("]");
 		return this;
 	}
 
@@ -90,5 +90,5 @@ public class RangeBuilder<REGEX extends HasRegexFunctions<REGEX>> {
 	public REGEX endRange() {
 		return origin.add(new UnescapedSequence(encloseInBrackets()));
 	}
-	
+
 }
