@@ -7,8 +7,6 @@ package nz.co.gregs.regexi;
 
 import java.util.ArrayList;
 import java.util.List;
-import nz.co.gregs.separatedstring.SeparatedString;
-import nz.co.gregs.separatedstring.SeparatedStringBuilder;
 
 /**
  *
@@ -16,7 +14,7 @@ import nz.co.gregs.separatedstring.SeparatedStringBuilder;
  * @param <REGEX> the type returned by {@link #endOrGroup() }
  */
 public class OrGroup<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<OrGroup<REGEX>, REGEX> {
-	
+
 	private final List<String> ors = new ArrayList<>(0);
 
 	protected OrGroup(REGEX original) {
@@ -41,8 +39,17 @@ public class OrGroup<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<
 	public String getRegex() {
 		final String regexp = getCurrent().getRegex();
 		ors.add(regexp);
-		final SeparatedString groupedString = SeparatedStringBuilder.of(ors).separatedBy("|").withPrefix("(").withSuffix(")");
-		return groupedString.toString();
+		String result = "";
+		for (String or : ors) {
+			result += (result.isEmpty() ? "" : "|") + or;
+		}
+		if (result.isEmpty()) {
+			return result;
+		} else {
+			return "(" + result + ")";
+		}
+//		final SeparatedString groupedString = SeparatedStringBuilder.of(ors).separatedBy("|").withPrefix("(").withSuffix(")");
+//		return groupedString.toString();
 	}
-	
+
 }

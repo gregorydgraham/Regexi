@@ -53,12 +53,6 @@
 			<version>1.3</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>nz.co.gregs</groupId>
-			<artifactId>separatedstring</artifactId>
-			<version>1.2</version>
-			<type>jar</type>
-		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
