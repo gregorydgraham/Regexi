@@ -32,11 +32,8 @@ package nz.co.gregs.regexi.api;
  */
 import java.util.*;
 import java.util.stream.Collectors;
+import nz.co.gregs.regexi.*;
 import org.junit.Assert;
-import nz.co.gregs.regexi.Match;
-import nz.co.gregs.regexi.MatchedGroup;
-import nz.co.gregs.regexi.PartialRegex;
-import nz.co.gregs.regexi.Regex;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -988,6 +985,25 @@ public class RegexTest {
 		assertThat(regex.matchesBeginningOf("days after"), is(true));
 		assertThat(regex.matchesBeginningOf("daysmiddle after"), is(false));
 		assertThat(regex.matchesBeginningOf("before"), is(false));
+	}
+	
+	@Test
+	public void testReplacement(){
+		String s= "find all the backslashes (\\) and replace them with \\ also watch out for = \" , NULL and {} ";
+		Regex find = Regex.empty().namedCapture("special").orGroup()
+				.literal("\\")
+				.or().literal("=")
+				.or().literal("\"")
+				.or().literal(",")
+//				.or().literal("\"")
+				.or().literal("NULL")
+				.or().literal("}")
+				.or().literal("{").endOrGroup().once().endNamedCapture().toRegex();
+		assertThat(find.matchesWithinString(s), is(true));
+		
+		String result = find.replaceWith().literal("\\").namedReference("special").replaceAll(s);
+		
+		assertThat(result, is("find all the backslashes (\\\\) and replace them with \\\\ also watch out for \\= \\\" \\, \\NULL and \\{\\} "));
 	}
 
 	@Test

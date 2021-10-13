@@ -12,7 +12,6 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -167,4 +166,7 @@ public class Regex {
 		return testAgainstGeneric(testStr, patterns, "MATCHES ENTIRE STRING", (r, s) -> r.matchesEntireString(s));
 	}
 
+	public RegexReplacement replaceWith() {
+		return new RegexReplacement(this);
+	}
 }

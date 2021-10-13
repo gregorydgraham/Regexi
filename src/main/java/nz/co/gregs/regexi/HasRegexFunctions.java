@@ -1323,7 +1323,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 
 	public default REGEX anythingButThis(PartialRegex ender) {
 		return this.addGroup(
-				Regex.empty().addGroup(
+						Regex.empty().addGroup(
 						Regex.empty().negativeLookAhead().add(ender).endGroup().anyCharacter()
 				).optionalMany()
 		);
