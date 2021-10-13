@@ -995,7 +995,7 @@ public class RegexTest {
 				.or().literal("=")
 				.or().literal("\"")
 				.or().literal(",")
-//				.or().literal("\"")
+				.or().literal("\"")
 				.or().literal("NULL")
 				.or().literal("}")
 				.or().literal("{").endOrGroup().once().endNamedCapture().toRegex();
