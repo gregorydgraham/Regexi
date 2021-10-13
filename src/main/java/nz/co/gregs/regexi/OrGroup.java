@@ -48,8 +48,6 @@ public class OrGroup<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<
 		} else {
 			return "(" + result + ")";
 		}
-//		final SeparatedString groupedString = SeparatedStringBuilder.of(ors).separatedBy("|").withPrefix("(").withSuffix(")");
-//		return groupedString.toString();
 	}
 
 }
