@@ -104,8 +104,8 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 
 	protected final Pattern getPattern() {
 		if (compiledVersion == null) {
-			final String regexp = this.getRegex();
-			compiledVersion = Pattern.compile(regexp);
+			final String regex = this.getRegex();
+			compiledVersion = Pattern.compile(regex);
 		}
 		return compiledVersion;
 	}
