@@ -405,7 +405,7 @@ public class RegexTest {
 		final String literal = "[a-b]*$(alice|bob).^?";
 		Regex regex = Regex.empty().literal(literal).once().toRegex();
 
-		assertThat(regex.getRegex(), is("(\\[a-b]\\*\\$\\(alice|bob\\)\\.\\^\\?){1}"));
+		assertThat(regex.getRegex(), is("(\\[a-b\\]\\*\\$\\(alice\\|bob\\)\\.\\^\\?){1}"));
 
 		assertThat(regex.matchesWithinString(literal), is(true));
 		assertThat(regex.matchesWithinString("abcboba^?"), is(false));
