@@ -33,8 +33,9 @@ public class LiteralSequence extends PartialRegex {
 			this.literal = "";
 		} else {
 			this.literal = literals
-					.replaceAll("\\\\", "\\")
+					.replaceAll("\\\\", "\\\\\\\\")
 					.replaceAll("\\+", "\\\\+")
+					.replaceAll("\\{", "\\\\{")
 					.replaceAll("\\(", "\\\\(")
 					.replaceAll("\\)", "\\\\)")
 					.replaceAll("\\[", "\\\\[")
