@@ -50,8 +50,7 @@ public class RegexReplacement {
 		return this;
 	}
 
-	String getReplacementPattern() {
-		System.out.println("REPLACEMENT: " + pattern);
+	public String getReplacementPattern() {
 		return pattern;
 	}
 
@@ -60,9 +59,6 @@ public class RegexReplacement {
 	}
 
 	public String replaceAll(String s) {
-		System.out.println("STRING: " + s);
-		System.out.println("REGEX: " + regex.getRegex());
-		System.out.println("RELACEMENT: " + getReplacementPattern());
 		return getMatcher(s).replaceAll(getReplacementPattern());
 	}
 
