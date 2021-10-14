@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.MatchResult;
-import nz.co.gregs.regexi.internal.MatchedGroup;
 import nz.co.gregs.regexi.internal.PartialRegex;
 
 /**
