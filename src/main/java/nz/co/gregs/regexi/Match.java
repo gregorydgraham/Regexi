@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package nz.co.gregs.regexi.internal;
+package nz.co.gregs.regexi;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.MatchResult;
+import nz.co.gregs.regexi.internal.MatchedGroup;
+import nz.co.gregs.regexi.internal.PartialRegex;
 
 /**
  *
@@ -16,7 +18,7 @@ import java.util.regex.MatchResult;
  */
 public class Match {
 
-	static Match from(PartialRegex aThis, MatchResult m) {
+	public static Match from(PartialRegex aThis, MatchResult m) {
 		return new Match(aThis, m);
 	}
 

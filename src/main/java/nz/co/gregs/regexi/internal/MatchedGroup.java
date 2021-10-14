@@ -14,7 +14,7 @@ public class MatchedGroup {
 	private final String string;
 	private final int index;
 
-	MatchedGroup(String group, int i) {
+	public MatchedGroup(String group, int i) {
 		this.string = group;
 		this.index = i;
 	}

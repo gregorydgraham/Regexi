@@ -10,7 +10,6 @@ import nz.co.gregs.regexi.internal.UnescapedSequence;
 import nz.co.gregs.regexi.internal.RegexReplacement;
 import nz.co.gregs.regexi.internal.PartialRegex;
 import nz.co.gregs.regexi.internal.OrGroup;
-import nz.co.gregs.regexi.internal.Match;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

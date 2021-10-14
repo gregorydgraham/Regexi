@@ -32,7 +32,7 @@ package nz.co.gregs.regexi.api;
  */
 import nz.co.gregs.regexi.internal.PartialRegex;
 import nz.co.gregs.regexi.internal.MatchedGroup;
-import nz.co.gregs.regexi.internal.Match;
+import nz.co.gregs.regexi.Match;
 import java.util.*;
 import java.util.stream.Collectors;
 import nz.co.gregs.regexi.*;
