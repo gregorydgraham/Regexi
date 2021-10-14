@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package nz.co.gregs.regexi;
+package nz.co.gregs.regexi.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ public class UnescapedSequence extends PartialRegex {
 
 	private final String literal;
 
-	protected UnescapedSequence(String literals) {
+	public UnescapedSequence(String literals) {
 		if (literals == null) {
 			this.literal = "";
 		} else {

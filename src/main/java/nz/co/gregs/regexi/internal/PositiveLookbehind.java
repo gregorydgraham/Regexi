@@ -3,28 +3,29 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package nz.co.gregs.regexi;
+package nz.co.gregs.regexi.internal;
+
+import nz.co.gregs.regexi.internal.HasRegexFunctions;
 
 /**
  *
  * @author gregorygraham
  * @param <REGEX> the type returned by {@link #endGroup() }
  */
-public class Group<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<Group<REGEX>, REGEX> {
+public class PositiveLookbehind<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<PositiveLookbehind<REGEX>, REGEX> {
 	
 
-	protected Group(REGEX original) {
+	protected PositiveLookbehind(REGEX original) {
 		super(original);
 	}
 
 	@Override
 	public String getRegex() {
 		final String regexp = getCurrent().getRegex();
-		return "("+regexp+")";
+		return "(?<="+regexp+")";
 	}
 
-	@Override
-	public REGEX endGroup() {
+	public REGEX endLookahead() {
 		return super.endGroup();
 	}
 	

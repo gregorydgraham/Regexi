@@ -28,9 +28,12 @@
  * 
  * Check the Creative Commons website for any details, legalese, and updates.
  */
-package nz.co.gregs.regexi;
+package nz.co.gregs.regexi.internal;
 
+import nz.co.gregs.regexi.internal.Group;
+import nz.co.gregs.regexi.internal.CaseInsensitiveSection;
 import java.util.List;
+import nz.co.gregs.regexi.Regex;
 
 /**
  *

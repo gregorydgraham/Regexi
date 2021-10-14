@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package nz.co.gregs.regexi;
+package nz.co.gregs.regexi.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,26 +12,28 @@ import java.util.List;
  *
  * @author gregorygraham
  */
-class RegexCombination extends PartialRegex {
+public class NamedBackReference extends PartialRegex {
 
-	private final PartialRegex first;
-	private final PartialRegex second;
+	private final String literal;
 
-	protected RegexCombination(PartialRegex first, PartialRegex second) {
-		this.first = first;
-		this.second = second;
+	public NamedBackReference(String name) {
+		if (name == null) {
+			this.literal = "";
+		} else {
+			// \k<name>
+			this.literal = "\\k<" + name + ">";
+		}
 	}
 
 	@Override
 	public String getRegex() {
-		return first.getRegex() + second.getRegex();
+		return literal;
 	}
 
 	@Override
 	public List<PartialRegex> getRegexParts() {
 		List<PartialRegex> result = new ArrayList<PartialRegex>(1);
-		result.addAll(first.getRegexParts());
-		result.addAll(second.getRegexParts());
+		result.add(this);
 		return result;
 	}
 

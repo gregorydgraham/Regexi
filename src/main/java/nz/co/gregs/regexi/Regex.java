@@ -5,6 +5,12 @@
  */
 package nz.co.gregs.regexi;
 
+import nz.co.gregs.regexi.internal.UntestableSequence;
+import nz.co.gregs.regexi.internal.UnescapedSequence;
+import nz.co.gregs.regexi.internal.RegexReplacement;
+import nz.co.gregs.regexi.internal.PartialRegex;
+import nz.co.gregs.regexi.internal.OrGroup;
+import nz.co.gregs.regexi.internal.Match;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,7 +74,7 @@ public class Regex {
 
 	private final PartialRegex partial;
 
-	protected Regex(PartialRegex partial) {
+	public Regex(PartialRegex partial) {
 		this.partial = partial;
 	}
 
@@ -122,9 +128,6 @@ public class Regex {
 		partials.addAll(this.partial.getRegexParts());
 		List<String> strings = new ArrayList<>();
 		strings.addAll(testAgainstAnywhereInString(testStr, partials));
-//		strings.addAll(testAgainstAnywhereInString(testStr, partials));
-//		strings.addAll(testAgainstBeginningOfString(testStr, partials));
-//		strings.addAll(testAgainstEndOfString(testStr, partials));
 		return strings;
 	}
 

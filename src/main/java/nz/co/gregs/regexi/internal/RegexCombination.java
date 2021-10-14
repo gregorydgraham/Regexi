@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package nz.co.gregs.regexi;
+package nz.co.gregs.regexi.internal;
 
+import nz.co.gregs.regexi.internal.PartialRegex;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,28 +13,26 @@ import java.util.List;
  *
  * @author gregorygraham
  */
-public class NamedBackReference extends PartialRegex {
+class RegexCombination extends PartialRegex {
 
-	private final String literal;
+	private final PartialRegex first;
+	private final PartialRegex second;
 
-	public NamedBackReference(String name) {
-		if (name == null) {
-			this.literal = "";
-		} else {
-			// \k<name>
-			this.literal = "\\k<" + name + ">";
-		}
+	protected RegexCombination(PartialRegex first, PartialRegex second) {
+		this.first = first;
+		this.second = second;
 	}
 
 	@Override
 	public String getRegex() {
-		return literal;
+		return first.getRegex() + second.getRegex();
 	}
 
 	@Override
 	public List<PartialRegex> getRegexParts() {
 		List<PartialRegex> result = new ArrayList<PartialRegex>(1);
-		result.add(this);
+		result.addAll(first.getRegexParts());
+		result.addAll(second.getRegexParts());
 		return result;
 	}
 

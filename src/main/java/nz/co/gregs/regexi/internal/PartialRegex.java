@@ -28,8 +28,10 @@
  * 
  * Check the Creative Commons website for any details, legalese, and updates.
  */
-package nz.co.gregs.regexi;
+package nz.co.gregs.regexi.internal;
 
+import nz.co.gregs.regexi.internal.Match;
+import nz.co.gregs.regexi.internal.HasRegexFunctions;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -40,6 +42,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import nz.co.gregs.regexi.Regex;
 
 /**
  *
@@ -110,7 +113,7 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 		return compiledVersion;
 	}
 
-	protected boolean matchesEntireString(String string) {
+	public boolean matchesEntireString(String string) {
 		return getMatcher(string).matches();
 	}
 
@@ -125,7 +128,7 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 	 * @param string the string to test with this regex
 	 * @return true if the beginning of the string matches this regex.
 	 */
-	protected boolean matchesBeginningOf(String string) {
+	public boolean matchesBeginningOf(String string) {
 		return Regex.startingFromTheBeginning().add(this).matchesWithinString(string);
 	}
 
@@ -139,19 +142,19 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 	 * @param string the string to test with this regex
 	 * @return true if the end of the string matches this regex.
 	 */
-	protected boolean matchesEndOf(String string) {
+	public boolean matchesEndOf(String string) {
 		return endOfTheString().matchesWithinString(string);
 	}
 
-	protected boolean matchesWithinString(String string) {
+	public boolean matchesWithinString(String string) {
 		return getMatcher(string).find();
 	}
 
-	protected Stream<MatchResult> getMatchResultsStream(String string) {
+	public Stream<MatchResult> getMatchResultsStream(String string) {
 		return getMatcher(string).results();
 	}
 
-	protected Matcher getMatcher(String string) {
+	public Matcher getMatcher(String string) {
 		return getPattern().matcher(string);
 	}
 
@@ -165,11 +168,11 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 	 * @param string the string to generate the MatchResult for
 	 * @since 1.5
 	 */
-	protected MatchResult getMatchResult(String string) {
+	public MatchResult getMatchResult(String string) {
 		return getMatcher(string).toMatchResult();
 	}
 
-	protected HashMap<String, String> getAllNamedCapturesOfFirstMatchWithinString(String string) {
+	public HashMap<String, String> getAllNamedCapturesOfFirstMatchWithinString(String string) {
 		HashMap<String, String> resultMap = new HashMap<String, String>(0);
 		try {
 			Matcher matcher = getMatcher(string);
@@ -203,7 +206,7 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 		return resultMap;
 	}
 
-	protected List<Match> getAllMatches(String string) {
+	public List<Match> getAllMatches(String string) {
 		Matcher matcher = getMatcher(string);
 		List<Match> matches = matcher.results().map(
 				m -> Match.from(this, m)
@@ -211,7 +214,7 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 		return matches;
 	}
 
-	protected Optional<Match> getFirstMatchFrom(String string) {
+	public Optional<Match> getFirstMatchFrom(String string) {
 		Matcher matcher = getMatcher(string);
 		if (matcher.find()) {
 			MatchResult result = matcher.toMatchResult();

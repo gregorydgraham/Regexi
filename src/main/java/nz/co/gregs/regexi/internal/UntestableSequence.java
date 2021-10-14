@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package nz.co.gregs.regexi;
+package nz.co.gregs.regexi.internal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class UntestableSequence extends UnescapedSequence {
 
-	protected UntestableSequence(String literals) {
+	public UntestableSequence(String literals) {
 		super(literals);
 	}
 
