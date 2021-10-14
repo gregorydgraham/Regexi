@@ -31,7 +31,7 @@ package nz.co.gregs.regexi.api;
  * Check the Creative Commons website for any details, legalese, and updates.
  */
 import nz.co.gregs.regexi.internal.PartialRegex;
-import nz.co.gregs.regexi.internal.MatchedGroup;
+import nz.co.gregs.regexi.MatchedGroup;
 import nz.co.gregs.regexi.Match;
 import java.util.*;
 import java.util.stream.Collectors;
