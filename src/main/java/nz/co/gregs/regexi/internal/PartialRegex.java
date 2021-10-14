@@ -105,7 +105,7 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 			.or().literal('0').oneOrMore().notFollowedBy(Regex.startingAnywhere().digit())
 			.endOrGroup();
 
-	protected final Pattern getPattern() {
+	protected synchronized final Pattern getPattern() {
 		if (compiledVersion == null) {
 			final String regex = this.getRegex();
 			compiledVersion = Pattern.compile(regex);
@@ -113,7 +113,7 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 		return compiledVersion;
 	}
 
-	public boolean matchesEntireString(String string) {
+	public synchronized boolean matchesEntireString(String string) {
 		return getMatcher(string).matches();
 	}
 
@@ -128,7 +128,7 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 	 * @param string the string to test with this regex
 	 * @return true if the beginning of the string matches this regex.
 	 */
-	public boolean matchesBeginningOf(String string) {
+	public synchronized boolean matchesBeginningOf(String string) {
 		return Regex.startingFromTheBeginning().add(this).matchesWithinString(string);
 	}
 
@@ -142,19 +142,19 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 	 * @param string the string to test with this regex
 	 * @return true if the end of the string matches this regex.
 	 */
-	public boolean matchesEndOf(String string) {
+	public synchronized boolean matchesEndOf(String string) {
 		return endOfTheString().matchesWithinString(string);
 	}
 
-	public boolean matchesWithinString(String string) {
+	public synchronized boolean matchesWithinString(String string) {
 		return getMatcher(string).find();
 	}
 
-	public Stream<MatchResult> getMatchResultsStream(String string) {
+	public synchronized Stream<MatchResult> getMatchResultsStream(String string) {
 		return getMatcher(string).results();
 	}
 
-	public Matcher getMatcher(String string) {
+	public synchronized Matcher getMatcher(String string) {
 		return getPattern().matcher(string);
 	}
 
@@ -168,11 +168,11 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 	 * @param string the string to generate the MatchResult for
 	 * @since 1.5
 	 */
-	public MatchResult getMatchResult(String string) {
+	public synchronized MatchResult getMatchResult(String string) {
 		return getMatcher(string).toMatchResult();
 	}
 
-	public HashMap<String, String> getAllNamedCapturesOfFirstMatchWithinString(String string) {
+	public synchronized HashMap<String, String> getAllNamedCapturesOfFirstMatchWithinString(String string) {
 		HashMap<String, String> resultMap = new HashMap<String, String>(0);
 		try {
 			Matcher matcher = getMatcher(string);
@@ -206,7 +206,7 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 		return resultMap;
 	}
 
-	public List<Match> getAllMatches(String string) {
+	public synchronized List<Match> getAllMatches(String string) {
 		Matcher matcher = getMatcher(string);
 		List<Match> matches = matcher.results().map(
 				m -> Match.from(this, m)
@@ -214,7 +214,7 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 		return matches;
 	}
 
-	public Optional<Match> getFirstMatchFrom(String string) {
+	public synchronized Optional<Match> getFirstMatchFrom(String string) {
 		Matcher matcher = getMatcher(string);
 		if (matcher.find()) {
 			MatchResult result = matcher.toMatchResult();
