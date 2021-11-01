@@ -22,8 +22,8 @@ public class NamedCapture<REGEX extends HasRegexFunctions<REGEX>> extends RegexG
 	}
 
 	@Override
-	public String getRegex() {
-		final String regexp = getCurrent().getRegex();
+	public String toRegexString() {
+		final String regexp = getCurrent().toRegexString();
 		return "(?<" + name + ">" + regexp + ")";
 	}
 

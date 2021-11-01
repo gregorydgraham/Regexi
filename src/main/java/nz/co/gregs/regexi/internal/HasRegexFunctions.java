@@ -50,7 +50,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 *
 	 * @return the PartialRegex converted to a string pattern
 	 */
-	public String getRegex();
+	public String toRegexString();
 
 	/**
 	 * Return a list of partial regex patterns in this regex pattern

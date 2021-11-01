@@ -22,7 +22,7 @@ public class NumberedBackReference extends PartialRegex {
 	}
 
 	@Override
-	public String getRegex() {
+	public String toRegexString() {
 		return literal;
 	}
 

@@ -230,7 +230,7 @@ public class RegexTest {
 				= Regex.startingAnywhere()
 						.number().once().toRegex();
 		System.out.println(pattern.getRegex());
-//		assertThat(pattern.getRegex(), is("(([-+]?\\b([1-9]+\\d*|0+(?!\\d)))(\\.{1}(\\d+))?){1}"));
+//		assertThat(pattern.toRegexString(), is("(([-+]?\\b([1-9]+\\d*|0+(?!\\d)))(\\.{1}(\\d+))?){1}"));
 		assertThat(pattern.getRegex(), is("(([-+]?\\b([1-9]+\\d*|0+(?!\\d)))((\\.){1}(\\d+))?){1}"));
 
 		assertThat(pattern.matchesWithinString("before -1 after"), is(true));
@@ -458,7 +458,7 @@ public class RegexTest {
 				= Regex.startingAnywhere()
 						.numberIncludingScientificNotation().once().toRegex();
 		System.out.println(pattern.getRegex());
-//		assertThat(pattern.getRegex(),is("((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))(\\.{1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}(\\.{1}(\\d+))?)?){1}"));
+//		assertThat(pattern.toRegexString(),is("((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))(\\.{1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}(\\.{1}(\\d+))?)?){1}"));
 
 		assertThat(pattern.matchesWithinString("before -1 after"), is(true));
 		assertThat(pattern.matchesWithinString("before 2 after"), is(true));
@@ -872,7 +872,7 @@ public class RegexTest {
 						.wordBoundary()
 						.endOfTheString().toRegex();
 		System.out.println(regex.getRegex());
-//		assertThat(toRegex.getRegex(), is("\\b((?i)day(?-i)){1}((?i)s(?-i))?\\b$"));
+//		assertThat(toRegex.toRegexString(), is("\\b((?i)day(?-i)){1}((?i)s(?-i))?\\b$"));
 		assertThat(regex.getRegex(), is("\\b((?i)(day)(?-i)){1}((?i)(s)(?-i))?\\b$"));
 
 		assertThat(regex.matchesWithinString("day"), is(true));

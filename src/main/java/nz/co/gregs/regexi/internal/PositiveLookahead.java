@@ -20,8 +20,8 @@ public class PositiveLookahead<REGEX extends HasRegexFunctions<REGEX>> extends R
 	}
 
 	@Override
-	public String getRegex() {
-		final String regexp = getCurrent().getRegex();
+	public String toRegexString() {
+		final String regexp = getCurrent().toRegexString();
 		return "(?="+regexp+")";
 	}
 

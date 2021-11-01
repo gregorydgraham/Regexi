@@ -24,8 +24,8 @@ class RegexCombination extends PartialRegex {
 	}
 
 	@Override
-	public String getRegex() {
-		return first.getRegex() + second.getRegex();
+	public String toRegexString() {
+		return first.toRegexString() + second.toRegexString();
 	}
 
 	@Override

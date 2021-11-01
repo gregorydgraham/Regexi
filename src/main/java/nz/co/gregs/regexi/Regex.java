@@ -78,7 +78,7 @@ public class Regex {
 	}
 
 	public String getRegex() {
-		return partial.getRegex();
+		return partial.toRegexString();
 	}
 
 	public boolean matchesEntireString(String string) {
@@ -136,7 +136,7 @@ public class Regex {
 		strings.add(descriptionStart + ": " + testStr);
 		for (PartialRegex pattern : patterns) {
 			try {
-				strings.add("TESTING: " + pattern.getRegex());
+				strings.add("TESTING: " + pattern.toRegexString());
 				final Regex regex = pattern.toRegex();
 				final boolean result = matcher.apply(regex, testStr);
 				strings.add("RESULT: " + (result ? "found" : "FAILED"));

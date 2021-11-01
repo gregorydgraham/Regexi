@@ -18,8 +18,8 @@ public class CaseInsensitiveSection<REGEX extends HasRegexFunctions<REGEX>> exte
 	}
 
 	@Override
-	public String getRegex() {
-		final String regexp = getCurrent().getRegex();
+	public String toRegexString() {
+		final String regexp = getCurrent().toRegexString();
 		return "((?i)" + regexp + "(?-i))";
 	}
 

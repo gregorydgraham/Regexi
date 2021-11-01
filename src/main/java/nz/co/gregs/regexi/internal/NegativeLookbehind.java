@@ -20,8 +20,8 @@ public class NegativeLookbehind<REGEX extends HasRegexFunctions<REGEX>> extends 
 	}
 
 	@Override
-	public String getRegex() {
-		final String regexp = getCurrent().getRegex();
+	public String toRegexString() {
+		final String regexp = getCurrent().toRegexString();
 		return "(?<!"+regexp+")";
 	}
 

@@ -71,7 +71,7 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 	}
 
 	protected REGEX endGroup() {
-		return getOrigin().unescaped(this.getRegex());
+		return getOrigin().unescaped(this.toRegexString());
 	}
 
 	@Override

@@ -26,7 +26,7 @@ public class NamedBackReference extends PartialRegex {
 	}
 
 	@Override
-	public String getRegex() {
+	public String toRegexString() {
 		return literal;
 	}
 

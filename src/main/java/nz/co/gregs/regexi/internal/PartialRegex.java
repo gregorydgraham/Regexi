@@ -65,7 +65,7 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 	}
 
 	@Override
-	public abstract String getRegex() ;
+	public abstract String toRegexString();
 	
 	@Override
 	public abstract List<PartialRegex> getRegexParts() ;
@@ -107,7 +107,7 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 
 	protected synchronized final Pattern getPattern() {
 		if (compiledVersion == null) {
-			final String regex = this.getRegex();
+			final String regex = this.toRegexString();
 			compiledVersion = Pattern.compile(regex);
 		}
 		return compiledVersion;

@@ -28,7 +28,7 @@ public class OrGroup<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<
 	}
 
 	public OrGroup<REGEX> or() {
-		ors.add(getCurrent().getRegex());
+		ors.add(getCurrent().toRegexString());
 		return new OrGroup<>(getOrigin(), ors);
 	}
 
@@ -37,8 +37,8 @@ public class OrGroup<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<
 	}
 
 	@Override
-	public String getRegex() {
-		final String regexp = getCurrent().getRegex();
+	public String toRegexString() {
+		final String regexp = getCurrent().toRegexString();
 		ors.add(regexp);
 		String result = "";
 		for (String or : ors) {
