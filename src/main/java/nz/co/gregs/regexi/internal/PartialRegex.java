@@ -31,7 +31,6 @@
 package nz.co.gregs.regexi.internal;
 
 import nz.co.gregs.regexi.Match;
-import nz.co.gregs.regexi.internal.HasRegexFunctions;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
