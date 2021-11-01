@@ -285,6 +285,18 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	}
 
 	/**
+	 * Adds a match for zero or more characters to the regexp without grouping it.
+	 *
+	 * <p>
+	 * This is the equivalent of adding ".*" to the Pattern.</p>
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX anything() {
+		return this.anyCharacter().optionalMany();
+	}
+
+	/**
 	 * Adds a check for a simple range to the regular expression without grouping.
 	 *
 	 * <p>
@@ -1324,7 +1336,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 
 	public default REGEX anythingButThis(PartialRegex ender) {
 		return this.addGroup(
-						Regex.empty().addGroup(
+				Regex.empty().addGroup(
 						Regex.empty().negativeLookAhead().add(ender).endGroup().anyCharacter()
 				).optionalMany()
 		);
