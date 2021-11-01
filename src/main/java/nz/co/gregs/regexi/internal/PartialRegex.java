@@ -63,6 +63,15 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 		return new Regex(this);
 	}
 
+	/**
+	 * Transforms the PartialRegex into a full Regex ready for use with matching.
+	 *
+	 * @return a Regex
+	 */
+	public Regex endRegex() {
+		return toRegex();
+	}
+
 	@Override
 	public abstract String toRegexString();
 	
