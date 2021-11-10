@@ -7,7 +7,6 @@ package nz.co.gregs.regexi;
 
 import nz.co.gregs.regexi.internal.UntestableSequence;
 import nz.co.gregs.regexi.internal.UnescapedSequence;
-import nz.co.gregs.regexi.internal.RegexReplacement;
 import nz.co.gregs.regexi.internal.PartialRegex;
 import nz.co.gregs.regexi.internal.OrGroup;
 import java.util.ArrayList;

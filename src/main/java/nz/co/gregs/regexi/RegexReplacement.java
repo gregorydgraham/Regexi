@@ -3,12 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package nz.co.gregs.regexi.internal;
+package nz.co.gregs.regexi;
 
 import java.util.function.Function;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
-import nz.co.gregs.regexi.Regex;
 
 /**
  *
@@ -75,4 +74,7 @@ public class RegexReplacement {
 		return getMatcher(s).replaceFirst(getReplacementPattern());
 	}
 
+	public RegexReplacement nothing() {
+		return this.literal("");
+	}
 }
