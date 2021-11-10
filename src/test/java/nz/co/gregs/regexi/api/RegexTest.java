@@ -1029,6 +1029,25 @@ public class RegexTest {
 		assertThat(result, is("find all the backslashes () and replace them with  also watch out for     and  "));
 	}
 
+	
+	@Test
+	public void testReplacementWithNothingUsingReplaceWith(){
+		String s= "find all the backslashes (\\) and replace them with \\ also watch out for = \" , NULL and {} ";
+		RegexReplacement find = Regex.empty().namedCapture("special").orGroup()
+				.literal("\\")
+				.or().literal("=")
+				.or().literal("\"")
+				.or().literal(",")
+				.or().literal("\"")
+				.or().literal("NULL")
+				.or().literal("}")
+				.or().literal("{").endOrGroup().once().endNamedCapture()
+				.replaceWith().nothing();
+		String result  = find.replaceAll(s);
+		
+		assertThat(result, is("find all the backslashes () and replace them with  also watch out for     and  "));
+	}
+
 	@Test
 	public void testShouldMatch() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testShouldMatch()");

@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import nz.co.gregs.regexi.Regex;
+import nz.co.gregs.regexi.RegexReplacement;
 
 /**
  *
@@ -70,6 +71,15 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 	 */
 	public Regex endRegex() {
 		return toRegex();
+	}
+
+	/**
+	 * Transforms the PartialRegex into a RegexReplacement
+	 *
+	 * @return a RegexReplacement
+	 */
+	public RegexReplacement replaceWith() {
+		return toRegex().replaceWith();
 	}
 
 	@Override
