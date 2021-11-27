@@ -585,8 +585,8 @@ public class RegexTest {
 	}
 
 	@Test
-	public void testRegexValueFinder() {
-		System.out.println("nz.co.gregs.regexi.api.RegexTest.testRegexValueFinder()");
+	public void testRegexValueFinderOnce() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testRegexValueFinderOnce()");
 		// -2 days 00:00:00
 		// 1 days 00:00:5.5
 		// 0 days 00:00:-5.5
@@ -604,6 +604,27 @@ public class RegexTest {
 		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND";
 		final String valueStr = intervalRegex.getValueFrom(intervalString).orElse("");
 		assertThat(valueStr, is("-1.999999999946489E-6"));
+	}
+
+	@Test
+	public void testRegexValueFinderMany() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testRegexValueFinderMany()");
+		// -2 days 00:00:00
+		// 1 days 00:00:5.5
+		// 0 days 00:00:-5.5
+		//
+		// ^(?<interval>((?i)interval(?-i)){1}) {1}(?<value>([-+]?\b[1-9]+\d*(\.{1}\d+)?(((?i)E(?-i)){1}[-+]?[1-9]+\d*(\.{1}\d+)?)?(?!\S)){1}) {1}(?<unit>\w+)$
+		RegexValueFinder intervalRegex
+				= Regex.empty()
+						.beginNamedCapture("value").numberIncludingScientificNotation().once().endNamedCapture()
+						.returnValueFor("value");
+
+		String intervalString = "INTERVAL -1.999999999946489E-6 2 4 56";
+		final List<String> valueStr = intervalRegex.getAllValuesFrom(intervalString);
+		assertThat(valueStr.get(0), is("-1.999999999946489E-6"));
+		assertThat(valueStr.get(1), is("2"));
+		assertThat(valueStr.get(2), is("4"));
+		assertThat(valueStr.get(3), is("56"));
 	}
 
 	@Test

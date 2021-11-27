@@ -84,8 +84,15 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 	}
 
 	/**
-	 * Transforms the PartialRegex into a RegexValueFinder
+	 * Transforms the PartialRegex into a RegexValueFinder.
 	 *
+	 * RegexValueFinder is designed to be a convenient way to use named captures
+	 * to return values from within strings. For instance
+	 * Regex.empty().beginNamedCapture("NumberValue").number().endNamedCapture().returnValueFor("NumberValue").getValueFrom("this
+	 * that 215 another").orElse("") will return "215".
+	 *
+	 * @param previouslyDefinedNamedCapture the named capture to return the value
+	 * of.
 	 * @return a RegexValueFinder
 	 */
 	public RegexValueFinder returnValueFor(String previouslyDefinedNamedCapture) {
@@ -94,20 +101,21 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 
 	@Override
 	public abstract String toRegexString();
-	
+
 	@Override
-	public abstract List<PartialRegex> getRegexParts() ;
+	public abstract List<PartialRegex> getRegexParts();
 
 	/**
 	 * Adds the regular expression to the end of current expression as a new
 	 * group.
 	 *
 	 * <p>
- For example
- PartialRegex.startingAnywhere().addGroup(allowedValue).addGroup(separator) will addGroup
- the "separator" regular expression to the "allowedValue" expression (the
- rest of the instruction adds nothing). Assuming that allowedValue is
- "[0-9]" and separator is ":", the full regexp will be "([0-9])(:)".
+	 * For example
+	 * PartialRegex.startingAnywhere().addGroup(allowedValue).addGroup(separator)
+	 * will addGroup the "separator" regular expression to the "allowedValue"
+	 * expression (the rest of the instruction adds nothing). Assuming that
+	 * allowedValue is "[0-9]" and separator is ":", the full regexp will be
+	 * "([0-9])(:)".
 	 *
 	 * @param second the regular expression to addGroup to this regular expression
 	 * @return a new regular expression consisting of the current expression and
