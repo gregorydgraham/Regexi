@@ -550,11 +550,6 @@ public class RegexTest {
 	@Test
 	public void testNamedCaptures() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testNamedCaptures()");
-		// -2 days 00:00:00
-		// 1 days 00:00:5.5
-		// 0 days 00:00:-5.5
-		//
-		// ^(?<interval>((?i)interval(?-i)){1}) {1}(?<value>([-+]?\b[1-9]+\d*(\.{1}\d+)?(((?i)E(?-i)){1}[-+]?[1-9]+\d*(\.{1}\d+)?)?(?!\S)){1}) {1}(?<unit>\w+)$
 		Regex intervalRegex
 				= Regex.startingFromTheBeginning()
 						.beginNamedCapture("interval").literalCaseInsensitive("interval").once().endNamedCapture()
@@ -587,11 +582,6 @@ public class RegexTest {
 	@Test
 	public void testRegexValueFinderOnce() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testRegexValueFinderOnce()");
-		// -2 days 00:00:00
-		// 1 days 00:00:5.5
-		// 0 days 00:00:-5.5
-		//
-		// ^(?<interval>((?i)interval(?-i)){1}) {1}(?<value>([-+]?\b[1-9]+\d*(\.{1}\d+)?(((?i)E(?-i)){1}[-+]?[1-9]+\d*(\.{1}\d+)?)?(?!\S)){1}) {1}(?<unit>\w+)$
 		RegexValueFinder intervalRegex
 				= Regex.startingFromTheBeginning()
 						.beginNamedCapture("interval").literalCaseInsensitive("interval").once().endNamedCapture()
@@ -609,11 +599,6 @@ public class RegexTest {
 	@Test
 	public void testRegexValueFinderMany() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testRegexValueFinderMany()");
-		// -2 days 00:00:00
-		// 1 days 00:00:5.5
-		// 0 days 00:00:-5.5
-		//
-		// ^(?<interval>((?i)interval(?-i)){1}) {1}(?<value>([-+]?\b[1-9]+\d*(\.{1}\d+)?(((?i)E(?-i)){1}[-+]?[1-9]+\d*(\.{1}\d+)?)?(?!\S)){1}) {1}(?<unit>\w+)$
 		RegexValueFinder intervalRegex
 				= Regex.empty()
 						.beginNamedCapture("value").numberIncludingScientificNotation().once().endNamedCapture()
@@ -1032,10 +1017,10 @@ public class RegexTest {
 		assertThat(regex.matchesBeginningOf("daysmiddle after"), is(false));
 		assertThat(regex.matchesBeginningOf("before"), is(false));
 	}
-	
+
 	@Test
-	public void testReplacement(){
-		String s= "find all the backslashes (\\) and replace them with \\ also watch out for = \" , NULL and {} ";
+	public void testReplacement() {
+		String s = "find all the backslashes (\\) and replace them with \\ also watch out for = \" , NULL and {} ";
 		Regex find = Regex.empty().namedCapture("special").orGroup()
 				.literal("\\")
 				.or().literal("=")
@@ -1046,16 +1031,15 @@ public class RegexTest {
 				.or().literal("}")
 				.or().literal("{").endOrGroup().once().endNamedCapture().toRegex();
 		assertThat(find.matchesWithinString(s), is(true));
-		
+
 		String result = find.replaceWith().literal("\\").namedReference("special").replaceAll(s);
-		
+
 		assertThat(result, is("find all the backslashes (\\\\) and replace them with \\\\ also watch out for \\= \\\" \\, \\NULL and \\{\\} "));
 	}
 
-	
 	@Test
-	public void testReplacementWithNothing(){
-		String s= "find all the backslashes (\\) and replace them with \\ also watch out for = \" , NULL and {} ";
+	public void testReplacementWithNothing() {
+		String s = "find all the backslashes (\\) and replace them with \\ also watch out for = \" , NULL and {} ";
 		Regex find = Regex.empty().namedCapture("special").orGroup()
 				.literal("\\")
 				.or().literal("=")
@@ -1066,16 +1050,15 @@ public class RegexTest {
 				.or().literal("}")
 				.or().literal("{").endOrGroup().once().endNamedCapture().toRegex();
 		assertThat(find.matchesWithinString(s), is(true));
-		
+
 		String result = find.replaceWith().nothing().replaceAll(s);
-		
+
 		assertThat(result, is("find all the backslashes () and replace them with  also watch out for     and  "));
 	}
 
-	
 	@Test
-	public void testReplacementWithNothingUsingReplaceWith(){
-		String s= "find all the backslashes (\\) and replace them with \\ also watch out for = \" , NULL and {} ";
+	public void testReplacementWithNothingUsingReplaceWith() {
+		String s = "find all the backslashes (\\) and replace them with \\ also watch out for = \" , NULL and {} ";
 		RegexReplacement find = Regex.empty().namedCapture("special").orGroup()
 				.literal("\\")
 				.or().literal("=")
@@ -1086,8 +1069,8 @@ public class RegexTest {
 				.or().literal("}")
 				.or().literal("{").endOrGroup().once().endNamedCapture()
 				.replaceWith().nothing();
-		String result  = find.replaceAll(s);
-		
+		String result = find.replaceAll(s);
+
 		assertThat(result, is("find all the backslashes () and replace them with  also watch out for     and  "));
 	}
 
