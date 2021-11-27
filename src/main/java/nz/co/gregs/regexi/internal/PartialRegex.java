@@ -30,6 +30,7 @@
  */
 package nz.co.gregs.regexi.internal;
 
+import nz.co.gregs.regexi.RegexValueFinder;
 import nz.co.gregs.regexi.Match;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -80,6 +81,15 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 	 */
 	public RegexReplacement replaceWith() {
 		return toRegex().replaceWith();
+	}
+
+	/**
+	 * Transforms the PartialRegex into a RegexValueFinder
+	 *
+	 * @return a RegexValueFinder
+	 */
+	public RegexValueFinder returnValueFor(String previouslyDefinedNamedCapture) {
+		return toRegex().returnValueFrom(previouslyDefinedNamedCapture);
 	}
 
 	@Override

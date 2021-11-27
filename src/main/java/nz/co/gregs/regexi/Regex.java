@@ -18,6 +18,7 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import nz.co.gregs.regexi.internal.*;
 
 /**
  *
@@ -169,5 +170,9 @@ public class Regex {
 
 	public RegexReplacement replaceWith() {
 		return new RegexReplacement(this);
+	}
+
+	public RegexValueFinder returnValueFrom(String previouslyDefinedNamedCapture) {
+		return new RegexValueFinder(this, previouslyDefinedNamedCapture);
 	}
 }
