@@ -175,4 +175,8 @@ public class Regex {
 	public RegexValueFinder returnValueFrom(String previouslyDefinedNamedCapture) {
 		return new RegexValueFinder(this, previouslyDefinedNamedCapture);
 	}
+
+	public RegexSplitter toSplitter() {
+		return new RegexSplitter(this);
+	}
 }

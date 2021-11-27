@@ -42,8 +42,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import nz.co.gregs.regexi.Regex;
-import nz.co.gregs.regexi.RegexReplacement;
+import nz.co.gregs.regexi.*;
 
 /**
  *
@@ -257,5 +256,9 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 			return Optional.of(Match.from(this, result));
 		}
 		return Optional.empty();
+	}
+
+	public RegexSplitter toSplitter() {
+		return toRegex().toSplitter();
 	}
 }

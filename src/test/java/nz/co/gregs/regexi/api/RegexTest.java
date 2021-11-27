@@ -613,6 +613,19 @@ public class RegexTest {
 	}
 
 	@Test
+	public void testRegexSplitter() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testRegexSplitter()");
+		RegexSplitter regex = Regex.empty().literal(" ").toSplitter();
+
+		String intervalString = "-1.999999999946489E-6 2 4 56   ";
+		final List<String> valueStr = regex.splitToList(intervalString);
+		assertThat(valueStr.get(0), is("-1.999999999946489E-6"));
+		assertThat(valueStr.get(1), is("2"));
+		assertThat(valueStr.get(2), is("4"));
+		assertThat(valueStr.get(3), is("56"));
+	}
+
+	@Test
 	public void testNamedBackReferences() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testNamedBackReferences()");
 		// -2 days 00:00:00
