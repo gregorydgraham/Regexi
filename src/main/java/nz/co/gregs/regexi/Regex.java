@@ -284,4 +284,20 @@ public class Regex {
 	public RegexSplitter toSplitter() {
 		return new RegexSplitter(this);
 	}
+	
+	public boolean doesNotMatchTheBeginningOf(String sourceText){
+		return !matchesBeginningOf(sourceText);
+	}
+	
+	public boolean doesNotMatchTheEndOf(String sourceText){
+		return !matchesEndOf(sourceText);
+	}
+	
+	public boolean doesNotMatchTheEntireString(String sourceText){
+		return !matchesEntireString(sourceText);
+	}
+	
+	public boolean doesNotMatchWithin(String sourceText){
+		return !matchesWithinString(sourceText);
+	}
 }
