@@ -18,7 +18,6 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import nz.co.gregs.regexi.internal.*;
 
 /**
  *
@@ -77,22 +76,71 @@ public class Regex {
 		this.partial = partial;
 	}
 
+	/**
+	 * Converts the internal state of this Regex into a regular expression string.
+	 *
+	 * @return a regular expression string
+	 */
 	public String getRegex() {
 		return partial.toRegexString();
 	}
 
+	/**
+	 * Checks the string against the regular expression and returns true if the
+	 * entire string matches the expression.
+	 *
+	 * <p>
+	 * For instance {@code Regex regex =  Regex.startOrGroup().literal("A").or().literal("B").endOrGroup().toRegex().matchesEntireString("A");
+	 * } produces TRUE where as ...matchesEntireString("AB") would not.
+	 *
+	 * @param string the source text
+	 * @return true if the regular expression matches the entire source text
+	 */
 	public boolean matchesEntireString(String string) {
 		return partial.matchesEntireString(string);
 	}
 
+	/**
+	 * Checks the string against the regular expression and returns true if the
+	 * beginning of the string matches the expression.
+	 *
+	 * <p>
+	 * For instance {@code Regex regex =  Regex.startOrGroup().literal("A").or().literal("B").endOrGroup().toRegex().matchesBeginningOf("AB");
+	 * } produces TRUE where as ...matchesBeginningOf("CB") would not.
+	 *
+	 * @param string the source text
+	 * @return true if the regular expression matches the start of the source text
+	 */
 	public boolean matchesBeginningOf(String string) {
 		return partial.matchesBeginningOf(string);
 	}
 
+	/**
+	 * Checks the string against the regular expression and returns true if the
+	 * end of the string matches the expression.
+	 *
+	 * <p>
+	 * For instance {@code Regex regex =  Regex.startOrGroup().literal("A").or().literal("B").endOrGroup().toRegex().matchesEndOf("AB");
+	 * } produces TRUE where as ...matchesEndOf("AC") would not.
+	 *
+	 * @param string the source text
+	 * @return true if the regular expression matches the end of the source text
+	 */
 	public boolean matchesEndOf(String string) {
 		return partial.matchesEndOf(string);
 	}
 
+	/**
+	 * Checks the string against the regular expression and returns true if the
+	 * any part of the string matches the expression.
+	 *
+	 * <p>
+	 * For instance {@code Regex regex =  Regex.startOrGroup().literal("A").or().literal("B").endOrGroup().toRegex().matchesWithinString("CAD");
+	 * } produces TRUE where as ...matchesWithinString("CDE") would not.
+	 *
+	 * @param string the source text
+	 * @return true if the regular expression matches any part of the source text
+	 */
 	public boolean matchesWithinString(String string) {
 		return partial.matchesWithinString(string);
 	}
@@ -105,6 +153,12 @@ public class Regex {
 		return partial.getMatcher(string);
 	}
 
+	/**
+	 * Return a java.util.MatchResult.
+	 *
+	 * @param string the source text
+	 * @return the MatchResult
+	 */
 	public MatchResult getMatchResult(String string) {
 		return partial.getMatchResult(string);
 	}
@@ -113,14 +167,47 @@ public class Regex {
 		return partial.getAllNamedCapturesOfFirstMatchWithinString(string);
 	}
 
+	/**
+	 * Returns a list of all the matches found within the source text.
+	 *
+	 * <p>
+	 * Match includes the entire match, all the groups within the match, and all
+	 * the named captures.
+	 * </p>
+	 *
+	 * @param string the source text.
+	 * @return every Match found in the source text.
+	 */
 	public List<Match> getAllMatches(String string) {
 		return partial.getAllMatches(string);
 	}
 
+	/**
+	 * Returns the first match found within the source text.
+	 *
+	 * <p>
+	 * Match includes the entire match, all the groups within the match, and all
+	 * the named captures.
+	 * </p>
+	 *
+	 * @param string the source text.
+	 * @return the first Match found in the source text.
+	 */
 	public Optional<Match> getFirstMatchFrom(String string) {
 		return partial.getFirstMatchFrom(string);
 	}
 
+	/**
+	 * Test all parts of this Regex against the test string and return the
+	 * results.
+	 *
+	 * <p>
+	 * While tricky to interpret, this is a good way to work out why your Regex
+	 * isn't working.</p>
+	 *
+	 * @param testStr the test text to use
+	 * @return a list of the results of testing the parts of the Regex.
+	 */
 	public List<String> testAgainst(String testStr) {
 		List<PartialRegex> partials = new ArrayList<>();
 		partials.add(partial);
@@ -168,14 +255,32 @@ public class Regex {
 		return testAgainstGeneric(testStr, patterns, "MATCHES ENTIRE STRING", (r, s) -> r.matchesEntireString(s));
 	}
 
+	/**
+	 * Create a RegexReplacement from this Regex.
+	 *
+	 * @return a RegexReplacement
+	 */
 	public RegexReplacement replaceWith() {
 		return new RegexReplacement(this);
 	}
 
+	/**
+	 * Create a RegexValueFinder from this Regex, returning the specified named
+	 * capture.
+	 *
+	 * @param previouslyDefinedNamedCapture the named capture to return when
+	 * requested.
+	 * @return a RegexValueFinder
+	 */
 	public RegexValueFinder returnValueFrom(String previouslyDefinedNamedCapture) {
 		return new RegexValueFinder(this, previouslyDefinedNamedCapture);
 	}
 
+	/**
+	 * Creates a RegexSplitter from this Regex.
+	 *
+	 * @return a RegexSplitter
+	 */
 	public RegexSplitter toSplitter() {
 		return new RegexSplitter(this);
 	}

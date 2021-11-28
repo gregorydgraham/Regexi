@@ -101,7 +101,7 @@ public class RegexTest {
 				).onceOrNotAtAll();
 
 		final PartialRegex separator
-				= Regex.startingAnywhere().beginRange().addRange('0', '9').includeMinus().negated().endRange().atLeastOnce();
+				= Regex.startingAnywhere().beginSetExcluding().excludeRange('0', '9').excludeMinus().endSet().atLeastOnce();
 
 		Regex pattern
 				= Regex.startingAnywhere()
@@ -136,11 +136,10 @@ public class RegexTest {
 				= Regex.startingAnywhere()
 						.literal('-').onceOrNotAtAll()
 						.anyCharacterBetween('0', '9').atLeastOnce()
-						.beginRange()
-						.addRange('0', '9')
-						.includeMinus()
-						.negated()
-						.endRange()
+						.beginSetExcluding()
+						.excludeRange('0', '9')
+						.excludeMinus()
+						.endSet()
 						.atLeastOnce()
 						.literal('-').onceOrNotAtAll()
 						.anyCharacterBetween('0', '9').atLeastOnce()
@@ -1048,6 +1047,44 @@ public class RegexTest {
 		String result = find.replaceWith().literal("\\").namedReference("special").replaceAll(s);
 
 		assertThat(result, is("find all the backslashes (\\\\) and replace them with \\\\ also watch out for \\= \\\" \\, \\NULL and \\{\\} "));
+	}
+
+	@Test
+	public void testIncludingCharacterClasses() {
+		final PartialRegex empty = Regex.empty();
+		final RegexReplacement replacer = empty
+				.beginSetIncluding()
+				.includeDigits()
+				.includeLiterals("PYMDhns")
+				.includeDot()
+				.includeMinus()
+				.endSet().oneOrMore()
+				.remove();
+
+		assertThat(replacer.replaceAll("-.0123456789PMYDhns"), is(""));
+		assertThat(replacer.replaceAll("-.0123456789PMYDhnsWORKS"), is("WORKS"));
+		assertThat(replacer.replaceAll("-.0123456789PMYDHNS"), is("HNS"));
+		assertThat(replacer.replaceAll("WORKS-.0123456789PMYDhns"), is("WORKS"));
+		assertThat(replacer.replaceAll("-.0123456789WORKSPMYDhns"), is("WORKS"));
+	}
+
+	@Test
+	public void testExcludingCharacterClasses() {
+		final PartialRegex empty = Regex.empty();
+		final RegexReplacement replacer = empty
+				.beginSetExcluding()
+				.excludeDigits()
+				.excludeLiterals("PYMDhns")
+				.excludeDot()
+				.excludeMinus()
+				.endSet().oneOrMore()
+				.replaceWith().nothing();
+
+		assertThat(replacer.replaceAll("-.0123456789PMYDhns"), is("-.0123456789PMYDhns"));
+		assertThat(replacer.replaceAll("-.0123456789PMYDhnsWORKS"), is("-.0123456789PMYDhns"));
+		assertThat(replacer.replaceAll("-.0123456789PMYDHNS"), is("-.0123456789PMYD"));
+		assertThat(replacer.replaceAll("WORKS-.0123456789PMYDhns"), is("-.0123456789PMYDhns"));
+		assertThat(replacer.replaceAll("-.0123456789WORKSPMYDhns"), is("-.0123456789PMYDhns"));
 	}
 
 	@Test

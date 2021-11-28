@@ -82,6 +82,10 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 		return toRegex().replaceWith();
 	}
 
+	public RegexReplacement remove() {
+		return toRegex().replaceWith().nothing();
+	}
+
 	/**
 	 * Transforms the PartialRegex into a RegexValueFinder.
 	 *

@@ -5,14 +5,16 @@
  */
 package nz.co.gregs.regexi.internal;
 
-import nz.co.gregs.regexi.internal.HasRegexFunctions;
 import nz.co.gregs.regexi.Regex;
 
 /**
  *
  * @author gregorygraham
  * @param <REGEX> the type returned by {@link #endRange() }
+ * @deprecated use the {@link CharacterSetExcluding} and
+ * {@link CharacterSetIncluding} instead
  */
+@Deprecated
 public class RangeBuilder<REGEX extends HasRegexFunctions<REGEX>> {
 
 	private final REGEX origin;

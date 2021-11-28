@@ -717,7 +717,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @return a new regexp
 	 */
 	default REGEX noneOfTheseCharacters(String literals) {
-		return add(Regex.startingAnywhere().beginRange().addLiterals(literals).negated().endRange());
+		return add(Regex.startingAnywhere().beginSetExcluding().excludeLiterals(literals).endSet());
 	}
 
 	/**
@@ -805,7 +805,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @return a new regexp
 	 */
 	default REGEX noCharacterBetween(Character lowest, Character highest) {
-		return add(Regex.startingAnywhere().beginRange().addRange(lowest, highest).negated().endRange());
+		return add(Regex.startingAnywhere().beginSetExcluding().excludeRange(lowest, highest).endSet());
 	}
 
 	/**
@@ -855,18 +855,31 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	@SuppressWarnings("unchecked")
 	default REGEX range(char lowest, char highest) {
-		return beginRange().addRange(lowest, highest).endRange();
+		return beginSetIncluding().includeRange(lowest, highest).endSet();
 	}
 
 	/**
-	 * Make a character range.
+	 * Make a character set.
 	 *
 	 * @param literals all of the characters you would like included in the range
 	 * @return the start of a range.
+	 * @deprecated use {@link #characterSet(java.lang.String) } instead
 	 */
+	@Deprecated
 	@SuppressWarnings("unchecked")
 	default REGEX range(String literals) {
-		return beginRange().addLiterals(literals).endRange();
+		return beginSetIncluding().includeLiterals(literals).endSet();
+	}
+
+	/**
+	 * Make a character set (also known as a character class).
+	 *
+	 * @param literals all of the characters you would like included in the set
+	 * @return the start of a set.
+	 */
+	@SuppressWarnings("unchecked")
+	default REGEX characterSet(String literals) {
+		return beginSetIncluding().includeLiterals(literals).endSet();
 	}
 
 	/**
@@ -878,7 +891,18 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 */
 	@SuppressWarnings("unchecked")
 	default REGEX excludeRange(char lowest, char highest) {
-		return beginRange().excluding(lowest, highest).endRange();
+		return beginSetExcluding().excludeRange(lowest, highest).endSet();
+	}
+
+	/**
+	 * Make a character set (also known as a character class) that matches characters outside the set.
+	 *
+	 * @param literals all of the characters you would like included in the set
+	 * @return the start of a set.
+	 */
+	@SuppressWarnings("unchecked")
+	default REGEX excludeSet(String literals) {
+		return beginSetExcluding().excludeLiterals(literals).endSet();
 	}
 
 	/**
@@ -886,7 +910,9 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 *
 	 * @param literals all of the characters you would like included in the range
 	 * @return the start of a range.
+	 * @deprecated use {@link #excludeSet(java.lang.String) } instead
 	 */
+	@Deprecated
 	@SuppressWarnings("unchecked")
 	default REGEX excludeRange(String literals) {
 		return beginRange().excluding(literals).endRange();
@@ -902,7 +928,9 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * ranges.
 	 *
 	 * @return the start of a range.
+	 * @deprecated use {@link #beginSetIncluding() } instead.
 	 */
+	@Deprecated
 	@SuppressWarnings("unchecked")
 	default RangeBuilder<REGEX> range() {
 		return new RangeBuilder<REGEX>((REGEX) this);
@@ -918,10 +946,44 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * ranges.
 	 *
 	 * @return the start of a range.
+	 * @deprecated use {@link #beginSetIncluding()  } instead
 	 */
+	@Deprecated
 	@SuppressWarnings("unchecked")
 	default RangeBuilder<REGEX> beginRange() {
 		return new RangeBuilder<REGEX>((REGEX) this);
+	}
+
+	/**
+	 * Starts making a character class that matches all the characters NOT in the
+	 * class, use {@link RangeBuilder#endRange() } to return to the regex.
+	 *
+	 * <p>
+	 * This provides more options than the {@link #anyCharacterBetween(java.lang.Character, java.lang.Character)
+	 * } and {@link #anyCharacterIn(java.lang.String) } methods for creating
+	 * ranges.
+	 *
+	 * @return the start of a class.
+	 */
+	@SuppressWarnings("unchecked")
+	default CharacterSetExcluding<REGEX> beginSetExcluding() {
+		return new CharacterSetExcluding<REGEX>((REGEX) this);
+	}
+
+	/**
+	 * Starts making a character class that matches all the characters NOT in the
+	 * class, use {@link RangeBuilder#endRange() } to return to the regex.
+	 *
+	 * <p>
+	 * This provides more options than the {@link #anyCharacterBetween(java.lang.Character, java.lang.Character)
+	 * } and {@link #anyCharacterIn(java.lang.String) } methods for creating
+	 * ranges.
+	 *
+	 * @return the start of a class.
+	 */
+	@SuppressWarnings("unchecked")
+	default CharacterSetIncluding<REGEX> beginSetIncluding() {
+		return new CharacterSetIncluding<REGEX>((REGEX) this);
 	}
 
 	/**
@@ -934,7 +996,9 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * ranges.
 	 *
 	 * @return the start of a range.
+	 * @deprecated use {@link #beginSetExcluding() } instead
 	 */
+	@Deprecated
 	@SuppressWarnings("unchecked")
 	default RangeBuilder<REGEX> excludeRange() {
 		return beginRange().negated();
@@ -1403,7 +1467,7 @@ public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
 	 * @return a new regexp
 	 */
 	public default REGEX noneOfThisCharacter(Character literal) {
-		return add(Regex.empty().beginRange().addLiterals("" + literal).negated().endRange());
+		return add(Regex.empty().beginSetExcluding().excludeLiterals("" + literal).endSet());
 	}
 
 }
