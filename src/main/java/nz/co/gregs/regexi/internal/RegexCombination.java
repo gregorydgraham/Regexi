@@ -5,7 +5,6 @@
  */
 package nz.co.gregs.regexi.internal;
 
-import nz.co.gregs.regexi.internal.PartialRegex;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +20,8 @@ class RegexCombination extends PartialRegex {
 	protected RegexCombination(PartialRegex first, PartialRegex second) {
 		this.first = first;
 		this.second = second;
+		inheritStoredState(first);
+		inheritStoredState(second);
 	}
 
 	@Override
@@ -35,5 +36,4 @@ class RegexCombination extends PartialRegex {
 		result.addAll(second.getRegexParts());
 		return result;
 	}
-
 }

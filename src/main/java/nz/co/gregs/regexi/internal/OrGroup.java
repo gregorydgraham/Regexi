@@ -5,7 +5,6 @@
  */
 package nz.co.gregs.regexi.internal;
 
-import nz.co.gregs.regexi.internal.HasRegexFunctions;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +13,7 @@ import java.util.List;
  * @author gregorygraham
  * @param <REGEX> the type returned by {@link #endOrGroup() }
  */
-public class OrGroup<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<OrGroup<REGEX>, REGEX> {
+public class OrGroup<REGEX extends AbstractHasRegexFunctions<REGEX>> extends RegexGroup<OrGroup<REGEX>, REGEX> {
 
 	private final List<String> ors = new ArrayList<>(0);
 

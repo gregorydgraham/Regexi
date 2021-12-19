@@ -11,7 +11,7 @@ package nz.co.gregs.regexi.internal;
  * @param <REGEX> the regex to return after closing this class, the type
  returned by {@link #endCaseInsensitiveSection() }
  */
-public class CaseInsensitiveSection<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<CaseInsensitiveSection<REGEX>, REGEX> {
+public class CaseInsensitiveSection<REGEX extends AbstractHasRegexFunctions<REGEX>> extends RegexGroup<CaseInsensitiveSection<REGEX>, REGEX> {
 
 	public CaseInsensitiveSection(REGEX original) {
 		super(original);

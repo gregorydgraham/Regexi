@@ -9,7 +9,7 @@ package nz.co.gregs.regexi.internal;
  * @author gregorygraham
  * @param <REGEX> the class returned by {@link #endSet() }
  */
-public abstract class CharacterSet<REGEX extends HasRegexFunctions<REGEX>> {
+public abstract class CharacterSet<REGEX extends AbstractHasRegexFunctions<REGEX>> {
 
 	protected final REGEX origin;
 	protected String literals = "";

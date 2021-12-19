@@ -949,7 +949,7 @@ public class RegexTest {
 						.anyOf("DAY", "HOUR", "MINUTE", "SECOND").once().literal("S").onceOrNotAtAll()
 						.endCaseInsensitiveSection()
 						.endNamedCapture().toRegex();
-
+		
 		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND, INTERVAL 4 YEARS, INTERVAL 2 DAY, interval -34 hour, interval 56 minutes";
 		assertThat(regex.matchesWithinString(intervalString), is(true));
 

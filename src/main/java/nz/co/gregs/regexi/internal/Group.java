@@ -10,7 +10,7 @@ package nz.co.gregs.regexi.internal;
  * @author gregorygraham
  * @param <REGEX> the type returned by {@link #endGroup() }
  */
-public class Group<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<Group<REGEX>, REGEX> {
+public class Group<REGEX extends AbstractHasRegexFunctions<REGEX>> extends RegexGroup<Group<REGEX>, REGEX> {
 	
 
 	protected Group(REGEX original) {

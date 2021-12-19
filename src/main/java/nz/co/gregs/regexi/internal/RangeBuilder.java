@@ -15,7 +15,7 @@ import nz.co.gregs.regexi.Regex;
  * {@link CharacterSetIncluding} instead
  */
 @Deprecated
-public class RangeBuilder<REGEX extends HasRegexFunctions<REGEX>> {
+public class RangeBuilder<REGEX extends AbstractHasRegexFunctions<REGEX>> {
 
 	private final REGEX origin;
 	private String literals = "";

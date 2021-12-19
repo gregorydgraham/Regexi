@@ -5,14 +5,12 @@
  */
 package nz.co.gregs.regexi.internal;
 
-import nz.co.gregs.regexi.internal.HasRegexFunctions;
-
 /**
  *
  * @author gregorygraham
  * @param <REGEX> the type returned by {@link #endGroup() }
  */
-public class PositiveLookahead<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<PositiveLookahead<REGEX>, REGEX> {
+public class PositiveLookahead<REGEX extends AbstractHasRegexFunctions<REGEX>> extends RegexGroup<PositiveLookahead<REGEX>, REGEX> {
 	
 
 	protected PositiveLookahead(REGEX original) {

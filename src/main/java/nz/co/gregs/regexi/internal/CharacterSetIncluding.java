@@ -10,7 +10,7 @@ package nz.co.gregs.regexi.internal;
  * @author gregorygraham
  * @param <REGEX> the type returned by {@link #endSet() }
  */
-public class CharacterSetIncluding<REGEX extends HasRegexFunctions<REGEX>> extends CharacterSet<REGEX> {
+public class CharacterSetIncluding<REGEX extends AbstractHasRegexFunctions<REGEX>> extends CharacterSet<REGEX> {
 
 	public CharacterSetIncluding(REGEX regex) {
 		super(regex);

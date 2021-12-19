@@ -32,11 +32,7 @@ package nz.co.gregs.regexi.internal;
 
 import nz.co.gregs.regexi.RegexValueFinder;
 import nz.co.gregs.regexi.Match;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,11 +44,16 @@ import nz.co.gregs.regexi.*;
  *
  * @author gregorygraham
  */
-public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
+public abstract class PartialRegex extends AbstractHasRegexFunctions<PartialRegex> {
 
 	private Pattern compiledVersion;
+	private final List<String> namedGroups = new ArrayList<String>(0);
 
 	protected PartialRegex() {
+	}
+	
+	protected final void inheritStoredState(PartialRegex first) {
+		this.namedGroups.addAll(first.namedGroups);
 	}
 
 	/**
@@ -213,35 +214,41 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 
 	public synchronized HashMap<String, String> getAllNamedCapturesOfFirstMatchWithinString(String string) {
 		HashMap<String, String> resultMap = new HashMap<String, String>(0);
-		try {
+//		try {
 			Matcher matcher = getMatcher(string);
 			if (matcher.find()) {
-				Class<? extends Pattern> patternClass = getPattern().getClass();
-				Method method = patternClass.getDeclaredMethod("namedGroups");
-				method.setAccessible(true);
-				Object invoke = method.invoke(getPattern());
-				@SuppressWarnings("unchecked")
-				Map<String, Integer> map = (Map<String, Integer>) invoke;
-				if (map.size() > 0) {
-					for (String name : map.keySet()) {
-						final String group = matcher.group(name);
+				for(String name: getNamedGroups()){
+					final String group = matcher.group(name);
 						if (group != null) {
 							resultMap.put(name, group);
 						}
-					}
 				}
+//				Class<? extends Pattern> patternClass = getPattern().getClass();
+//				Method method = patternClass.getDeclaredMethod("namedGroups");
+//				method.setAccessible(true);
+//				Object invoke = method.invoke(getPattern());
+//				@SuppressWarnings("unchecked")
+//				Map<String, Integer> map = (Map<String, Integer>) invoke;
+//				if (map.size() > 0) {
+//					for (String name : map.keySet()) {
+//						final String group = matcher.group(name);
+//						if (group != null) {
+//							resultMap.put(name, group);
+//						}
+//					}
+//				}
 			}
-		} catch (NoSuchMethodException ex) {
-			Logger.getLogger(PartialRegex.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (SecurityException ex) {
-			Logger.getLogger(PartialRegex.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (IllegalAccessException ex) {
-			Logger.getLogger(PartialRegex.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (IllegalArgumentException ex) {
-			Logger.getLogger(PartialRegex.class.getName()).log(Level.SEVERE, null, ex);
-		} catch (InvocationTargetException ex) {
-			Logger.getLogger(PartialRegex.class.getName()).log(Level.SEVERE, null, ex);
-		}
+//		} catch (NoSuchMethodException ex) {
+//			Logger.getLogger(PartialRegex.class.getName()).log(Level.SEVERE, null, ex);
+//		} catch (SecurityException ex) {
+//			Logger.getLogger(PartialRegex.class.getName()).log(Level.SEVERE, null, ex);
+//		} catch (IllegalAccessException ex) {
+//			Logger.getLogger(PartialRegex.class.getName()).log(Level.SEVERE, null, ex);
+//		} catch (IllegalArgumentException ex) {
+//			Logger.getLogger(PartialRegex.class.getName()).log(Level.SEVERE, null, ex);
+//		} catch (InvocationTargetException ex) {
+//			Logger.getLogger(PartialRegex.class.getName()).log(Level.SEVERE, null, ex);
+//		}
 		return resultMap;
 	}
 
@@ -264,5 +271,15 @@ public abstract class PartialRegex implements HasRegexFunctions<PartialRegex> {
 
 	public RegexSplitter toSplitter() {
 		return toRegex().toSplitter();
+	}
+
+	@Override
+	protected void registerNamedGroup(String name) {
+		this.namedGroups.add(name);
+	}
+
+	@Override
+	public List<String> getNamedGroups() {
+		return new ArrayList<String>(this.namedGroups);
 	}
 }

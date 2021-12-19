@@ -38,8 +38,10 @@ import nz.co.gregs.regexi.Regex;
  * @author gregorygraham
  * @param <REGEX> the PartialRegex to return to after ending the group
  */
-public interface HasRegexFunctions<REGEX extends HasRegexFunctions<REGEX>> {
+public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX>> {
 
+	List<String> getNamedGroups();
+	
 	/**
 	 * Converts the Regex into a string.
 	 *

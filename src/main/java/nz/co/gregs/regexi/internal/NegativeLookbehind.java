@@ -5,14 +5,12 @@
  */
 package nz.co.gregs.regexi.internal;
 
-import nz.co.gregs.regexi.internal.HasRegexFunctions;
-
 /**
  *
  * @author gregorygraham
  * @param <REGEX> the type returned by {@link #endGroup() }
  */
-public class NegativeLookbehind<REGEX extends HasRegexFunctions<REGEX>> extends RegexGroup<NegativeLookbehind<REGEX>, REGEX> {
+public class NegativeLookbehind<REGEX extends AbstractHasRegexFunctions<REGEX>> extends RegexGroup<NegativeLookbehind<REGEX>, REGEX> {
 	
 
 	protected NegativeLookbehind(REGEX original) {

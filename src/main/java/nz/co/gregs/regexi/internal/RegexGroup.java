@@ -30,8 +30,7 @@
  */
 package nz.co.gregs.regexi.internal;
 
-import nz.co.gregs.regexi.internal.PartialRegex;
-import nz.co.gregs.regexi.internal.HasRegexFunctions;
+import java.util.ArrayList;
 import java.util.List;
 import nz.co.gregs.regexi.Regex;
 
@@ -42,7 +41,7 @@ import nz.co.gregs.regexi.Regex;
  * maintain type safety
  * @param <REGEX> the regex to return to after ending this group
  */
-public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX extends HasRegexFunctions<REGEX>> implements HasRegexFunctions<THIS> {
+public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX extends AbstractHasRegexFunctions<REGEX>> extends AbstractHasRegexFunctions<THIS> {
 
 	private final REGEX origin;
 	private PartialRegex current = Regex.empty();
@@ -54,6 +53,16 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 	@Override
 	public List<PartialRegex> getRegexParts() {
 		return getCurrent().getRegexParts();
+	}
+	
+	@Override
+	public void registerNamedGroup(String name){
+		origin.registerNamedGroup(name);
+	}
+
+	@Override
+	public List<String> getNamedGroups(){
+		return new ArrayList<>(0);
 	}
 
 	/**
