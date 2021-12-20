@@ -47,13 +47,12 @@ import nz.co.gregs.regexi.*;
 public abstract class PartialRegex extends AbstractHasRegexFunctions<PartialRegex> {
 
 	private Pattern compiledVersion;
-	private final List<String> namedGroups = new ArrayList<String>(0);
 
 	protected PartialRegex() {
 	}
-	
+
 	protected final void inheritStoredState(PartialRegex first) {
-		this.namedGroups.addAll(first.namedGroups);
+		this.registerAllNamedGroups(first.getNamedGroups());
 	}
 
 	/**
@@ -214,41 +213,15 @@ public abstract class PartialRegex extends AbstractHasRegexFunctions<PartialRege
 
 	public synchronized HashMap<String, String> getAllNamedCapturesOfFirstMatchWithinString(String string) {
 		HashMap<String, String> resultMap = new HashMap<String, String>(0);
-//		try {
-			Matcher matcher = getMatcher(string);
-			if (matcher.find()) {
-				for(String name: getNamedGroups()){
-					final String group = matcher.group(name);
-						if (group != null) {
-							resultMap.put(name, group);
-						}
+		Matcher matcher = getMatcher(string);
+		if (matcher.find()) {
+			for (String name : getNamedGroups()) {
+				final String group = matcher.group(name);
+				if (group != null) {
+					resultMap.put(name, group);
 				}
-//				Class<? extends Pattern> patternClass = getPattern().getClass();
-//				Method method = patternClass.getDeclaredMethod("namedGroups");
-//				method.setAccessible(true);
-//				Object invoke = method.invoke(getPattern());
-//				@SuppressWarnings("unchecked")
-//				Map<String, Integer> map = (Map<String, Integer>) invoke;
-//				if (map.size() > 0) {
-//					for (String name : map.keySet()) {
-//						final String group = matcher.group(name);
-//						if (group != null) {
-//							resultMap.put(name, group);
-//						}
-//					}
-//				}
 			}
-//		} catch (NoSuchMethodException ex) {
-//			Logger.getLogger(PartialRegex.class.getName()).log(Level.SEVERE, null, ex);
-//		} catch (SecurityException ex) {
-//			Logger.getLogger(PartialRegex.class.getName()).log(Level.SEVERE, null, ex);
-//		} catch (IllegalAccessException ex) {
-//			Logger.getLogger(PartialRegex.class.getName()).log(Level.SEVERE, null, ex);
-//		} catch (IllegalArgumentException ex) {
-//			Logger.getLogger(PartialRegex.class.getName()).log(Level.SEVERE, null, ex);
-//		} catch (InvocationTargetException ex) {
-//			Logger.getLogger(PartialRegex.class.getName()).log(Level.SEVERE, null, ex);
-//		}
+		}
 		return resultMap;
 	}
 
@@ -271,15 +244,5 @@ public abstract class PartialRegex extends AbstractHasRegexFunctions<PartialRege
 
 	public RegexSplitter toSplitter() {
 		return toRegex().toSplitter();
-	}
-
-	@Override
-	protected void registerNamedGroup(String name) {
-		this.namedGroups.add(name);
-	}
-
-	@Override
-	public List<String> getNamedGroups() {
-		return new ArrayList<String>(this.namedGroups);
 	}
 }

@@ -56,7 +56,7 @@ public abstract class RegexGroup<THIS extends RegexGroup<THIS, REGEX>, REGEX ext
 	}
 	
 	@Override
-	public void registerNamedGroup(String name){
+	protected void registerNamedGroup(String name){
 		origin.registerNamedGroup(name);
 	}
 
