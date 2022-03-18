@@ -77,4 +77,8 @@ public class RegexReplacement {
 	public RegexReplacement nothing() {
 		return this.literal("");
 	}
+
+	public RegexReplacement backslash() {
+		return this.literal("\\");
+	}
 }

@@ -1050,6 +1050,32 @@ public class RegexTest {
 	}
 
 	@Test
+	public void testSimpleBackslashReplacement() {
+		String singleBackslashVersion = "find all the backslashes (\\) and replace them with \\ and don't worry about = \" , NULL and {} ";
+		final String doubleBackslashVersion = "find all the backslashes (\\\\) and replace them with \\\\ and don't worry about = \" , NULL and {} ";
+
+		/* Check that replacing with a single back slash produces the same thing*/
+		String replaced = Regex.empty().backslash().replaceWith().backslash().replaceAll(singleBackslashVersion);
+		assertThat(replaced, is(singleBackslashVersion));
+
+		replaced = Regex.empty().backslash().replaceWith().literal("\\").replaceAll(singleBackslashVersion);
+		assertThat(replaced, is(singleBackslashVersion));
+		
+		/* Check that double backslash works in all cases */
+		replaced = Regex.empty().backslash().replaceWith().backslash().backslash().replaceAll(singleBackslashVersion);
+		assertThat(replaced, is(doubleBackslashVersion));
+
+		replaced = Regex.empty().backslash().replaceWith().literal("\\").backslash().replaceAll(singleBackslashVersion);
+		assertThat(replaced, is(doubleBackslashVersion));
+
+		replaced = Regex.empty().backslash().replaceWith().literal("\\\\").replaceAll(singleBackslashVersion);
+		assertThat(replaced, is(doubleBackslashVersion));
+
+		replaced = Regex.empty().backslash().replaceWith().literal("\\").literal("\\").replaceAll(singleBackslashVersion);
+		assertThat(replaced, is(doubleBackslashVersion));
+	}
+
+	@Test
 	public void testIncludingCharacterClasses() {
 		final PartialRegex empty = Regex.empty();
 		final RegexReplacement replacer = empty
