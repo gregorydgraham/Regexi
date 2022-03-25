@@ -6,7 +6,7 @@ Regular expressions are very powerful but don't scale well.
 
 ### What does that mean?
 The power of the regex language trips up developers very quickly.  For instance everyone can search for a number using regex and usually they'll be wrong.
-The simple and obvious pattern, `/[0-9]\*/`, will incorrectly match `ABC0345` but miss `0.89`.  
+The simple and obvious pattern, `/[0-9]*/`, will incorrectly match `ABC0345` but miss `0.89`.  
 
 A better solution is `/(([-+]?\\b([1-9]+\\d\*|0+(?!\\d)))((\\.){1}(\\d+))?){1}/`
 but 99% developers will recognise that as complete gibberish. What is it doing and why? No one knows, 
