@@ -1184,6 +1184,46 @@ public class RegexTest {
 		shouldMatchTests(regex, "INTERVAL '5 04:03:02' DAY TO SECOND", "5", "04", "03", "02", "");
 
 	}
+	@Test
+	public void testAnyCharacterExcept() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testAnyCharacterExcept()");
+
+		PartialRegex legalStartingCharacter = Regex.empty().beginSetIncluding()
+				.includeLetters()
+				.includeDigits()
+				.includeLiterals("!#$%&'*+-/=?^_`{|}~")
+				.endSet()
+				;
+		PartialRegex legalContinuingCharacter = Regex.empty().beginSetIncluding()
+				.includeLetters()
+				.includeDigits()
+				.includeLiterals("!#$%&'*+-/=?^_`{|}~.")
+				.endSet()
+				;
+		
+		Regex regex
+				= Regex.startingAnywhere()
+						.add(legalStartingCharacter)
+						.add(legalContinuingCharacter).oneOrMore()
+						.literal("@")
+						.anyCharacterExcept(" .@").oneOrMore()
+						.beginGroup().literal(".").anyCharacterExcept(' ').oneOrMore().endGroup().optionalMany()
+						.toRegex();
+
+		assertThat(regex.matchesWithinString("somebody at somewhere.com"), is(false));
+		assertThat(regex.matchesWithinString("somebody @ somewhere.com"), is(false));
+		assertThat(regex.matchesWithinString("somebody@@somewhere.com"), is(false));
+		assertThat(regex.matchesWithinString("somebody@somewhere.com"), is(true));
+		assertThat(regex.matchesWithinString("somebody@somewhere.co.au"), is(true));
+		assertThat(regex.matchesWithinString("somebody@somewhe.re.com"), is(true));
+		assertThat(regex.matchesWithinString("some_body@somewhere.com"), is(true));
+		assertThat(regex.matchesWithinString("some.body@somewhere.com"), is(true));
+		assertThat(regex.matchesWithinString("somebody@somewhere"), is(true));
+		assertThat(regex.matchesWithinString("somebody@somewhere.com.com.com.com"), is(true));
+		assertThat(regex.matchesWithinString("some body@somewhere.co m"), is(true));
+		assertThat(regex.getAllMatches("some body@somewhere.co m").get(0).getEntireMatch(), is("body@somewhere.co"));
+
+	}
 
 	private void shouldMatchTests(final Regex regex, String testStr, String days, String hours, String minutes, String seconds, String nanos) {
 //		assertThat(toRegex.matchesWithinString(testStr), is(true));

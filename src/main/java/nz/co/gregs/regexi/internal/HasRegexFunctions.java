@@ -889,7 +889,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 *
 	 * @param lowest the first character to be included in the range
 	 * @param highest the last character to be included in the range
-	 * @return the start of a range.
+	 * @return the character range.
 	 */
 	@SuppressWarnings("unchecked")
 	default REGEX excludeRange(char lowest, char highest) {
@@ -900,11 +900,32 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Make a character set (also known as a character class) that matches characters outside the set.
 	 *
 	 * @param literals all of the characters you would like included in the set
-	 * @return the start of a set.
+	 * @return the character set.
 	 */
 	@SuppressWarnings("unchecked")
 	default REGEX excludeSet(String literals) {
 		return beginSetExcluding().excludeLiterals(literals).endSet();
+	}
+
+
+	/**
+	 * Make a character set (also known as a character class) that matches characters outside the set.
+	 *
+	 * @param c the character you do not want to match
+	 * @return the character set.
+	 */
+	default REGEX anyCharacterExcept(char c) {
+		return excludeSet(""+c);
+	}
+
+	/**
+	 * Make a character set (also known as a character class) that matches characters outside the set.
+	 *
+	 * @param listOfExcludedCharacters the character you do not want to match
+	 * @return the character set.
+	 */
+	default REGEX anyCharacterExcept(String listOfExcludedCharacters) {
+		return excludeSet(listOfExcludedCharacters);
 	}
 
 	/**

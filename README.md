@@ -6,7 +6,7 @@ Regular expressions are very powerful but don't scale well.
 
 ### What does that mean?
 The power of the regex language trips up developers very quickly.  For instance everyone can search for a number using regex and usually they'll be wrong.
-The simple and obvious pattern, `/[0-9]\*/`, will incorrectly match `ABC0345` but miss `0.89`.  
+The simple and obvious pattern, `/[0-9]*/`, will incorrectly match `ABC0345` but miss `0.89`.  
 
 A better solution is `/(([-+]?\\b([1-9]+\\d\*|0+(?!\\d)))((\\.){1}(\\d+))?){1}/`
 but 99% developers will recognise that as complete gibberish. What is it doing and why? No one knows, 
@@ -28,12 +28,33 @@ Regexi solves this by implementing all the parts of the regular expression langu
 Or even better
 
       Regex.startingAnywhere().number().once().toRegex();
+
+Using that in actual Java: 
+			
+    Regex pattern = Regex
+        .startingAnywhere()
+        .number().once()
+        .toRegex();
+		
+		
+    final String input = "it should find 0.89 correctly";
+    if(pattern.matchesWithinString(input)){
+        System.out.println("Found it successfully");
+        System.out.println("The number we found: "+ pattern.getAllMatches(input).get(0).getEntireMatch());
+    }
+
+    if(!pattern.matchesWithinString("and don't find ABC0345 because it's not a number")){
+		    System.out.println("Didn't find it successfully");
+    }
+			
       
 ### Seems nice but I've spotted 5 errors in your regex already.
 That's cool, please raise an issue :)
 
 Nothing is ever perfect, so I've kept access to all the parts of the regex language available. 
 You can use PartialRegex to create your own standard patterns and combine them as required.
+
+    final PartialRegex oneNumber = Regex.startingAnywhere().number().once();
 
 ### Anything else I should know about?
 
