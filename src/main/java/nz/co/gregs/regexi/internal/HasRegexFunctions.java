@@ -1160,6 +1160,35 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	}
 
 	/**
+	 * Adds a check for a apostrophe character( ' ) to the regular expression without
+	 * grouping.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX apostrophe() {
+		return unescaped("'");
+	}
+	/**
+	 * Adds a check for a single quote character( ' ) to the regular expression without
+	 * grouping.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX singlequote() {
+		return unescaped("'");
+	}
+
+	/**
+	 * Adds a check for a double quote character( " ) to the regular expression without
+	 * grouping.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX doublequote() {
+		return unescaped("\"");
+	}
+
+	/**
 	 * Adds a check for a space character( ) to the regular expression without
 	 * grouping.
 	 *
