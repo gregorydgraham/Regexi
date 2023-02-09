@@ -266,6 +266,114 @@ public class RegexTest {
 	}
 
 	@Test
+	public void testApostrophe() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testCharactersWrappedBy()");
+		// -2 days 00:00:00
+		// 1 days 00:00:5.5
+		// 0 days 00:00:-5.5
+		//
+		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
+		Regex pattern
+				= Regex.startingAnywhere()
+						.apostrophe().once().toRegex();
+		System.out.println(pattern.getRegex());
+
+		assertThat(pattern.matchesWithinString("'-1' after"), is(true));
+		assertThat(pattern.matchesWithinString("before '-1m'"), is(true));
+		assertThat(pattern.matchesWithinString("before '2' after"), is(true));
+		assertThat(pattern.matchesWithinString("before '-234' after"), is(true));
+		assertThat(pattern.matchesWithinString("before 'mid' after"), is(true));
+		assertThat(pattern.matchesWithinString("before 'mid' 'mid again' after"), is(true));
+
+		assertThat(pattern.matchesEntireString("'mid'"), is(false));
+
+		assertThat(pattern.matchesWithinString("'02 after"), is(true));
+		assertThat(pattern.matchesWithinString("-0234' after"), is(true));
+		assertThat(pattern.matchesWithinString("before '004 after"), is(true));
+		assertThat(pattern.matchesWithinString("before _4' after"), is(true));
+
+		assertThat(pattern.matchesEntireString("'mid'  "), is(false));
+		assertThat(pattern.matchesEntireString("  'mid'"), is(false));
+		assertThat(pattern.matchesEntireString("  'mid'  "), is(false));
+		assertThat(pattern.matchesEntireString("'beginning''end'"), is(false));
+		
+		assertThat(pattern.matchesWithinString("before \"A4\" after"), is(false));
+		assertThat(pattern.matchesWithinString("before A4after"), is(false));
+	}
+
+	@Test
+	public void testSingleQuote() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testCharactersWrappedBy()");
+		// -2 days 00:00:00
+		// 1 days 00:00:5.5
+		// 0 days 00:00:-5.5
+		//
+		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
+		Regex pattern
+				= Regex.startingAnywhere()
+						.singlequote().once().toRegex();
+		System.out.println(pattern.getRegex());
+
+		assertThat(pattern.matchesWithinString("'-1' after"), is(true));
+		assertThat(pattern.matchesWithinString("before '-1m'"), is(true));
+		assertThat(pattern.matchesWithinString("before '2' after"), is(true));
+		assertThat(pattern.matchesWithinString("before '-234' after"), is(true));
+		assertThat(pattern.matchesWithinString("before 'mid' after"), is(true));
+		assertThat(pattern.matchesWithinString("before 'mid' 'mid again' after"), is(true));
+
+		assertThat(pattern.matchesEntireString("'mid'"), is(false));
+
+		assertThat(pattern.matchesWithinString("'02 after"), is(true));
+		assertThat(pattern.matchesWithinString("-0234' after"), is(true));
+		assertThat(pattern.matchesWithinString("before '004 after"), is(true));
+		assertThat(pattern.matchesWithinString("before _4' after"), is(true));
+
+		assertThat(pattern.matchesEntireString("'mid'  "), is(false));
+		assertThat(pattern.matchesEntireString("  'mid'"), is(false));
+		assertThat(pattern.matchesEntireString("  'mid'  "), is(false));
+		assertThat(pattern.matchesEntireString("'beginning''end'"), is(false));
+		
+		assertThat(pattern.matchesWithinString("before \"A4\" after"), is(false));
+		assertThat(pattern.matchesWithinString("before A4after"), is(false));
+	}
+
+	@Test
+	public void testDoubleQuote() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testCharactersWrappedBy()");
+		// -2 days 00:00:00
+		// 1 days 00:00:5.5
+		// 0 days 00:00:-5.5
+		//
+		// ([-+]?\b[1-9]+\d*(\.{1}\d+)?){1}
+		Regex pattern
+				= Regex.startingAnywhere()
+						.doublequote().once().toRegex();
+		System.out.println(pattern.getRegex());
+
+		assertThat(pattern.matchesWithinString("\"-1\" after"), is(true));
+		assertThat(pattern.matchesWithinString("before \"-1m\""), is(true));
+		assertThat(pattern.matchesWithinString("before \"2\" after"), is(true));
+		assertThat(pattern.matchesWithinString("before \"-234\" after"), is(true));
+		assertThat(pattern.matchesWithinString("before \"mid\" after"), is(true));
+		assertThat(pattern.matchesWithinString("before \"mid\" \"mid again\" after"), is(true));
+
+		assertThat(pattern.matchesEntireString("\"mid\""), is(false));
+
+		assertThat(pattern.matchesWithinString("\"02 after"), is(true));
+		assertThat(pattern.matchesWithinString("-0234\" after"), is(true));
+		assertThat(pattern.matchesWithinString("before \"004 after"), is(true));
+		assertThat(pattern.matchesWithinString("before _4\" after"), is(true));
+
+		assertThat(pattern.matchesEntireString("\"mid\"  "), is(false));
+		assertThat(pattern.matchesEntireString("  \"mid\""), is(false));
+		assertThat(pattern.matchesEntireString("  \"mid\"  "), is(false));
+		assertThat(pattern.matchesEntireString("\"beginning\"\"end\""), is(false));
+		
+		assertThat(pattern.matchesWithinString("before 'A4' after"), is(false));
+		assertThat(pattern.matchesWithinString("before A4after"), is(false));
+	}
+
+	@Test
 	public void testCharactersWrappedBy() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testCharactersWrappedBy()");
 		// -2 days 00:00:00
