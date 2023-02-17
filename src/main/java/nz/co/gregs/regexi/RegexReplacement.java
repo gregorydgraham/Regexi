@@ -5,6 +5,7 @@
  */
 package nz.co.gregs.regexi;
 
+import java.io.Serializable;
 import java.util.function.Function;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -13,7 +14,7 @@ import java.util.regex.Matcher;
  *
  * @author gregorygraham
  */
-public class RegexReplacement {
+public class RegexReplacement implements Serializable {
 
 	String pattern = "";
 
@@ -24,7 +25,7 @@ public class RegexReplacement {
 	}
 
 	private String escape(String unescaped) {
-		String escaped = "";
+		String escaped;
 		if (unescaped == null) {
 			escaped = "";
 		} else {

@@ -1,5 +1,6 @@
 package nz.co.gregs.regexi;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -7,7 +8,7 @@ import java.util.List;
  *
  * @author gregorygraham
  */
-public class RegexSplitter {
+public class RegexSplitter implements Serializable {
 
 	private final Regex regex;
 

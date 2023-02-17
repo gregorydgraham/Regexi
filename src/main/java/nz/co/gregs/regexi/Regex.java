@@ -5,6 +5,7 @@
  */
 package nz.co.gregs.regexi;
 
+import java.io.Serializable;
 import nz.co.gregs.regexi.internal.UntestableSequence;
 import nz.co.gregs.regexi.internal.UnescapedSequence;
 import nz.co.gregs.regexi.internal.PartialRegex;
@@ -23,7 +24,7 @@ import java.util.stream.Stream;
  *
  * @author gregorygraham
  */
-public class Regex {
+public class Regex implements Serializable {
 
 	/**
 	 * Create a new empty regular expression.

@@ -5,11 +5,13 @@
  */
 package nz.co.gregs.regexi;
 
+import java.io.Serializable;
+
 /**
  *
  * @author gregorygraham
  */
-public class MatchedGroup {
+public class MatchedGroup implements Serializable {
 
 	private final String string;
 	private final int index;

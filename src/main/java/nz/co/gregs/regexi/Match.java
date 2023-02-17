@@ -5,6 +5,7 @@
  */
 package nz.co.gregs.regexi;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +16,7 @@ import nz.co.gregs.regexi.internal.PartialRegex;
  *
  * @author gregorygraham
  */
-public class Match {
+public class Match implements Serializable {
 
 	public static Match from(PartialRegex aThis, MatchResult m) {
 		return new Match(aThis, m);

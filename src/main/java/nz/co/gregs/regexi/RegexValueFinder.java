@@ -1,5 +1,6 @@
 package nz.co.gregs.regexi;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +10,7 @@ import java.util.stream.Collectors;
  *
  * @author gregorygraham
  */
-public class RegexValueFinder {
+public class RegexValueFinder implements Serializable {
 
 	private final Regex regex;
 	private final String namedCapture;
