@@ -287,6 +287,37 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	}
 
 	/**
+	 * Adds a match for any single character (including line terminators) to the regexp without grouping it.
+	 * 
+	 * <p>This <\p>
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX anyCharacterIncludingLineEnd() {
+		return this.beginDotAllSection().anyCharacter().endDotAllSection();
+	}
+
+	/**
+	 * Extends the regular expression with a group that allows the dot operator to match line terminators.
+	 *
+	 * @return an extended regular expression
+	 */
+	@SuppressWarnings("unchecked")
+	default DotAllSection<REGEX> dotAllSection() {
+		return beginDotAllSection();
+	}
+
+	/**
+	 * Extends the regular expression with group where the dot operator matches line terminators (DOTALL).
+	 *
+	 * @return an extended regular expression
+	 */
+	@SuppressWarnings("unchecked")
+	default DotAllSection<REGEX> beginDotAllSection() {
+		return new DotAllSection<>((REGEX) this);
+	}
+
+	/**
 	 * Adds a match for zero or more characters to the regexp without grouping it.
 	 *
 	 * <p>
