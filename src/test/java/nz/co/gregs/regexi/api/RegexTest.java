@@ -52,6 +52,62 @@ public class RegexTest {
 	}
 
 	@Test
+	public void testFindingAnAsterisk() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testFindingAnAsterisk()");
+		Regex regex = Regex.startingAnywhere().asterisk().toRegex();
+		Assert.assertTrue(regex.matchesEntireString("*"));
+		Assert.assertFalse(regex.matchesWithinString("-1"));
+		Assert.assertTrue(regex.matchesWithinString("1*2"));
+		Assert.assertTrue(regex.matchesWithinString("1*"));
+		Assert.assertTrue(regex.matchesEndOf("1*"));
+		Assert.assertFalse(regex.matchesBeginningOf("1*"));
+		Assert.assertTrue(regex.matchesBeginningOf("*1"));
+		Assert.assertFalse(regex.matchesEntireString("below zero there are negatives and -1* is the first"));
+		Assert.assertTrue(regex.matchesWithinString("below zero there are negatives and -1* is the first"));
+	}
+
+	@Test
+	public void testFindingADot() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testFindingADot()");
+		Regex regex = Regex.startingAnywhere().dot().toRegex();
+		Assert.assertTrue(regex.matchesEntireString("."));
+		Assert.assertFalse(regex.matchesWithinString("-1"));
+		Assert.assertTrue(regex.matchesWithinString("1.2"));
+		Assert.assertTrue(regex.matchesWithinString("1."));
+		Assert.assertTrue(regex.matchesEndOf("1."));
+		Assert.assertFalse(regex.matchesBeginningOf("1."));
+		Assert.assertTrue(regex.matchesBeginningOf(".1"));
+		Assert.assertFalse(regex.matchesEntireString("below zero there are negatives and -1. is the first"));
+		Assert.assertTrue(regex.matchesWithinString("below zero there are negatives and -1. is the first"));
+	}
+
+	@Test
+	public void testFindingAPlus() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testFindingAPlus()");
+		Regex regex = Regex.startingAnywhere().plus().toRegex();
+		Assert.assertTrue(regex.matchesEntireString("+"));
+		Assert.assertTrue(regex.matchesBeginningOf("+1"));
+		Assert.assertTrue(regex.matchesWithinString("+1"));
+		Assert.assertTrue(regex.matchesWithinString("1+2"));
+		Assert.assertTrue(regex.matchesWithinString("1+"));
+		Assert.assertTrue(regex.matchesEndOf("1+"));
+		Assert.assertFalse(regex.matchesBeginningOf("1+"));
+		Assert.assertFalse(regex.matchesEntireString("below zero there are negatives and -1+ is the first"));
+		Assert.assertTrue(regex.matchesWithinString("below zero there are negatives and -1+ is the first"));
+		
+		regex = Regex.startingAnywhere().plus().star().toRegex();
+		Assert.assertTrue(regex.matchesEntireString("+*"));
+		Assert.assertTrue(regex.matchesBeginningOf("+*1"));
+		Assert.assertTrue(regex.matchesWithinString("+*1"));
+		Assert.assertTrue(regex.matchesWithinString("1+*2"));
+		Assert.assertTrue(regex.matchesWithinString("1+*"));
+		Assert.assertTrue(regex.matchesEndOf("1+*"));
+		Assert.assertFalse(regex.matchesBeginningOf("1+*"));
+		Assert.assertFalse(regex.matchesEntireString("below zero there are negatives and -1+* is the first"));
+		Assert.assertTrue(regex.matchesWithinString("below zero there are negatives and -1+* is the first"));
+	}
+
+	@Test
 	public void testFindingANegativeNumber() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testFindingANegativeNumber()");
 		Regex negativeInteger = Regex.startingAnywhere().negativeInteger().toRegex();

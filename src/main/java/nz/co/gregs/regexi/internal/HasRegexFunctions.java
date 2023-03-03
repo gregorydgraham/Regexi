@@ -41,7 +41,7 @@ import nz.co.gregs.regexi.Regex;
 public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX>> {
 
 	List<String> getNamedGroups();
-	
+
 	/**
 	 * Converts the Regex into a string.
 	 *
@@ -897,7 +897,8 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	}
 
 	/**
-	 * Make a character set (also known as a character class) that matches characters outside the set.
+	 * Make a character set (also known as a character class) that matches
+	 * characters outside the set.
 	 *
 	 * @param literals all of the characters you would like included in the set
 	 * @return the character set.
@@ -907,19 +908,20 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 		return beginSetExcluding().excludeLiterals(literals).endSet();
 	}
 
-
 	/**
-	 * Make a character set (also known as a character class) that matches characters outside the set.
+	 * Make a character set (also known as a character class) that matches
+	 * characters outside the set.
 	 *
 	 * @param c the character you do not want to match
 	 * @return the character set.
 	 */
 	default REGEX anyCharacterExcept(char c) {
-		return excludeSet(""+c);
+		return excludeSet("" + c);
 	}
 
 	/**
-	 * Make a character set (also known as a character class) that matches characters outside the set.
+	 * Make a character set (also known as a character class) that matches
+	 * characters outside the set.
 	 *
 	 * @param listOfExcludedCharacters the character you do not want to match
 	 * @return the character set.
@@ -969,7 +971,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * ranges.
 	 *
 	 * @return the start of a range.
-	 * @deprecated use {@link #beginSetIncluding()  } instead
+	 * @deprecated use {@link #beginSetIncluding() } instead
 	 */
 	@Deprecated
 	@SuppressWarnings("unchecked")
@@ -1160,17 +1162,66 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	}
 
 	/**
-	 * Adds a check for a apostrophe character( ' ) to the regular expression without
-	 * grouping.
+	 * Adds a check for an apostrophe character( ' ) to the regular expression
+	 * without grouping.
 	 *
 	 * @return a new regexp
 	 */
 	default REGEX apostrophe() {
 		return unescaped("'");
 	}
+
 	/**
-	 * Adds a check for a single quote character( ' ) to the regular expression without
+	 * Adds a check for an asterisk character( * ) to the regular expression
+	 * without grouping.
+	 *
+	 * This is a literal asterisk not the wildcard asterisk of regex syntax
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX asterisk() {
+		return unescaped("\\*");
+	}
+
+	/**
+	 * Adds a check for an asterisk character( * ) to the regular expression
+	 * without grouping.
+	 *
+	 * This is a literal asterisk not the wildcard asterisk of regex syntax
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX star() {
+		return unescaped("\\*");
+	}
+
+	/**
+	 * Adds a check for an dot character( . ) to the regular expression without
 	 * grouping.
+	 *
+	 * This is a literal dot not the wildcard dot of regex syntax
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX dot() {
+		return unescaped("\\.");
+	}
+
+	/**
+	 * Adds a check for an plus character( + ) to the regular expression without
+	 * grouping.
+	 *
+	 * This is a literal plus not the wildcard plus of regex syntax
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX plus() {
+		return unescaped("\\+");
+	}
+
+	/**
+	 * Adds a check for a single quote character( ' ) to the regular expression
+	 * without grouping.
 	 *
 	 * @return a new regexp
 	 */
@@ -1179,8 +1230,8 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	}
 
 	/**
-	 * Adds a check for a double quote character( " ) to the regular expression without
-	 * grouping.
+	 * Adds a check for a double quote character( " ) to the regular expression
+	 * without grouping.
 	 *
 	 * @return a new regexp
 	 */
