@@ -289,7 +289,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	/**
 	 * Adds a match for any single character (including line terminators) to the regexp without grouping it.
 	 * 
-	 * <p>This <\p>
+	 * <p>This implements DOTALL behavior.</p>
 	 *
 	 * @return a new regexp
 	 */

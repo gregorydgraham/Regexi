@@ -9,7 +9,7 @@ package nz.co.gregs.regexi.internal;
  *
  * @author gregorygraham
  * @param <REGEX> the regex to return after closing this class, the type
- returned by {@link #endCaseInsensitiveSection() }
+ returned by {@link #endDotAllSection() }
  */
 public class DotAllSection<REGEX extends AbstractHasRegexFunctions<REGEX>> extends RegexGroup<DotAllSection<REGEX>, REGEX> {
 
