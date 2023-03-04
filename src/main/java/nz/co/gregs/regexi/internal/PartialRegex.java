@@ -153,7 +153,8 @@ public abstract class PartialRegex extends AbstractHasRegexFunctions<PartialRege
 	}
 
 	public synchronized boolean matchesEntireString(String string) {
-		return getMatcher(string).matches();
+		String test = checkForNull(string);
+		return getMatcher(test).matches();
 	}
 
 	/**
@@ -168,7 +169,13 @@ public abstract class PartialRegex extends AbstractHasRegexFunctions<PartialRege
 	 * @return true if the beginning of the string matches this regex.
 	 */
 	public synchronized boolean matchesBeginningOf(String string) {
-		return Regex.startingFromTheBeginning().add(this).matchesWithinString(string);
+		String test = checkForNull(string);
+		boolean result = Regex.startingFromTheBeginning().add(this).matchesWithinString(test);
+		return result;
+	}
+
+	private String checkForNull(String string) {
+		return (string != null ? string : "");
 	}
 
 	/**
@@ -182,11 +189,14 @@ public abstract class PartialRegex extends AbstractHasRegexFunctions<PartialRege
 	 * @return true if the end of the string matches this regex.
 	 */
 	public synchronized boolean matchesEndOf(String string) {
-		return endOfTheString().matchesWithinString(string);
+		String test = checkForNull(string);
+		boolean result = endOfTheString().matchesWithinString(test);
+		return result;
 	}
 
 	public synchronized boolean matchesWithinString(String string) {
-		return getMatcher(string).find();
+		String test = checkForNull(string);
+		return getMatcher(test).find();
 	}
 
 	public synchronized Stream<MatchResult> getMatchResultsStream(String string) {

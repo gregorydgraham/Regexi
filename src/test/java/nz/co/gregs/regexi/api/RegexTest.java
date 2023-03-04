@@ -52,6 +52,21 @@ public class RegexTest {
 	}
 
 	@Test
+	public void testWorksWithNullString() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testWorksWithNullString()");
+		Regex regex = Regex.startingAnywhere().asterisk().anyCharacterIncludingLineEnd().atLeastOnce().literal('-').toRegex();
+		Assert.assertTrue(regex.doesNotMatchTheBeginningOf(null));
+		Assert.assertTrue(regex.doesNotMatchTheEndOf(null));
+		Assert.assertTrue(regex.doesNotMatchTheEntireString(null));
+		Assert.assertTrue(regex.doesNotMatchWithin(null));
+		Assert.assertFalse(regex.matchesBeginningOf(null));
+		Assert.assertFalse(regex.matchesEndOf(null));
+		Assert.assertFalse(regex.matchesEntireString(null));
+		Assert.assertFalse(regex.matchesWithinString(null));
+
+	}
+
+	@Test
 	public void testAnyCharacterIncludingLineEnd() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testAnyCharacterIncludingLineEnd()");
 		Regex regex = Regex.startingAnywhere().asterisk().anyCharacterIncludingLineEnd().atLeastOnce().literal('-').toRegex();
@@ -124,7 +139,7 @@ public class RegexTest {
 		Assert.assertFalse(regex.matchesBeginningOf("1+"));
 		Assert.assertFalse(regex.matchesEntireString("below zero there are negatives and -1+ is the first"));
 		Assert.assertTrue(regex.matchesWithinString("below zero there are negatives and -1+ is the first"));
-		
+
 		regex = Regex.startingAnywhere().plus().star().toRegex();
 		Assert.assertTrue(regex.matchesEntireString("+*"));
 		Assert.assertTrue(regex.matchesBeginningOf("+*1"));
@@ -382,7 +397,7 @@ public class RegexTest {
 		assertThat(pattern.matchesEntireString("  'mid'"), is(false));
 		assertThat(pattern.matchesEntireString("  'mid'  "), is(false));
 		assertThat(pattern.matchesEntireString("'beginning''end'"), is(false));
-		
+
 		assertThat(pattern.matchesWithinString("before \"A4\" after"), is(false));
 		assertThat(pattern.matchesWithinString("before A4after"), is(false));
 	}
@@ -418,7 +433,7 @@ public class RegexTest {
 		assertThat(pattern.matchesEntireString("  'mid'"), is(false));
 		assertThat(pattern.matchesEntireString("  'mid'  "), is(false));
 		assertThat(pattern.matchesEntireString("'beginning''end'"), is(false));
-		
+
 		assertThat(pattern.matchesWithinString("before \"A4\" after"), is(false));
 		assertThat(pattern.matchesWithinString("before A4after"), is(false));
 	}
@@ -454,7 +469,7 @@ public class RegexTest {
 		assertThat(pattern.matchesEntireString("  \"mid\""), is(false));
 		assertThat(pattern.matchesEntireString("  \"mid\"  "), is(false));
 		assertThat(pattern.matchesEntireString("\"beginning\"\"end\""), is(false));
-		
+
 		assertThat(pattern.matchesWithinString("before 'A4' after"), is(false));
 		assertThat(pattern.matchesWithinString("before A4after"), is(false));
 	}
@@ -1143,7 +1158,7 @@ public class RegexTest {
 						.anyOf("DAY", "HOUR", "MINUTE", "SECOND").once().literal("S").onceOrNotAtAll()
 						.endCaseInsensitiveSection()
 						.endNamedCapture().toRegex();
-		
+
 		String intervalString = "INTERVAL -1.999999999946489E-6 SECOND, INTERVAL 4 YEARS, INTERVAL 2 DAY, interval -34 hour, interval 56 minutes";
 		assertThat(regex.matchesWithinString(intervalString), is(true));
 
@@ -1254,7 +1269,7 @@ public class RegexTest {
 
 		replaced = Regex.empty().backslash().replaceWith().literal("\\").replaceAll(singleBackslashVersion);
 		assertThat(replaced, is(singleBackslashVersion));
-		
+
 		/* Check that double backslash works in all cases */
 		replaced = Regex.empty().backslash().replaceWith().backslash().backslash().replaceAll(singleBackslashVersion);
 		assertThat(replaced, is(doubleBackslashVersion));
@@ -1378,6 +1393,7 @@ public class RegexTest {
 		shouldMatchTests(regex, "INTERVAL '5 04:03:02' DAY TO SECOND", "5", "04", "03", "02", "");
 
 	}
+
 	@Test
 	public void testAnyCharacterExcept() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testAnyCharacterExcept()");
@@ -1386,15 +1402,13 @@ public class RegexTest {
 				.includeLetters()
 				.includeDigits()
 				.includeLiterals("!#$%&'*+-/=?^_`{|}~")
-				.endSet()
-				;
+				.endSet();
 		PartialRegex legalContinuingCharacter = Regex.empty().beginSetIncluding()
 				.includeLetters()
 				.includeDigits()
 				.includeLiterals("!#$%&'*+-/=?^_`{|}~.")
-				.endSet()
-				;
-		
+				.endSet();
+
 		Regex regex
 				= Regex.startingAnywhere()
 						.add(legalStartingCharacter)
