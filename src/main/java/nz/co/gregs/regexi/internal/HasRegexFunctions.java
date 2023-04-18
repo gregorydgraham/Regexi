@@ -742,8 +742,8 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * grouping.
 	 *
 	 * <p>
-	 * To addGroup more complex ranges use .addGroup(new
-	 * PartialRegex.Range(rangeItems)).
+	 * To add more complex ranges use {@link #addGroup(nz.co.gregs.regexi.internal.PartialRegex) addGroup(new
+	 * PartialRegex.Range(rangeItems))}.
 	 *
 	 * @param literals all the characters to be included in the range, for example
 	 * "abcdeABCDE"
@@ -751,6 +751,27 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 */
 	default REGEX noneOfTheseCharacters(String literals) {
 		return add(Regex.startingAnywhere().beginSetExcluding().excludeLiterals(literals).endSet());
+	}
+
+	/**
+	 * Adds a check to exclude a simple range from the regular expression without
+	 * grouping.
+	 *
+	 * <p>
+	 * To add more complex ranges use {@link #addGroup(nz.co.gregs.regexi.internal.PartialRegex) addGroup(new
+	 * PartialRegex.Range(rangeItems))}.
+	 *
+	 * @param literals all the characters to be included in the range, for example
+	 * "abcdeABCDE"
+	 * @return a new regexp
+	 */
+	default REGEX noneOfTheseCharacters(Character... literals) {
+		PartialRegex regexToAdd = Regex.startingAnywhere();
+		CharacterSetExcluding<PartialRegex> excluding = regexToAdd.beginSetExcluding();
+		for (Character literal : literals) {
+			excluding = excluding.excludeLiteral(literal);
+		}
+		return add(excluding.endSet());
 	}
 
 	/**

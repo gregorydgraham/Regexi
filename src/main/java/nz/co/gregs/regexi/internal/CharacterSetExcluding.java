@@ -24,6 +24,10 @@ public class CharacterSetExcluding<REGEX extends AbstractHasRegexFunctions<REGEX
 		return (CharacterSetExcluding<REGEX>) extendWithLiterals(literals);
 	}
 
+	public final CharacterSetExcluding<REGEX> excludeLiteral(Character literal) {
+		return (CharacterSetExcluding<REGEX>) extendWithLiteral(literal);
+	}
+
 	public CharacterSetExcluding<REGEX> excludeMinus() {
 		return (CharacterSetExcluding<REGEX>) extendWithHyphen();
 	}

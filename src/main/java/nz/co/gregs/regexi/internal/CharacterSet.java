@@ -44,6 +44,10 @@ public abstract class CharacterSet<REGEX extends AbstractHasRegexFunctions<REGEX
 		return this;
 	}
 
+	protected CharacterSet<REGEX> extendWithLiteral(Character literal) {
+		return extendWithLiterals(""+literal);
+	}
+
 	protected CharacterSet<REGEX> extendWithHyphen() {
 		includeMinus = true;
 		return this;
