@@ -153,11 +153,11 @@ public abstract class PartialRegex extends AbstractHasRegexFunctions<PartialRege
 	}
 
 	/**
-	 * Tests whether the supplied string matches this regex.
+	 * Tests whether the supplied string matches this regex in it's entirety.
 	 *
 	 * The method works by combining {@link Regex#startingFromTheBeginning() } and
 	 * {@link PartialRegex#endOfTheString()} with this regex and calling
-	 * {@link #matches(java.lang.String)}.
+	 * {@link Matcher#matches()}.
 	 *
 	 * @param string the string to test with this regex
 	 * @return true if the beginning of the string matches this regex.

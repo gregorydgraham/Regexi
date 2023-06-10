@@ -96,7 +96,7 @@ public class Regex implements Serializable {
 	 *
 	 * <p>
 	 * Please note: This is like the functionality of {@link Matcher#find() } as
-	 * it provides more useful behaviour than {@link Matcher#matches(). In
+	 * it provides more useful behaviour than {@link Matcher#matches()}. In
 	 * particular it allows for regexes specifying end points, as well as regexes
 	 * that don't {@link #matches(java.lang.String) Matches(string)} may be
 	 * equivalent to {@link #matchesBeginningOf(java.lang.String) },
@@ -121,7 +121,7 @@ public class Regex implements Serializable {
 	 *
 	 * <p>
 	 * Please note: This is like the functionality of {@link Matcher#find() } as
-	 * it provides more useful behaviour than {@link Matcher#matches(). In
+	 * it provides more useful behaviour than {@link Matcher#matches()}. In
 	 * particular it allows for regexes specifying end points, as well as regexes
 	 * that don't {@link #matches(java.lang.String) Matches(string)} may be
 	 * equivalent to {@link #matchesBeginningOf(java.lang.String) },
@@ -129,7 +129,8 @@ public class Regex implements Serializable {
 	 * {@link #matchesEndOf(java.lang.String) } depending on the Regex. This
 	 * is a feature, not a bug.</p>
 	 *
-	 * @param string the source text
+	 * @param string the source text to test against
+	 * @param regexes all the regexes to test with
 	 * @return true if the regular expression matches the source text
 	 */
 	public static boolean matchesAny(String string, Regex... regexes) {
@@ -161,7 +162,7 @@ public class Regex implements Serializable {
 	 *
 	 * <p>
 	 * Please note: This is like the functionality of {@link Matcher#find() } as
-	 * it provides more useful behaviour than {@link Matcher#matches(). In
+	 * it provides more useful behaviour than {@link Matcher#matches()}. In
 	 * particular it allows for regexes specifying end points, as well as regexes
 	 * that don't {@link #matches(java.lang.String) Matches(string)} may be
 	 * equivalent to {@link #matchesBeginningOf(java.lang.String) },
@@ -170,6 +171,7 @@ public class Regex implements Serializable {
 	 * is a feature, not a bug.</p>
 	 *
 	 * @param string the source text
+	 * @param regexes the regexes to test with
 	 * @return true if the regular expression matches the source text
 	 */
 	public static boolean matchesAll(String string, Regex... regexes) {
