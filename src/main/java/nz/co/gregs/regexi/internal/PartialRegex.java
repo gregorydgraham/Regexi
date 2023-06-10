@@ -152,6 +152,16 @@ public abstract class PartialRegex extends AbstractHasRegexFunctions<PartialRege
 		return compiledVersion;
 	}
 
+	/**
+	 * Tests whether the supplied string matches this regex.
+	 *
+	 * The method works by combining {@link Regex#startingFromTheBeginning() } and
+	 * {@link PartialRegex#endOfTheString()} with this regex and calling
+	 * {@link #matches(java.lang.String)}.
+	 *
+	 * @param string the string to test with this regex
+	 * @return true if the beginning of the string matches this regex.
+	 */
 	public synchronized boolean matchesEntireString(String string) {
 		String test = checkForNull(string);
 		return getMatcher(test).matches();

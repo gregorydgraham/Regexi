@@ -88,6 +88,115 @@ public class Regex implements Serializable {
 
 	/**
 	 * Checks the string against the regular expression and returns true if the
+	 * string matches the expression.
+	 *
+	 * <p>
+	 * For instance {@code Regex regex =  Regex.startOrGroup().literal("A").or().literal("B").endOrGroup().toRegex().matches("AB");
+	 * } produces TRUE where as ...matches("CD") would not.</p>
+	 *
+	 * <p>
+	 * Please note: This is like the functionality of {@link Matcher#find() } as
+	 * it provides more useful behaviour than {@link Matcher#matches(). In
+	 * particular it allows for regexes specifying end points, as well as regexes
+	 * that don't {@link #matches(java.lang.String) Matches(string)} may be
+	 * equivalent to {@link #matchesBeginningOf(java.lang.String) },
+	 * {@link #matchesEntireString(java.lang.String) }, or
+	 * {@link #matchesEndOf(java.lang.String) } depending on the Regex. This
+	 * is a feature, not a bug.</p>
+	 *
+	 * @param string the source text
+	 * @return true if the regular expression matches the source text
+	 */
+	public boolean matches(String string) {
+		return partial.matchesWithinString(string);
+	}
+
+	/**
+	 * Checks the string against the regular expression and returns true if the
+	 * string matches the expression.
+	 *
+	 * <p>
+	 * For instance {@code Regex regex =  Regex.startOrGroup().literal("A").or().literal("B").endOrGroup().toRegex().matches("AB");
+	 * } produces TRUE where as ...matches("CD") would not.</p>
+	 *
+	 * <p>
+	 * Please note: This is like the functionality of {@link Matcher#find() } as
+	 * it provides more useful behaviour than {@link Matcher#matches(). In
+	 * particular it allows for regexes specifying end points, as well as regexes
+	 * that don't {@link #matches(java.lang.String) Matches(string)} may be
+	 * equivalent to {@link #matchesBeginningOf(java.lang.String) },
+	 * {@link #matchesEntireString(java.lang.String) }, or
+	 * {@link #matchesEndOf(java.lang.String) } depending on the Regex. This
+	 * is a feature, not a bug.</p>
+	 *
+	 * @param string the source text
+	 * @return true if the regular expression matches the source text
+	 */
+	public static boolean matchesAny(String string, Regex... regexes) {
+		return loopForMatches(regexes, string, false, true);
+//		boolean result = false;
+//		boolean continueLoop = true;
+//		int i = 0;
+//		while (continueLoop) {
+//			if (i < regexes.length) {
+//				if (regexes[i].matches(string)) {
+//					result = true;
+//					continueLoop = false;
+//				}
+//			} else {
+//				continueLoop = false;
+//			}
+//			i++;
+//		}
+//		return result;
+	}
+
+	/**
+	 * Checks the string against the regular expression and returns true if the
+	 * string matches the expression.
+	 *
+	 * <p>
+	 * For instance {@code Regex regex =  Regex.startOrGroup().literal("A").or().literal("B").endOrGroup().toRegex().matches("AB");
+	 * } produces TRUE where as ...matches("CD") would not.</p>
+	 *
+	 * <p>
+	 * Please note: This is like the functionality of {@link Matcher#find() } as
+	 * it provides more useful behaviour than {@link Matcher#matches(). In
+	 * particular it allows for regexes specifying end points, as well as regexes
+	 * that don't {@link #matches(java.lang.String) Matches(string)} may be
+	 * equivalent to {@link #matchesBeginningOf(java.lang.String) },
+	 * {@link #matchesEntireString(java.lang.String) }, or
+	 * {@link #matchesEndOf(java.lang.String) } depending on the Regex. This
+	 * is a feature, not a bug.</p>
+	 *
+	 * @param string the source text
+	 * @return true if the regular expression matches the source text
+	 */
+	public static boolean matchesAll(String string, Regex... regexes) {
+		boolean result = loopForMatches(regexes, string, true, false);
+		return result;
+	}
+
+	protected static boolean loopForMatches(Regex[] regexes, String string, boolean initialAssumption, boolean watchFor) {
+		boolean result = initialAssumption;
+		boolean continueLoop = true;
+		int i = 0;
+		while (continueLoop) {
+			if (i < regexes.length) {
+				if (regexes[i].matches(string) == watchFor) {
+					result = !initialAssumption;
+					continueLoop = false;
+				}
+			} else {
+				continueLoop = false;
+			}
+			i++;
+		}
+		return result;
+	}
+
+	/**
+	 * Checks the string against the regular expression and returns true if the
 	 * entire string matches the expression.
 	 *
 	 * <p>
@@ -285,20 +394,20 @@ public class Regex implements Serializable {
 	public RegexSplitter toSplitter() {
 		return new RegexSplitter(this);
 	}
-	
-	public boolean doesNotMatchTheBeginningOf(String sourceText){
+
+	public boolean doesNotMatchTheBeginningOf(String sourceText) {
 		return !matchesBeginningOf(sourceText);
 	}
-	
-	public boolean doesNotMatchTheEndOf(String sourceText){
+
+	public boolean doesNotMatchTheEndOf(String sourceText) {
 		return !matchesEndOf(sourceText);
 	}
-	
-	public boolean doesNotMatchTheEntireString(String sourceText){
+
+	public boolean doesNotMatchTheEntireString(String sourceText) {
 		return !matchesEntireString(sourceText);
 	}
-	
-	public boolean doesNotMatchWithin(String sourceText){
+
+	public boolean doesNotMatchWithin(String sourceText) {
 		return !matchesWithinString(sourceText);
 	}
 }

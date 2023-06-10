@@ -1433,6 +1433,113 @@ public class RegexTest {
 
 	}
 
+	@Test
+	public void testMatchesWithMultipleRegexes() {
+		List<Regex> regexes = new ArrayList<>();
+		List<Boolean> expected = new ArrayList<>();
+
+		regexes.add(Regex.startingFromTheBeginning().literal("somebody").toRegex());
+		expected.add(true);
+
+		regexes.add(Regex.startingAnywhere().literal('@').toRegex());
+		expected.add(true);
+
+		regexes.add(Regex.startingAnywhere().literal("au").endOfTheString().toRegex());
+		expected.add(true);
+
+		regexes.add(Regex.startingFromTheBeginning().literal("somebody@somewhere.co.au").endOfTheString().toRegex());
+		expected.add(true);
+
+		regexes.add(Regex.startingFromTheBeginning().literal("au").endOfTheString().toRegex());
+		expected.add(false);
+
+		regexes.add(Regex.startingAnywhere().literal('~').toRegex());
+		expected.add(false);
+
+		regexes.add(Regex.startingAnywhere().literal("somebody").endOfTheString().toRegex());
+		expected.add(false);
+
+		regexes.add(Regex.startingFromTheBeginning().literal("somebody@nowhere.co.au").endOfTheString().toRegex());
+		expected.add(false);
+
+		Regex[] regexArray = regexes.toArray(new Regex[]{});
+		Boolean[] expectedArray = expected.toArray(new Boolean[]{});
+
+		for (int i = 0; i < regexArray.length; i++) {
+			boolean test = regexArray[i].matches("somebody@somewhere.co.au");
+			if (test != expectedArray[i]) {
+				System.out.println("FAILED: expected=" + expectedArray[i] + " actually=" + test + " FROM: " + regexArray[i].getRegex());
+			}
+			assertThat(test, is(expectedArray[i]));
+		}
+	}
+
+	@Test
+	public void testStaticMatchesAnyRegexes() {
+		List<Regex> regexes = new ArrayList<>();
+		List<Boolean> expected = new ArrayList<>();
+		
+		assertThat(Regex.matchesAny("somebody@somewhere.co.au", 
+				Regex.startingAnywhere().literal('@').toRegex() //should match
+				), is(true));
+		
+		assertThat(Regex.matchesAny("somebody@somewhere.co.au", // should all match
+				Regex.startingFromTheBeginning().literal("somebody").toRegex(),
+				Regex.startingAnywhere().literal('@').toRegex(),
+				Regex.startingAnywhere().literal("au").endOfTheString().toRegex()
+				), is(true));
+		
+		assertThat(Regex.matchesAny("somebody@somewhere.co.au", 
+				Regex.startingFromTheBeginning().literal("au").endOfTheString().toRegex(),
+				Regex.startingAnywhere().literal('~').toRegex(),
+				Regex.startingAnywhere().literal('@').toRegex(),//should match
+				Regex.startingFromTheBeginning().literal("somebody@nowhere.co.au").endOfTheString().toRegex()
+				), is(true));
+
+		assertThat(Regex.matchesAny("somebody@somewhere.co.au", // should NOT match
+				Regex.startingFromTheBeginning().literal("au").endOfTheString().toRegex(),
+				Regex.startingAnywhere().literal('~').toRegex(),
+				Regex.startingFromTheBeginning().literal("somebody@nowhere.co.au").endOfTheString().toRegex()
+				), is(false));
+
+		assertThat(Regex.matchesAny("somebody@somewhere.co.au", // should NOT match
+				Regex.startingFromTheBeginning().literal("somebody@nowhere.co.au").endOfTheString().toRegex()
+				), is(false));
+	}
+
+	@Test
+	public void testStaticMatchesAllRegexes() {
+		List<Regex> regexes = new ArrayList<>();
+		List<Boolean> expected = new ArrayList<>();
+		
+		assertThat(Regex.matchesAll("somebody@somewhere.co.au", 
+				Regex.startingAnywhere().literal('@').toRegex() //should match
+				), is(true));
+		
+		assertThat(Regex.matchesAll("somebody@somewhere.co.au", // should all match
+				Regex.startingFromTheBeginning().literal("somebody").toRegex(),
+				Regex.startingAnywhere().literal('@').toRegex(),
+				Regex.startingAnywhere().literal("au").endOfTheString().toRegex()
+				), is(true));
+		
+		assertThat(Regex.matchesAll("somebody@somewhere.co.au", 
+				Regex.startingFromTheBeginning().literal("au").endOfTheString().toRegex(),
+				Regex.startingAnywhere().literal('~').toRegex(),
+				Regex.startingAnywhere().literal('@').toRegex(),//should match
+				Regex.startingFromTheBeginning().literal("somebody@nowhere.co.au").endOfTheString().toRegex()
+				), is(false));
+
+		assertThat(Regex.matchesAll("somebody@somewhere.co.au", // should NOT match
+				Regex.startingFromTheBeginning().literal("au").endOfTheString().toRegex(),
+				Regex.startingAnywhere().literal('~').toRegex(),
+				Regex.startingFromTheBeginning().literal("somebody@nowhere.co.au").endOfTheString().toRegex()
+				), is(false));
+
+		assertThat(Regex.matchesAll("somebody@somewhere.co.au", // should NOT match
+				Regex.startingFromTheBeginning().literal("somebody@nowhere.co.au").endOfTheString().toRegex()
+				), is(false));
+	}
+
 	private void shouldMatchTests(final Regex regex, String testStr, String days, String hours, String minutes, String seconds, String nanos) {
 //		assertThat(toRegex.matchesWithinString(testStr), is(true));
 		if (regex.matchesWithinString(testStr)) {
