@@ -122,6 +122,32 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	}
 
 	/**
+	 * Adds a check for a positive or negative integer following the ISO 31 spec
+	 * to the regular expression without grouping.
+	 *
+	 * <p>
+	 * Will capture the plus or minus so watch out for that in your calculator
+	 * application.
+	 *
+	 * @return a new regexp
+	 */
+	public default REGEX integerISO_31() {
+		return addGroup(
+				Regex.startingAnywhere()
+						.anyCharacterIn("-+").onceOrNotAtAll() // sign needs to be before the word boundary, IDK why
+						.wordBoundary() // numbers should be clearly separated
+						.beginOrGroup() //choose from the usual classes: a number or zero
+						.anyCharacterBetween('1', '9').atLeastOnce() // numbers is always start with a 1-9
+						.group() // what comes next is either blocks of digits or nothing
+						.space().onceOrNotAtAll().digits().oneOrMore() // a block of digits optionally preceded by a space
+						.endGroup().optionalMany() // optionally zero or lots of number blocks
+						.or() // alternatively an integer can be a simple zero
+						.literal('0').oneOrMore().notFollowedBy(Regex.startingAnywhere().digit()) // a zero without any other numbers
+						.endOrGroup().notFollowedBy(Regex.empty().characterSet(",. ").digit())
+		);
+	}
+
+	/**
 	 * Adds a standard pattern that will match any valid number to the pattern as
 	 * a grouped element.
 	 *
@@ -287,9 +313,11 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	}
 
 	/**
-	 * Adds a match for any single character (including line terminators) to the regexp without grouping it.
-	 * 
-	 * <p>This implements DOTALL behavior.</p>
+	 * Adds a match for any single character (including line terminators) to the
+	 * regexp without grouping it.
+	 *
+	 * <p>
+	 * This implements DOTALL behavior.</p>
 	 *
 	 * @return a new regexp
 	 */
@@ -298,7 +326,8 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	}
 
 	/**
-	 * Extends the regular expression with a group that allows the dot operator to match line terminators.
+	 * Extends the regular expression with a group that allows the dot operator to
+	 * match line terminators.
 	 *
 	 * @return an extended regular expression
 	 */
@@ -308,7 +337,8 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	}
 
 	/**
-	 * Extends the regular expression with group where the dot operator matches line terminators (DOTALL).
+	 * Extends the regular expression with group where the dot operator matches
+	 * line terminators (DOTALL).
 	 *
 	 * @return an extended regular expression
 	 */
@@ -333,15 +363,20 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Adds a check for a simple range to the regular expression without grouping.
 	 *
 	 * <p>
+	 * The string provided is interpreted as a set of characters that are
+	 * permitted in the expression. That is to say that "abc" will be interpreted
+	 * as the range "[abc]" and will match "a" but not "abc"</p>
+	 *
+	 * <p>
 	 * To addGroup more complex ranges use .addGroup(new
-	 * PartialRegex.Range(rangeItems)).
+	 * PartialRegex.Range(rangeItems)).</p>
 	 *
 	 * @param literals all the characters to be included in the range, for example
 	 * "abcdeABCDE"
 	 * @return a new regexp
 	 */
 	default REGEX anyCharacterIn(String literals) {
-		return range(literals);
+		return characterSet(literals);
 	}
 
 	/**
@@ -928,6 +963,12 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	/**
 	 * Make a character set (also known as a character class).
 	 *
+	 * <p>
+	 * The string provided is interpreted as a set of characters that are
+	 * permitted in the expression. That is to say that "abc" will be interpreted
+	 * as the range "[abc]" and will match "b" but not "abc"</p>
+	 *
+	 * <p>
 	 * @param literals all of the characters you would like included in the set
 	 * @return the start of a set.
 	 */
