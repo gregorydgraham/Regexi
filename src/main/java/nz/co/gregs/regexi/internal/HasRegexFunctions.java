@@ -126,8 +126,11 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * to the regular expression without grouping.
 	 *
 	 * <p>
+	 * For real numbers, use {@link #integerISO_31() }</p>
+	 *
+	 * <p>
 	 * Will capture the plus or minus so watch out for that in your calculator
-	 * application.
+	 * application.</p>
 	 *
 	 * @return a new regexp
 	 */
@@ -144,6 +147,47 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 						.or() // alternatively an integer can be a simple zero
 						.literal('0').oneOrMore().notFollowedBy(Regex.startingAnywhere().digit()) // a zero without any other numbers
 						.endOrGroup().notFollowedBy(Regex.empty().characterSet(",. ").digit())
+		);
+	}
+
+	/**
+	 * Adds a check for a positive or negative number following the ISO 31 spec to
+	 * the regular expression without grouping.
+	 *
+	 * <p>
+	 * For integers, use {@link #integerISO_31() }</p>
+	 * <p>
+	 *
+	 * Will capture the plus or minus so watch out for that in your calculator
+	 * application.</p>
+	 *
+	 * @return a new regexp
+	 */
+	public default REGEX numberISO_31() {
+		PartialRegex beforeTheDecimal = Regex.startingAnywhere()
+				.beginOrGroup()
+				.anyCharacterBetween('1', '9').atLeastOnce() // numbers is always start with a 1-9
+				.group() // what comes next is either blocks of digits or nothing
+				.space().onceOrNotAtAll().digits() // a block of digits optionally preceded by a space
+				.endGroup().optionalMany() // optionally zero or lots of number blocks;
+				.or()
+				.literal('0')
+				.endOrGroup();
+
+		return addGroup(
+				Regex.startingAnywhere()
+						.group()
+						.anyCharacterIn("-+").onceOrNotAtAll() // sign needs to be before the word boundary, IDK why
+						.wordBoundary() // numbers should be clearly separated
+						.beginOrGroup() // choose from the dot or comma version
+						.add(beforeTheDecimal).notFollowedBy(Regex.empty().characterSet(".,").digits())
+						.or()
+						.add(beforeTheDecimal).dot().digits().notFollowedBy(Regex.empty().dot().digits())
+						.or()
+						.add(beforeTheDecimal).literal(',').digits().notFollowedBy(Regex.empty().literal(',').digits())
+						.endOrGroup()
+						.wordBoundary()
+						.endGroup()
 		);
 	}
 
@@ -1141,8 +1185,11 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * appears in that position or not.
 	 *
 	 * <p>
-	 * literal('a').literal('b)'.zeroOrMore().literal('c') will match "ac" or
-	 * "abc".
+	 * Adds a "*" to regular expression.</p>
+	 *
+	 * <p>
+	 * literal('a').literal('b)'.zeroOrMore().literal('c') will match "ac", "abc",
+	 * or "abbbc".</p>
 	 *
 	 * @return a new regexp
 	 */

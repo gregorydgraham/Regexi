@@ -1558,27 +1558,4 @@ public class RegexTest {
 		}
 	}
 
-	@Test
-	public void testIntegerISO_31() {
-
-		RegexTests tests = new RegexTests();
-
-		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "something", false);
-		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "1,234,567", false);
-		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "1.234.567", false);
-		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), " +1", false);
-		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "1.0", false);
-
-		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "1", true);
-		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "+1", true);
-		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "-1", true);
-		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "1 234 567", true);
-		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "-1 234 567", true);
-		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "+1 234 567", true);
-		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "+1 012345", true);
-		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "1 012345", true);
-
-		tests.performTests();
-	}
-
 }

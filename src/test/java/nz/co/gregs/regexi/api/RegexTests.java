@@ -33,15 +33,13 @@ package nz.co.gregs.regexi.api;
 import java.util.ArrayList;
 import java.util.List;
 import nz.co.gregs.regexi.Regex;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 
 /**
  *
  * @author gregorygraham
  */
 public class RegexTests {
-	
+
 	List<String> tests = new ArrayList<>();
 	List<Regex> regexes = new ArrayList<>();
 	List<Boolean> expected = new ArrayList<>();
@@ -57,20 +55,26 @@ public class RegexTests {
 	}
 
 	public void performTests() {
+		int failed = 0;
 		String[] testArray = tests.toArray(new String[]{});
 		Regex[] regexArray = regexes.toArray(new Regex[]{});
 		Boolean[] expectedArray = expected.toArray(new Boolean[]{});
 		for (int i = 0; i < regexArray.length; i++) {
 			boolean test = regexArray[i].matches(testArray[i]);
 			if (test != expectedArray[i]) {
+				failed++;
 				System.out.println("FAILED: [" + i + "] expected=" + expectedArray[i] + " actually=" + test + " USING: ~" + testArray[i] + "~ AGAINST: " + regexArray[i].getRegex());
 				List<String> testAgainst = regexArray[i].testAgainst(testArray[i]);
 				for (String string : testAgainst) {
 					System.out.println(string);
 				}
+			} else {
+				System.out.println("success: [" + i + "]");
 			}
-			MatcherAssert.assertThat(test, Matchers.is(expectedArray[i]));
+		}
+		if (failed > 0) {
+			org.junit.Assert.fail("FAILURE: " + failed + " test(s) failed");
 		}
 	}
-	
+
 }
