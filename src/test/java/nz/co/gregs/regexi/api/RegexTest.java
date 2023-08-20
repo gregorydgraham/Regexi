@@ -1476,68 +1476,64 @@ public class RegexTest {
 
 	@Test
 	public void testStaticMatchesAnyRegexes() {
-		List<Regex> regexes = new ArrayList<>();
-		List<Boolean> expected = new ArrayList<>();
-		
-		assertThat(Regex.matchesAny("somebody@somewhere.co.au", 
+
+		assertThat(Regex.matchesAny("somebody@somewhere.co.au",
 				Regex.startingAnywhere().literal('@').toRegex() //should match
-				), is(true));
-		
+		), is(true));
+
 		assertThat(Regex.matchesAny("somebody@somewhere.co.au", // should all match
 				Regex.startingFromTheBeginning().literal("somebody").toRegex(),
 				Regex.startingAnywhere().literal('@').toRegex(),
 				Regex.startingAnywhere().literal("au").endOfTheString().toRegex()
-				), is(true));
-		
-		assertThat(Regex.matchesAny("somebody@somewhere.co.au", 
+		), is(true));
+
+		assertThat(Regex.matchesAny("somebody@somewhere.co.au",
 				Regex.startingFromTheBeginning().literal("au").endOfTheString().toRegex(),
 				Regex.startingAnywhere().literal('~').toRegex(),
 				Regex.startingAnywhere().literal('@').toRegex(),//should match
 				Regex.startingFromTheBeginning().literal("somebody@nowhere.co.au").endOfTheString().toRegex()
-				), is(true));
+		), is(true));
 
 		assertThat(Regex.matchesAny("somebody@somewhere.co.au", // should NOT match
 				Regex.startingFromTheBeginning().literal("au").endOfTheString().toRegex(),
 				Regex.startingAnywhere().literal('~').toRegex(),
 				Regex.startingFromTheBeginning().literal("somebody@nowhere.co.au").endOfTheString().toRegex()
-				), is(false));
+		), is(false));
 
 		assertThat(Regex.matchesAny("somebody@somewhere.co.au", // should NOT match
 				Regex.startingFromTheBeginning().literal("somebody@nowhere.co.au").endOfTheString().toRegex()
-				), is(false));
+		), is(false));
 	}
 
 	@Test
 	public void testStaticMatchesAllRegexes() {
-		List<Regex> regexes = new ArrayList<>();
-		List<Boolean> expected = new ArrayList<>();
-		
-		assertThat(Regex.matchesAll("somebody@somewhere.co.au", 
+
+		assertThat(Regex.matchesAll("somebody@somewhere.co.au",
 				Regex.startingAnywhere().literal('@').toRegex() //should match
-				), is(true));
-		
+		), is(true));
+
 		assertThat(Regex.matchesAll("somebody@somewhere.co.au", // should all match
 				Regex.startingFromTheBeginning().literal("somebody").toRegex(),
 				Regex.startingAnywhere().literal('@').toRegex(),
 				Regex.startingAnywhere().literal("au").endOfTheString().toRegex()
-				), is(true));
-		
-		assertThat(Regex.matchesAll("somebody@somewhere.co.au", 
+		), is(true));
+
+		assertThat(Regex.matchesAll("somebody@somewhere.co.au",
 				Regex.startingFromTheBeginning().literal("au").endOfTheString().toRegex(),
 				Regex.startingAnywhere().literal('~').toRegex(),
 				Regex.startingAnywhere().literal('@').toRegex(),//should match
 				Regex.startingFromTheBeginning().literal("somebody@nowhere.co.au").endOfTheString().toRegex()
-				), is(false));
+		), is(false));
 
 		assertThat(Regex.matchesAll("somebody@somewhere.co.au", // should NOT match
 				Regex.startingFromTheBeginning().literal("au").endOfTheString().toRegex(),
 				Regex.startingAnywhere().literal('~').toRegex(),
 				Regex.startingFromTheBeginning().literal("somebody@nowhere.co.au").endOfTheString().toRegex()
-				), is(false));
+		), is(false));
 
 		assertThat(Regex.matchesAll("somebody@somewhere.co.au", // should NOT match
 				Regex.startingFromTheBeginning().literal("somebody@nowhere.co.au").endOfTheString().toRegex()
-				), is(false));
+		), is(false));
 	}
 
 	private void shouldMatchTests(final Regex regex, String testStr, String days, String hours, String minutes, String seconds, String nanos) {
@@ -1561,4 +1557,28 @@ public class RegexTest {
 			Assert.fail("Match Failed");
 		}
 	}
+
+	@Test
+	public void testIntegerISO_31() {
+
+		RegexTests tests = new RegexTests();
+
+		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "something", false);
+		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "1,234,567", false);
+		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "1.234.567", false);
+		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), " +1", false);
+		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "1.0", false);
+
+		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "1", true);
+		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "+1", true);
+		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "-1", true);
+		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "1 234 567", true);
+		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "-1 234 567", true);
+		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "+1 234 567", true);
+		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "+1 012345", true);
+		tests.add(Regex.startingFromTheBeginning().integerISO_31().toRegex(), "1 012345", true);
+
+		tests.performTests();
+	}
+
 }
