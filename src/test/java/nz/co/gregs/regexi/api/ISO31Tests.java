@@ -87,6 +87,9 @@ public class ISO31Tests {
 		tests.add(Regex.startingFromTheBeginning().numberISO_31().toRegex(), "+1 234 567.3", true);
 		tests.add(Regex.startingFromTheBeginning().numberISO_31().toRegex(), "+1 012345", true);
 		tests.add(Regex.startingFromTheBeginning().numberISO_31().toRegex(), "1 012345.4", true);
+		
+		tests.add(Regex.empty().numberISO_31().toRegex(), "yada 1 012345.4 yada", true);
+		tests.add(Regex.empty().numberISO_31().toRegex(), "yada1 012345.4yada", false);
 
 		tests.performTests();
 	}
