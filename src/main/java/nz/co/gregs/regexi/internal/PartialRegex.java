@@ -47,12 +47,19 @@ import nz.co.gregs.regexi.*;
 public abstract class PartialRegex extends AbstractHasRegexFunctions<PartialRegex> {
 
 	private Pattern compiledVersion;
+	private int flags = 0;
 
 	protected PartialRegex() {
 	}
 
 	protected final void inheritStoredState(PartialRegex first) {
 		this.registerAllNamedGroups(first.getNamedGroups());
+		addFlags(first.flags);
+	}
+
+	protected PartialRegex addFlags(int flags) {
+		this.flags |= flags;
+		return this;
 	}
 
 	/**
@@ -147,7 +154,7 @@ public abstract class PartialRegex extends AbstractHasRegexFunctions<PartialRege
 	protected synchronized final Pattern getPattern() {
 		if (compiledVersion == null) {
 			final String regex = this.toRegexString();
-			compiledVersion = Pattern.compile(regex);
+			compiledVersion = Pattern.compile(regex, flags);
 		}
 		return compiledVersion;
 	}

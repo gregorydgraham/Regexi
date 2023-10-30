@@ -71,14 +71,15 @@ public class RegexTest {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testAnyCharacterIncludingLineEnd()");
 		Regex regex = Regex.startingAnywhere().asterisk().anyCharacterIncludingLineEnd().atLeastOnce().literal('-').toRegex();
 		Assert.assertTrue(regex.matchesEntireString("*\n-"));
-		Assert.assertFalse(regex.matchesWithinString("-1-"));
 		Assert.assertTrue(regex.matchesWithinString("1*\nyada-2"));
 		Assert.assertTrue(regex.matchesWithinString("1*\nyada-"));
 		Assert.assertTrue(regex.matchesEndOf("1*\n-"));
-		Assert.assertFalse(regex.matchesBeginningOf("1*\nyada-"));
 		Assert.assertTrue(regex.matchesBeginningOf("*\n--1"));
-		Assert.assertFalse(regex.matchesEntireString("below zero there are negatives and -1*\n- is the first"));
 		Assert.assertTrue(regex.matchesWithinString("below zero there are negatives and -1*\n- is the first"));
+
+		Assert.assertFalse(regex.matchesWithinString("-1-"));
+		Assert.assertFalse(regex.matchesBeginningOf("1*\nyada-"));
+		Assert.assertFalse(regex.matchesEntireString("below zero there are negatives and -1*\n- is the first"));
 	}
 
 	@Test
@@ -86,14 +87,43 @@ public class RegexTest {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testDotAllSection()");
 		Regex regex = Regex.startingAnywhere().beginDotAllSection().asterisk().anyCharacter().atLeastOnce().endDotAllSection().toRegex();
 		Assert.assertTrue(regex.matchesEntireString("*\n"));
-		Assert.assertFalse(regex.matchesWithinString("-1"));
 		Assert.assertTrue(regex.matchesWithinString("1*\n2"));
 		Assert.assertTrue(regex.matchesWithinString("1*\n"));
 		Assert.assertTrue(regex.matchesEndOf("1*\n"));
-		Assert.assertFalse(regex.matchesBeginningOf("1*\n"));
 		Assert.assertTrue(regex.matchesBeginningOf("*\n1"));
-		Assert.assertFalse(regex.matchesEntireString("below zero there are negatives and -1*\n is the first"));
 		Assert.assertTrue(regex.matchesWithinString("below zero there are negatives and -1*\n is the first"));
+
+		Assert.assertFalse(regex.matchesWithinString("-1"));
+		Assert.assertFalse(regex.matchesBeginningOf("1*\n"));
+		Assert.assertFalse(regex.matchesEntireString("below zero there are negatives and -1*\n is the first"));
+	}
+
+	@Test
+	public void testMultilineSupport() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testMultilineSupport()");
+		Regex regex = Regex.multiline().asterisk().newline().anyCharacterIn("a1234 ").atLeastOnce().toRegex();
+		Assert.assertTrue(regex.matchesEntireString("*\na"));
+		Assert.assertTrue(regex.matchesWithinString("1*\n2"));
+		Assert.assertTrue(regex.matchesWithinString("1*\n234"));
+		Assert.assertTrue(regex.matchesEndOf("1*\n234"));
+		Assert.assertTrue(regex.matchesBeginningOf("*\n1"));
+		Assert.assertTrue(regex.matchesWithinString("below zero there are negatives and -1*\n is the first"));
+
+		Assert.assertFalse(regex.matchesWithinString("-1"));
+		Assert.assertFalse(regex.matchesBeginningOf("1*\n"));
+		Assert.assertFalse(regex.matchesEntireString("below zero there are negatives and -1*\n.0 is the first"));
+
+		regex = Regex.multiline().asterisk().anyCharacter().atLeastOnce().toRegex();
+		Assert.assertTrue(regex.matchesEntireString("*\na"));
+		Assert.assertTrue(regex.matchesWithinString("1*\n2"));
+		Assert.assertTrue(regex.matchesWithinString("1*\n234"));
+		Assert.assertTrue(regex.matchesEndOf("1*\n234"));
+		Assert.assertTrue(regex.matchesBeginningOf("*\n1"));
+		Assert.assertTrue(regex.matchesWithinString("below zero there are negatives and -1*\n is the first"));
+
+		Assert.assertFalse(regex.matchesWithinString("-1"));
+		Assert.assertFalse(regex.matchesBeginningOf("1*\n"));
+		Assert.assertFalse(regex.matchesEntireString("below zero there are negatives and -1*\n is the first"));
 	}
 
 	@Test

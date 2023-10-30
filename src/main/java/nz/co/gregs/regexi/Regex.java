@@ -17,8 +17,10 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import nz.co.gregs.regexi.internal.*;
 
 /**
  *
@@ -33,6 +35,26 @@ public class Regex implements Serializable {
 	 */
 	public static PartialRegex startingAnywhere() {
 		return new UntestableSequence("");
+	}
+
+	/**
+	 * Create a new empty regular expression with support for MULTILINE matches
+	 * and DOTALL.
+	 *
+	 * <p>
+	 * Normal Regex's assume that the new line characters (newline, carriage
+	 * return, etc) separate the matching attempts. Adding multi-line support
+	 * allows the Regex to match across new line characters by treating new line
+	 * characters as normal characters.</p>
+	 *
+	 * <p>
+	 * Additionally the DOTALL flag is included so that anyCharacter() etc.
+	 * will match new line characters just like every other character.</p>
+	 *
+	 * @return a new empty regular expression
+	 */
+	public static PartialRegex multiline() {
+		return new MultilinePartialRegex();
 	}
 
 	/**
@@ -87,6 +109,16 @@ public class Regex implements Serializable {
 	}
 
 	/**
+	 * Converts the internal state of this Regex into a regular expression string.
+	 *
+	 * @return a regular expression string
+	 */
+	@Override
+	public String toString() {
+		return partial.toRegexString();
+	}
+
+	/**
 	 * Checks the string against the regular expression and returns true if the
 	 * string matches the expression.
 	 *
@@ -101,8 +133,8 @@ public class Regex implements Serializable {
 	 * that don't {@link #matches(java.lang.String) Matches(string)} may be
 	 * equivalent to {@link #matchesBeginningOf(java.lang.String) },
 	 * {@link #matchesEntireString(java.lang.String) }, or
-	 * {@link #matchesEndOf(java.lang.String) } depending on the Regex. This
-	 * is a feature, not a bug.</p>
+	 * {@link #matchesEndOf(java.lang.String) } depending on the Regex. This is a
+	 * feature, not a bug.</p>
 	 *
 	 * @param string the source text
 	 * @return true if the regular expression matches the source text
@@ -126,8 +158,8 @@ public class Regex implements Serializable {
 	 * that don't {@link #matches(java.lang.String) Matches(string)} may be
 	 * equivalent to {@link #matchesBeginningOf(java.lang.String) },
 	 * {@link #matchesEntireString(java.lang.String) }, or
-	 * {@link #matchesEndOf(java.lang.String) } depending on the Regex. This
-	 * is a feature, not a bug.</p>
+	 * {@link #matchesEndOf(java.lang.String) } depending on the Regex. This is a
+	 * feature, not a bug.</p>
 	 *
 	 * @param string the source text to test against
 	 * @param regexes all the regexes to test with
@@ -167,8 +199,8 @@ public class Regex implements Serializable {
 	 * that don't {@link #matches(java.lang.String) Matches(string)} may be
 	 * equivalent to {@link #matchesBeginningOf(java.lang.String) },
 	 * {@link #matchesEntireString(java.lang.String) }, or
-	 * {@link #matchesEndOf(java.lang.String) } depending on the Regex. This
-	 * is a feature, not a bug.</p>
+	 * {@link #matchesEndOf(java.lang.String) } depending on the Regex. This is a
+	 * feature, not a bug.</p>
 	 *
 	 * @param string the source text
 	 * @param regexes the regexes to test with

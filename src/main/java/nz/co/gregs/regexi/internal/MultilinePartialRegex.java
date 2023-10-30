@@ -31,22 +31,15 @@
 
 package nz.co.gregs.regexi.internal;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.regex.Pattern;
 
-/**
- *
- * @author gregorygraham
- */
-public class UntestableSequence extends UnescapedSequence {
 
-	public UntestableSequence(String literals) {
-		super(literals);
+public class MultilinePartialRegex extends UntestableSequence {
+
+	public MultilinePartialRegex() {
+		super("");
+		addFlags(Pattern.MULTILINE);
+		addFlags(Pattern.DOTALL);
 	}
-
-	@Override
-	public List<PartialRegex> getRegexParts() {
-		ArrayList<PartialRegex> arrayList = new ArrayList<PartialRegex>(0);
-		return arrayList;
-	}
+	
 }
