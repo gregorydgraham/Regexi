@@ -667,6 +667,30 @@ public class RegexTest {
 	}
 
 	@Test
+	public void testUppercaseCharacterClass() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testUppercaseCharacterClass()");
+		final String literal = "AliCE";
+		Regex regex = Regex.empty().uppercaseCharacter().oneOrMore().toRegex();
+		final List<Match> matches = regex.getAllMatches(literal);
+
+		assertThat(matches.size(), is(2));
+		assertThat(matches.get(0).getEntireMatch(), is("A"));
+		assertThat(matches.get(1).getEntireMatch(), is("CE"));
+	}
+
+	@Test
+	public void testLowercaseCharacterClass() {
+		System.out.println("nz.co.gregs.regexi.api.RegexTest.testUppercaseCharacterClass()");
+		final String literal = "AliCEs";
+		Regex regex = Regex.empty().lowercaseCharacter().oneOrMore().toRegex();
+		final List<Match> matches = regex.getAllMatches(literal);
+
+		assertThat(matches.size(), is(2));
+		assertThat(matches.get(0).getEntireMatch(), is("li"));
+		assertThat(matches.get(1).getEntireMatch(), is("s"));
+	}
+
+	@Test
 	public void testLiteralMatchesMoreThanOnce() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testLiteralMatchesMoreThanOnce()");
 		final String literal = "alice";

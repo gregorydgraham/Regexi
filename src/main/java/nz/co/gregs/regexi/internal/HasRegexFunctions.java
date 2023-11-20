@@ -817,6 +817,62 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	}
 
 	/**
+	 * Adds a check for an uppercase character([A-Z]) to the regular expression
+	 * without grouping.
+	 *
+	 * <p>
+	 * Please note that this is only for ASCII uppercase characters that is "C"
+	 * will match but "Ç" will not.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX uppercaseCharacter() {
+		return add(new UnescapedSequence("[A-Z]"));
+	}
+
+	/**
+	 * Adds a check for anything other than an uppercase character([^A-Z]) to the regular expression
+	 * without grouping.
+	 *
+	 * <p>
+	 * Please note that this is only for ASCII uppercase characters that is "C"
+	 * will not match but "Ç" will.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX notUppercaseCharacter() {
+		return add(new UnescapedSequence("[^A-Z]"));
+	}
+
+	/**
+	 * Adds a check for a lowercase character([a-z]) to the regular expression
+	 * without grouping.
+	 *
+	 * <p>
+	 * Please note that this is only for ASCII lowercase characters that is to say
+	 * "c" will match but "ç" will not.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX lowercaseCharacter() {
+		return add(new UnescapedSequence("[a-z]"));
+	}
+
+	/**
+	 * Adds a check for anything other than a lowercase character([a-z]) to the regular expression
+	 * without grouping.
+	 *
+	 * <p>
+	 * Please note that this is only for ASCII lowercase characters that is to say
+	 * "c" will not match but "ç" will.
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX notLowercaseCharacter() {
+		return add(new UnescapedSequence("[^a-z]"));
+	}
+
+	/**
 	 * Adds a check to exclude a simple range from the regular expression without
 	 * grouping.
 	 *
