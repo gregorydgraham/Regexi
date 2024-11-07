@@ -453,9 +453,10 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 *
 	 * @return a new regexp
 	 *
-	 * @Deprecated Use {@link #atLeastOnceGreedy() } so the greediness is clearly
+	 * @deprecated Use {@link #atLeastOnceGreedy() } so the greediness is clearly
 	 * indicated
 	 */
+	@Deprecated
 	default REGEX atLeastOnce() {
 		return atLeastOnceGreedy();
 	}
@@ -1167,9 +1168,10 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Equivalent to "?"
 	 *
 	 * @return a new regexp
-	 * @Deprecated use {@link #onceOrNotAtAllGreedy() } so the greediness is
+	 * @deprecated use {@link #onceOrNotAtAllGreedy() } so the greediness is
 	 * clearly indicated
 	 */
+	@Deprecated
 	default REGEX onceOrNotAtAll() {
 		return onceOrNotAtAllGreedy();
 	}
@@ -1235,8 +1237,9 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 *
 	 * @return a new regexp
 	 *
-	 * @Deprecated use {@link #oneOrMoreGreedy() } so the greediness is clear
+	 * @deprecated use {@link #oneOrMoreGreedy() } so the greediness is clear
 	 */
+	@Deprecated
 	default REGEX oneOrMore() {
 		return atLeastOnceGreedy();
 	}
