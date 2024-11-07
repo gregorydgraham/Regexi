@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import nz.co.gregs.regexi.internal.*;
@@ -27,6 +26,7 @@ import nz.co.gregs.regexi.internal.*;
  * @author gregorygraham
  */
 public class Regex implements Serializable {
+	
 
 	/**
 	 * Create a new empty regular expression.
@@ -115,7 +115,7 @@ public class Regex implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return partial.toRegexString();
+		return getRegex();
 	}
 
 	/**
@@ -167,21 +167,6 @@ public class Regex implements Serializable {
 	 */
 	public static boolean matchesAny(String string, Regex... regexes) {
 		return loopForMatches(regexes, string, false, true);
-//		boolean result = false;
-//		boolean continueLoop = true;
-//		int i = 0;
-//		while (continueLoop) {
-//			if (i < regexes.length) {
-//				if (regexes[i].matches(string)) {
-//					result = true;
-//					continueLoop = false;
-//				}
-//			} else {
-//				continueLoop = false;
-//			}
-//			i++;
-//		}
-//		return result;
 	}
 
 	/**

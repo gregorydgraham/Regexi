@@ -15,19 +15,27 @@ import java.util.List;
 public class NamedBackReference extends PartialRegex {
 
 	private final String literal;
+	private final String name;
 
 	public NamedBackReference(String name) {
 		if (name == null) {
 			this.literal = "";
+			this.name = "";
 		} else {
 			// \k<name>
 			this.literal = "\\k<" + name + ">";
+			this.name = name;
 		}
 	}
 
 	@Override
 	public String toRegexString() {
 		return literal;
+	}
+	
+	@Override
+	public String toString() {
+		return "\\k<"+this.name+">";
 	}
 
 	@Override

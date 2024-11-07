@@ -15,15 +15,22 @@ import java.util.List;
 public class NumberedBackReference extends PartialRegex {
 
 	private final String literal;
+	private final int number;
 
 	public NumberedBackReference(int number) {
 		// \number e.g. \5
 		this.literal = "\\" + number;
+		this.number = number;
 	}
 
 	@Override
 	public String toRegexString() {
 		return literal;
+	}
+
+	@Override
+	public String toString() {
+		return "\\"+number;
 	}
 
 	@Override

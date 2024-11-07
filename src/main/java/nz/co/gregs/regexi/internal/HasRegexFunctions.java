@@ -47,7 +47,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 *
 	 * <p>
 	 * For instance
-	 * {@code PartialRegex.startingAnywhere().charactersWrappedBy("<<",">>").once()}
+	 * {@code PartialRegex.startingAnywhere().charactersWrappedBy("<<",">>").once().toRegexString()}
 	 * might produce {@code "(<<(((?!>>).)*)>>){1}" }
 	 *
 	 * @return the PartialRegex converted to a string pattern
@@ -137,15 +137,15 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	public default REGEX integerISO_31() {
 		return addGroup(
 				Regex.startingAnywhere()
-						.anyCharacterIn("-+").onceOrNotAtAll() // sign needs to be before the word boundary, IDK why
+						.anyCharacterIn("-+").onceOrNotAtAllGreedy()// sign needs to be before the word boundary, IDK why
 						.wordBoundary() // numbers should be clearly separated
 						.beginOrGroup() //choose from the usual classes: a number or zero
-						.anyCharacterBetween('1', '9').atLeastOnce() // numbers is always start with a 1-9
+						.anyCharacterBetween('1', '9').atLeastOnceGreedy() // numbers is always start with a 1-9
 						.group() // what comes next is either blocks of digits or nothing
-						.space().onceOrNotAtAll().digits().oneOrMore() // a block of digits optionally preceded by a space
+						.space().onceOrNotAtAllGreedy().digits().oneOrMoreGreedy()// a block of digits optionally preceded by a space
 						.endGroup().optionalMany() // optionally zero or lots of number blocks
 						.or() // alternatively an integer can be a simple zero
-						.literal('0').oneOrMore().notFollowedBy(Regex.startingAnywhere().digit()) // a zero without any other numbers
+						.literal('0').oneOrMoreGreedy().notFollowedBy(Regex.startingAnywhere().digit()) // a zero without any other numbers
 						.endOrGroup().notFollowedBy(Regex.empty().characterSet(",. ").digit())
 		);
 	}
@@ -166,9 +166,9 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	public default REGEX numberISO_31() {
 		PartialRegex beforeTheDecimal = Regex.startingAnywhere()
 				.beginOrGroup()
-				.anyCharacterBetween('1', '9').atLeastOnce() // numbers is always start with a 1-9
+				.anyCharacterBetween('1', '9').atLeastOnceGreedy() // numbers is always start with a 1-9
 				.group() // what comes next is either blocks of digits or nothing
-				.space().onceOrNotAtAll().digits() // a block of digits optionally preceded by a space
+				.space().onceOrNotAtAllGreedy().digits() // a block of digits optionally preceded by a space
 				.endGroup().optionalMany() // optionally zero or lots of number blocks;
 				.or()
 				.literal('0')
@@ -177,7 +177,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 		return addGroup(
 				Regex.startingAnywhere()
 						.group()
-						.anyCharacterIn("-+").onceOrNotAtAll() // sign needs to be before the word boundary, IDK why
+						.anyCharacterIn("-+").onceOrNotAtAllGreedy()// sign needs to be before the word boundary, IDK why
 						.wordBoundary() // numbers should be clearly separated
 						.beginOrGroup() // choose from the dot or comma version
 						.add(beforeTheDecimal).notFollowedBy(Regex.empty().characterSet(".,").digits())
@@ -222,7 +222,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 				.addGroup(Regex.startingAnywhere()
 						.literal(".").once()
 						.digits()
-				).onceOrNotAtAll()
+				).onceOrNotAtAllGreedy()
 				.endGroup()
 		);
 	}
@@ -253,12 +253,12 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 */
 	public default REGEX numberLike() {
 		return add(Regex.startOrGroup()
-				.anyCharacterIn("-+").onceOrNotAtAll()
-				.digit().atLeastOnce().notFollowedBy(Regex.startingAnywhere().digit())
+				.anyCharacterIn("-+").onceOrNotAtAllGreedy()
+				.digit().atLeastOnceGreedy().notFollowedBy(Regex.startingAnywhere().digit())
 				.addGroup(Regex.startingAnywhere()
 						.literal(".").once()
-						.digit().oneOrMore().notFollowedBy(Regex.startingAnywhere().digit())
-				).onceOrNotAtAll()
+						.digit().oneOrMoreGreedy().notFollowedBy(Regex.startingAnywhere().digit())
+				).onceOrNotAtAllGreedy()
 				.endGroup()
 		);
 	}
@@ -288,17 +288,17 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 				// possibly followed by an E
 				.anyCharacterIn("Ee")
 				// followed by another number (but without the wordboundary in the middle)
-				.anyCharacterIn("-+").onceOrNotAtAll()
+				.anyCharacterIn("-+").onceOrNotAtAllGreedy()
 				.beginOrGroup()
-				.anyCharacterBetween('1', '9').atLeastOnce()
+				.anyCharacterBetween('1', '9').atLeastOnceGreedy()
 				.digit().zeroOrMore()
-				.or().literal('0').oneOrMore().notFollowedBy(Regex.startingAnywhere().digit())
+				.or().literal('0').oneOrMoreGreedy().notFollowedBy(Regex.startingAnywhere().digit())
 				.endOrGroup().once()
 				.beginGroup()
 				.literal(".").once()
 				.digits()
-				.endGroup().onceOrNotAtAll()
-				.endGroup().onceOrNotAtAll()
+				.endGroup().onceOrNotAtAllGreedy()
+				.endGroup().onceOrNotAtAllGreedy()
 		);
 	}
 
@@ -328,7 +328,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 				.anyCharacterIn("Ee")
 				// followed by another number (but without the wordboundary in the middle)
 				.numberLike()
-				.endGroup().onceOrNotAtAll()
+				.endGroup().onceOrNotAtAllGreedy()
 		);
 	}
 
@@ -448,13 +448,58 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * element appears in that position exactly once or not at all.
 	 *
 	 * <p>
-	 * literal('a').literal('b)'.atLeastOnce() will match "ab" or "abb", but not
-	 * "a"
+	 * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but
+	 * not "a"
+	 *
+	 * @return a new regexp
+	 *
+	 * @Deprecated Use {@link #atLeastOnceGreedy() } so the greediness is clearly
+	 * indicated
+	 */
+	default REGEX atLeastOnce() {
+		return atLeastOnceGreedy();
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly once or not at all.
+	 *
+	 * <p>
+	 * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but
+	 * not "a"
 	 *
 	 * @return a new regexp
 	 */
-	default REGEX atLeastOnce() {
+	default REGEX atLeastOnceGreedy() {
 		return unescaped("+");
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly once or not at all.
+	 *
+	 * <p>
+	 * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but
+	 * not "a"
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX atLeastOnceReluctant() {
+		return unescaped("+?");
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly once or not at all.
+	 *
+	 * <p>
+	 * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but
+	 * not "a"
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX atLeastOncePossessive() {
+		return unescaped("++");
 	}
 
 	/**
@@ -582,7 +627,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * @return a new regexp
 	 */
 	default REGEX digits() {
-		return beginGroup().digit().oneOrMore().endGroup();
+		return beginGroup().digit().oneOrMoreGreedy().endGroup();
 	}
 
 	/**
@@ -634,7 +679,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * @return a new regexp
 	 */
 	default REGEX gapBetweenWords() {
-		return nonWordCharacter().oneOrMore();
+		return nonWordCharacter().oneOrMoreGreedy();
 	}
 
 	/**
@@ -711,6 +756,22 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 */
 	default REGEX newline() {
 		return add(new UnescapedSequence("\\n"));
+	}
+
+	/**
+	 * Adds a back reference to the regexp without grouping it, ONE-based
+	 * indexing.
+	 *
+	 * <p>
+	 * Back reference indexes are tricky to enumerate so use them carefully. I
+	 * recommend using Named References instead.
+	 *
+	 * @param n the index of the back reference, 1-based
+	 *
+	 * @return this regexp extended with a back reference
+	 */
+	default REGEX backReference(int n) {
+		return numberedBackReference(n);
 	}
 
 	/**
@@ -813,7 +874,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * @return a new regexp
 	 */
 	default REGEX nondigits() {
-		return nondigit().oneOrMore();
+		return nondigit().oneOrMoreGreedy();
 	}
 
 	/**
@@ -831,8 +892,8 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	}
 
 	/**
-	 * Adds a check for anything other than an uppercase character([^A-Z]) to the regular expression
-	 * without grouping.
+	 * Adds a check for anything other than an uppercase character([^A-Z]) to the
+	 * regular expression without grouping.
 	 *
 	 * <p>
 	 * Please note that this is only for ASCII uppercase characters that is "C"
@@ -859,8 +920,8 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	}
 
 	/**
-	 * Adds a check for anything other than a lowercase character([a-z]) to the regular expression
-	 * without grouping.
+	 * Adds a check for anything other than a lowercase character([a-z]) to the
+	 * regular expression without grouping.
 	 *
 	 * <p>
 	 * Please note that this is only for ASCII lowercase characters that is to say
@@ -1015,9 +1076,31 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * literal('a').literal('b)'.onceOrNotAtAll() will match "a" or "ab", but not
 	 * "abb"
 	 *
+	 * <p>
+	 * Equivalent to "?"
+	 *
 	 * @return a new regexp
+	 * @Deprecated use {@link #onceOrNotAtAllGreedy() } so the greediness is
+	 * clearly indicated
 	 */
 	default REGEX onceOrNotAtAll() {
+		return onceOrNotAtAllGreedy();
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly once or not at all.
+	 *
+	 * <p>
+	 * literal('a').literal('b)'.onceOrNotAtAll() will match "a" or "ab", but not
+	 * "abb"
+	 *
+	 * <p>
+	 * Equivalent to "?"
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX onceOrNotAtAllGreedy() {
 		return add(new UntestableSequence("?"));
 	}
 
@@ -1026,13 +1109,91 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * element appears in that position exactly once or not at all.
 	 *
 	 * <p>
-	 * literal('a').literal('b)'.atLeastOnce() will match "ab" or "abb", but not
-	 * "a"
+	 * literal('a').literal('b)'.onceOrNotAtAll() will match "a" or "ab", but not
+	 * "abb"
+	 *
+	 * <p>
+	 * Equivalent to "??"
 	 *
 	 * @return a new regexp
 	 */
+	default REGEX onceOrNotAtAllReluctant() {
+		return add(new UntestableSequence("??"));
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly once or not at all.
+	 *
+	 * <p>
+	 * literal('a').literal('b)'.onceOrNotAtAll() will match "a" or "ab", but not
+	 * "abb"
+	 *
+	 * <p>
+	 * Equivalent to "?+"
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX onceOrNotAtAllPossessive() {
+		return add(new UntestableSequence("?+"));
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly once or not at all.
+	 *
+	 * <p>
+	 * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but
+	 * not "a"
+	 *
+	 * @return a new regexp
+	 *
+	 * @Deprecated use {@link #oneOrMoreGreedy() } so the greediness is clear
+	 */
 	default REGEX oneOrMore() {
-		return atLeastOnce();
+		return atLeastOnceGreedy();
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly once or not at all.
+	 *
+	 * <p>
+	 * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but
+	 * not "a"
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX oneOrMoreGreedy() {
+		return atLeastOnceGreedy();
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly once or not at all.
+	 *
+	 * <p>
+	 * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but
+	 * not "a"
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX oneOrMoreReluctant() {
+		return atLeastOnceReluctant();
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly once or not at all.
+	 *
+	 * <p>
+	 * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but
+	 * not "a"
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX oneOrMorePossessive() {
+		return atLeastOncePossessive();
 	}
 
 	/**
@@ -1265,14 +1426,35 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	default REGEX positiveInteger() {
 		return add(Regex.startingAnywhere()
 				.notPrecededBy("-")
-				.literal("+").onceOrNotAtAll()
+				.literal("+").onceOrNotAtAllGreedy()
 				.beginOrGroup()
 				.anyCharacterBetween('1', '9').once()
 				.digit().zeroOrMore()
 				.or()
-				.literal('0').oneOrMore().notFollowedBy(Regex.startingAnywhere().digit())
+				.literal('0').oneOrMoreGreedy().notFollowedBy(Regex.startingAnywhere().digit())
 				.endOrGroup()
 		);
+	}
+
+	/**
+	 * Extends this regular expression with a | operator without grouping.
+	 *
+	 * <p>
+	 * for instance, use this to generate "FRED|EMILY|GRETA|DONALD".
+	 *
+	 * <p>
+	 * Note that this can behave differently from the OR Group "(A|B)" in some
+	 * circumstances.
+	 *
+	 * <p>
+	 * {@code Regex regex =  Regex.startAnywhere().literal("A").or().literal("B").toRegex();
+	 * } produces "A|B".
+	 *
+	 * @return a new regular expression
+	 */
+	@SuppressWarnings("unchecked")
+	public default REGEX or() {
+		return add(new UntestableSequence("|"));
 	}
 
 	/**
@@ -1280,6 +1462,10 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 *
 	 * <p>
 	 * for instance, use this to generate "(FRED|EMILY|GRETA|DONALD)".
+	 *
+	 * <p>
+	 * Note that this may behave differently from the OR operator "A|B" in some
+	 * circumstances.
 	 *
 	 * <p>
 	 * {@code Regex regex =  Regex.startAnywhere().literal("Project ").startOrGroup().literal("A").or().literal("B").endOrGroup().toRegex();
@@ -1535,7 +1721,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * @return a new regexp
 	 */
 	default REGEX word() {
-		return this.beginGroup().wordCharacter().oneOrMore().endGroup();
+		return this.beginGroup().wordCharacter().oneOrMoreGreedy().endGroup();
 	}
 
 	default REGEX wordBoundary() {
@@ -1567,7 +1753,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * @return a new regexp
 	 */
 	public default REGEX zeroOrOnce() {
-		return onceOrNotAtAll();
+		return onceOrNotAtAllGreedy();
 	}
 
 	public default REGEX namedBackReference(String name) {
@@ -1767,6 +1953,16 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 */
 	public default REGEX noneOfThisCharacter(Character literal) {
 		return add(Regex.empty().beginSetExcluding().excludeLiterals("" + literal).endSet());
+	}
+
+	/**
+	 * Create a new regular expression that includes a test for the start of the
+	 * string.
+	 *
+	 * @return a new regular expression
+	 */
+	public default REGEX startOfInput() {
+		return add(new UnescapedSequence("^"));
 	}
 
 }

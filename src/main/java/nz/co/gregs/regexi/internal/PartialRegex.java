@@ -111,6 +111,11 @@ public abstract class PartialRegex extends AbstractHasRegexFunctions<PartialRege
 
 	@Override
 	public abstract String toRegexString();
+	
+	@Override
+	public String toString(){
+		return toRegexString();
+	}
 
 	@Override
 	public abstract List<PartialRegex> getRegexParts();

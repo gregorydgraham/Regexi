@@ -54,7 +54,7 @@ public class RegexTest {
 	@Test
 	public void testWorksWithNullString() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testWorksWithNullString()");
-		Regex regex = Regex.startingAnywhere().asterisk().anyCharacterIncludingLineEnd().atLeastOnce().literal('-').toRegex();
+		Regex regex = Regex.startingAnywhere().asterisk().anyCharacterIncludingLineEnd().atLeastOnceGreedy().literal('-').toRegex();
 		Assert.assertTrue(regex.doesNotMatchTheBeginningOf(null));
 		Assert.assertTrue(regex.doesNotMatchTheEndOf(null));
 		Assert.assertTrue(regex.doesNotMatchTheEntireString(null));
@@ -69,7 +69,7 @@ public class RegexTest {
 	@Test
 	public void testAnyCharacterIncludingLineEnd() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testAnyCharacterIncludingLineEnd()");
-		Regex regex = Regex.startingAnywhere().asterisk().anyCharacterIncludingLineEnd().atLeastOnce().literal('-').toRegex();
+		Regex regex = Regex.startingAnywhere().asterisk().anyCharacterIncludingLineEnd().atLeastOnceGreedy().literal('-').toRegex();
 		Assert.assertTrue(regex.matchesEntireString("*\n-"));
 		Assert.assertTrue(regex.matchesWithinString("1*\nyada-2"));
 		Assert.assertTrue(regex.matchesWithinString("1*\nyada-"));
@@ -85,7 +85,7 @@ public class RegexTest {
 	@Test
 	public void testDotAllSection() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testDotAllSection()");
-		Regex regex = Regex.startingAnywhere().beginDotAllSection().asterisk().anyCharacter().atLeastOnce().endDotAllSection().toRegex();
+		Regex regex = Regex.startingAnywhere().beginDotAllSection().asterisk().anyCharacter().atLeastOnceGreedy().endDotAllSection().toRegex();
 		Assert.assertTrue(regex.matchesEntireString("*\n"));
 		Assert.assertTrue(regex.matchesWithinString("1*\n2"));
 		Assert.assertTrue(regex.matchesWithinString("1*\n"));
@@ -101,7 +101,7 @@ public class RegexTest {
 	@Test
 	public void testMultilineSupport() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testMultilineSupport()");
-		Regex regex = Regex.multiline().asterisk().newline().anyCharacterIn("a1234 ").atLeastOnce().toRegex();
+		Regex regex = Regex.multiline().asterisk().newline().anyCharacterIn("a1234 ").atLeastOnceGreedy().toRegex();
 		Assert.assertTrue(regex.matchesEntireString("*\na"));
 		Assert.assertTrue(regex.matchesWithinString("1*\n2"));
 		Assert.assertTrue(regex.matchesWithinString("1*\n234"));
@@ -113,7 +113,7 @@ public class RegexTest {
 		Assert.assertFalse(regex.matchesBeginningOf("1*\n"));
 		Assert.assertFalse(regex.matchesEntireString("below zero there are negatives and -1*\n.0 is the first"));
 
-		regex = Regex.multiline().asterisk().anyCharacter().atLeastOnce().toRegex();
+		regex = Regex.multiline().asterisk().anyCharacter().atLeastOnceGreedy().toRegex();
 		Assert.assertTrue(regex.matchesEntireString("*\na"));
 		Assert.assertTrue(regex.matchesWithinString("1*\n2"));
 		Assert.assertTrue(regex.matchesWithinString("1*\n234"));
@@ -232,7 +232,7 @@ public class RegexTest {
 				).onceOrNotAtAll();
 
 		final PartialRegex separator
-				= Regex.startingAnywhere().beginSetExcluding().excludeRange('0', '9').excludeMinus().endSet().atLeastOnce();
+				= Regex.startingAnywhere().beginSetExcluding().excludeRange('0', '9').excludeMinus().endSet().atLeastOnceGreedy();
 
 		Regex pattern
 				= Regex.startingAnywhere()
@@ -670,7 +670,7 @@ public class RegexTest {
 	public void testUppercaseCharacterClass() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testUppercaseCharacterClass()");
 		final String literal = "AliCE";
-		Regex regex = Regex.empty().uppercaseCharacter().oneOrMore().toRegex();
+		Regex regex = Regex.empty().uppercaseCharacter().oneOrMoreGreedy().toRegex();
 		final List<Match> matches = regex.getAllMatches(literal);
 
 		assertThat(matches.size(), is(2));
@@ -682,7 +682,7 @@ public class RegexTest {
 	public void testLowercaseCharacterClass() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testUppercaseCharacterClass()");
 		final String literal = "AliCEs";
-		Regex regex = Regex.empty().lowercaseCharacter().oneOrMore().toRegex();
+		Regex regex = Regex.empty().lowercaseCharacter().oneOrMoreGreedy().toRegex();
 		final List<Match> matches = regex.getAllMatches(literal);
 
 		assertThat(matches.size(), is(2));
@@ -1027,7 +1027,7 @@ public class RegexTest {
 						.endOfInput().toRegex();
 
 		System.out.println(regex.getRegex());
-		assertThat(regex.getRegex(), is("^(?<interval>((?i)(interval)(?-i)){1}) {1}(?<value>((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))((\\.){1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}((\\.){1}(\\d+))?)?){1}) {1}(?<unit>(\\w+)) {1}(?<secondValue>\\4)*$"));
+		assertThat(regex.toString(), is("^(?<interval>((?i)(interval)(?-i)){1}) {1}(?<value>((([-+]?\\b([1-9]+\\d*|0+(?!\\d)))((\\.){1}(\\d+))?){1}([Ee][-+]?([1-9]+\\d*|0+(?!\\d)){1}((\\.){1}(\\d+))?)?){1}) {1}(?<unit>(\\w+)) {1}(?<secondValue>\\4)*$"));
 
 		regex.testAgainst(string).stream().forEachOrdered(s -> System.out.println(s));
 		assertThat(regex.matchesEntireString(string), is(true));
@@ -1347,7 +1347,7 @@ public class RegexTest {
 				.includeLiterals("PYMDhns")
 				.includeDot()
 				.includeMinus()
-				.endSet().oneOrMore()
+				.endSet().oneOrMoreGreedy()
 				.remove();
 
 		assertThat(replacer.replaceAll("-.0123456789PMYDhns"), is(""));
@@ -1366,7 +1366,7 @@ public class RegexTest {
 				.excludeLiterals("PYMDhns")
 				.excludeDot()
 				.excludeMinus()
-				.endSet().oneOrMore()
+				.endSet().oneOrMoreGreedy()
 				.replaceWith().nothing();
 
 		assertThat(replacer.replaceAll("-.0123456789PMYDhns"), is("-.0123456789PMYDhns"));
@@ -1466,10 +1466,10 @@ public class RegexTest {
 		Regex regex
 				= Regex.startingAnywhere()
 						.add(legalStartingCharacter)
-						.add(legalContinuingCharacter).oneOrMore()
+						.add(legalContinuingCharacter).oneOrMoreGreedy()
 						.literal("@")
-						.anyCharacterExcept(" .@").oneOrMore()
-						.beginGroup().literal(".").anyCharacterExcept(' ').oneOrMore().endGroup().optionalMany()
+						.anyCharacterExcept(" .@").oneOrMoreGreedy()
+						.beginGroup().literal(".").anyCharacterExcept(' ').oneOrMoreGreedy().endGroup().optionalMany()
 						.toRegex();
 
 		assertThat(regex.matchesWithinString("somebody at somewhere.com"), is(false));
