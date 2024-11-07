@@ -143,7 +143,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 						.anyCharacterBetween('1', '9').atLeastOnceGreedy() // numbers is always start with a 1-9
 						.group() // what comes next is either blocks of digits or nothing
 						.space().onceOrNotAtAllGreedy().digits().oneOrMoreGreedy()// a block of digits optionally preceded by a space
-						.endGroup().optionalMany() // optionally zero or lots of number blocks
+						.endGroup().optionalManyGreedy()// optionally zero or lots of number blocks
 						.or() // alternatively an integer can be a simple zero
 						.literal('0').oneOrMoreGreedy().notFollowedBy(Regex.startingAnywhere().digit()) // a zero without any other numbers
 						.endOrGroup().notFollowedBy(Regex.empty().characterSet(",. ").digit())
@@ -169,7 +169,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 				.anyCharacterBetween('1', '9').atLeastOnceGreedy() // numbers is always start with a 1-9
 				.group() // what comes next is either blocks of digits or nothing
 				.space().onceOrNotAtAllGreedy().digits() // a block of digits optionally preceded by a space
-				.endGroup().optionalMany() // optionally zero or lots of number blocks;
+				.endGroup().optionalManyGreedy()// optionally zero or lots of number blocks;
 				.or()
 				.literal('0')
 				.endOrGroup();
@@ -291,7 +291,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 				.anyCharacterIn("-+").onceOrNotAtAllGreedy()
 				.beginOrGroup()
 				.anyCharacterBetween('1', '9').atLeastOnceGreedy()
-				.digit().zeroOrMore()
+				.digit().zeroOrMoreGreedy()
 				.or().literal('0').oneOrMoreGreedy().notFollowedBy(Regex.startingAnywhere().digit())
 				.endOrGroup().once()
 				.beginGroup()
@@ -399,8 +399,8 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 *
 	 * @return a new regexp
 	 */
-	default REGEX anything() {
-		return this.anyCharacter().optionalMany();
+	default REGEX anythingGreedy() {
+		return this.anyCharacter().optionalManyGreedy();
 	}
 
 	/**
@@ -504,13 +504,68 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 
 	/**
 	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly X times.
+	 *
+	 * @param x the exact number of times the previous match must occur
+	 * @return a new regexp
+	 */
+	default REGEX exactlyThisManyTimesGreedy(int x) {
+		return unescaped("{" + x + "}");
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly X times.
+	 *
+	 * @param x the exact number of times the previous match must occur
+	 * @return a new regexp
+	 */
+	default REGEX exactlyThisManyTimesReluctant(int x) {
+		return unescaped("{" + x + "}?");
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position exactly X times.
+	 *
+	 * @param x the exact number of times the previous match must occur
+	 * @return a new regexp
+	 */
+	default REGEX exactlyThisManyTimesPossessive(int x) {
+		return unescaped("{" + x + "}+");
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position X times or more.
 	 *
 	 * @param x the minimum number of times the previous match must occur
 	 * @return a new regexp
 	 */
-	default REGEX atLeastThisManyTimes(int x) {
+	default REGEX atLeastThisManyTimesGreedy(int x) {
 		return unescaped("{" + x + ",}");
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position X times or more.
+	 *
+	 * @param x the minimum number of times the previous match must occur
+	 * @return a new regexp
+	 */
+	default REGEX atLeastThisManyTimesReluctant(int x) {
+		return unescaped("{" + x + ",}?");
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position X times or more.
+	 *
+	 * @param x the minimum number of times the previous match must occur
+	 * @return a new regexp
+	 */
+	default REGEX atLeastThisManyTimesPossessive(int x) {
+		return unescaped("{" + x + ",}+");
 	}
 
 	/**
@@ -525,8 +580,40 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * @param y the maximum number of times the previous match must occur
 	 * @return a new regexp
 	 */
-	default REGEX atLeastXAndNoMoreThanYTimes(int x, int y) {
+	default REGEX atLeastXAndNoMoreThanYTimesGreedy(int x, int y) {
 		return add(new UntestableSequence("{" + x + "," + y + "}"));
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position X or more times but no more than Y times.
+	 *
+	 * <p>
+	 * literal('a').atLeastXAndNoMoreThanYTimes(2,3) will match "aa" and "aaa" but
+	 * not "aa" nor "aaaa".
+	 *
+	 * @param x the minimum number of times the previous match must occur
+	 * @param y the maximum number of times the previous match must occur
+	 * @return a new regexp
+	 */
+	default REGEX atLeastXAndNoMoreThanYTimesReluctant(int x, int y) {
+		return add(new UntestableSequence("{" + x + "," + y + "}?"));
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it only matches if the
+	 * element appears in that position X or more times but no more than Y times.
+	 *
+	 * <p>
+	 * literal('a').atLeastXAndNoMoreThanYTimes(2,3) will match "aa" and "aaa" but
+	 * not "aa" nor "aaaa".
+	 *
+	 * @param x the minimum number of times the previous match must occur
+	 * @param y the maximum number of times the previous match must occur
+	 * @return a new regexp
+	 */
+	default REGEX atLeastXAndNoMoreThanYTimesPossessive(int x, int y) {
+		return add(new UntestableSequence("{" + x + "," + y + "}+"));
 	}
 
 	/**
@@ -742,7 +829,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 				Regex.startingAnywhere()
 						.literal('-')
 						.beginOrGroup()
-						.anyCharacterBetween('1', '9').once().digit().zeroOrMore()
+						.anyCharacterBetween('1', '9').once().digit().zeroOrMoreGreedy()
 						.or()
 						.literal('0').notFollowedBy(Regex.startingAnywhere().digit())
 						.endOrGroup()
@@ -1388,13 +1475,41 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * appears in that position or not.
 	 *
 	 * <p>
-	 * literal('a').literal('b)'.zeroOrMore().literal('c') will match "ac" or
-	 * "abc".</p>
+ literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac" or
+ "abc".</p>
 	 *
 	 * @return a new regexp
 	 */
-	default REGEX optionalMany() {
-		return zeroOrMore();
+	default REGEX optionalManyGreedy() {
+		return zeroOrMoreGreedy();
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it matches if the element
+	 * appears in that position or not.
+	 *
+	 * <p>
+ literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac" or
+ "abc".</p>
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX optionalManyReluctant() {
+		return zeroOrMoreReluctant();
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it matches if the element
+	 * appears in that position or not.
+	 *
+	 * <p>
+ literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac" or
+ "abc".</p>
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX optionalManyPossessive() {
+		return zeroOrMorePossessive();
 	}
 
 	/**
@@ -1405,13 +1520,47 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Adds a "*" to regular expression.</p>
 	 *
 	 * <p>
-	 * literal('a').literal('b)'.zeroOrMore().literal('c') will match "ac", "abc",
-	 * or "abbbc".</p>
+ literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac", "abc",
+ or "abbbc".</p>
 	 *
 	 * @return a new regexp
 	 */
-	default REGEX zeroOrMore() {
+	default REGEX zeroOrMoreGreedy() {
 		return add(new UntestableSequence("*"));
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it matches if the element
+	 * appears in that position or not.
+	 *
+	 * <p>
+	 * Adds a "*" to regular expression.</p>
+	 *
+	 * <p>
+ literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac", "abc",
+ or "abbbc".</p>
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX zeroOrMoreReluctant() {
+		return add(new UntestableSequence("*?"));
+	}
+
+	/**
+	 * Alters the previous element in the regexp so that it matches if the element
+	 * appears in that position or not.
+	 *
+	 * <p>
+	 * Adds a "*" to regular expression.</p>
+	 *
+	 * <p>
+ literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac", "abc",
+ or "abbbc".</p>
+	 *
+	 * @return a new regexp
+	 */
+	default REGEX zeroOrMorePossessive() {
+		return add(new UntestableSequence("*+"));
 	}
 
 	/**
@@ -1429,7 +1578,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 				.literal("+").onceOrNotAtAllGreedy()
 				.beginOrGroup()
 				.anyCharacterBetween('1', '9').once()
-				.digit().zeroOrMore()
+				.digit().zeroOrMoreGreedy()
 				.or()
 				.literal('0').oneOrMoreGreedy().notFollowedBy(Regex.startingAnywhere().digit())
 				.endOrGroup()
@@ -1787,7 +1936,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * @return a new regex
 	 */
 	public default REGEX charactersWrappedBy(Character literal) {
-		return this.addGroup(Regex.startingAnywhere().literal(literal).noneOfThisCharacter(literal).optionalMany().literal(literal));
+		return this.addGroup(Regex.startingAnywhere().literal(literal).noneOfThisCharacter(literal).optionalManyGreedy().literal(literal));
 	}
 
 	/**
@@ -1808,7 +1957,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * @return a new regex
 	 */
 	public default REGEX charactersWrappedBy(Character starter, Character ender) {
-		return this.addGroup(Regex.startingAnywhere().literal(starter).noneOfThisCharacter(ender).optionalMany().literal(ender));
+		return this.addGroup(Regex.startingAnywhere().literal(starter).noneOfThisCharacter(ender).optionalManyGreedy().literal(ender));
 	}
 
 	/**
@@ -1887,7 +2036,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 		return this.addGroup(
 				Regex.empty().addGroup(
 						Regex.empty().negativeLookAhead().add(ender).endGroup().anyCharacter()
-				).optionalMany()
+				).optionalManyGreedy()
 		);
 	}
 

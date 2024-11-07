@@ -152,7 +152,7 @@ public abstract class PartialRegex extends AbstractHasRegexFunctions<PartialRege
 			.wordBoundary()
 			.beginOrGroup()
 			.anyCharacterBetween('1', '9').atLeastOnce()
-			.digit().zeroOrMore()
+			.digit().zeroOrMoreGreedy()
 			.or().literal('0').oneOrMore().notFollowedBy(Regex.startingAnywhere().digit())
 			.endOrGroup();
 

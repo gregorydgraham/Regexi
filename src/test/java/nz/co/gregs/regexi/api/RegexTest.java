@@ -694,7 +694,7 @@ public class RegexTest {
 	public void testLiteralMatchesMoreThanOnce() {
 		System.out.println("nz.co.gregs.regexi.api.RegexTest.testLiteralMatchesMoreThanOnce()");
 		final String literal = "alice";
-		Regex regex = Regex.empty().literal(literal).atLeastThisManyTimes(2).toRegex();
+		Regex regex = Regex.empty().literal(literal).atLeastThisManyTimesGreedy(2).toRegex();
 
 		final String regex1 = regex.getRegex();
 		System.out.println(regex1);
@@ -1023,7 +1023,7 @@ public class RegexTest {
 						.space().once()
 						.beginNamedCapture("unit").word().endNamedCapture()
 						.space().once()
-						.beginNamedCapture("secondValue").numberedBackReference(4).endNamedCapture().optionalMany()
+						.beginNamedCapture("secondValue").numberedBackReference(4).endNamedCapture().optionalManyGreedy()
 						.endOfInput().toRegex();
 
 		System.out.println(regex.getRegex());
@@ -1469,7 +1469,7 @@ public class RegexTest {
 						.add(legalContinuingCharacter).oneOrMoreGreedy()
 						.literal("@")
 						.anyCharacterExcept(" .@").oneOrMoreGreedy()
-						.beginGroup().literal(".").anyCharacterExcept(' ').oneOrMoreGreedy().endGroup().optionalMany()
+						.beginGroup().literal(".").anyCharacterExcept(' ').oneOrMoreGreedy().endGroup().optionalManyGreedy()
 						.toRegex();
 
 		assertThat(regex.matchesWithinString("somebody at somewhere.com"), is(false));
