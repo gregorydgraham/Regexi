@@ -7,7 +7,7 @@
 	<packaging>jar</packaging>
 	<name>RegeXI</name>
 	<description>A fluent API to generate and use regular expressions</description>
-	<url>http://ssh.github.com/gregorydgraham/Regexi</url>
+	<url>https://github.com/gregorydgraham/Regexi</url>
 	<licenses>
 		<license>
 			<name>Commercial License</name>
@@ -33,9 +33,9 @@
 	</developers>
 
 	<scm>
-		<url>http://ssh.github.com/gregorydgraham/Regexi</url>
-		<connection>scm:git:http://ssh.github.com/gregorydgraham/Regexi.git</connection>
-		<developerConnection>scm:git:http://ssh.github.com/gregorydgraham/Regexi.git</developerConnection>
+		<url>https://github.com/gregorydgraham/Regexi</url>
+		<connection>scm:git:https://github.com/gregorydgraham/Regexi.git</connection>
+		<developerConnection>scm:git:https://github.com/gregorydgraham/Regexi.git</developerConnection>
 		<tag>regexi-1.4.5</tag>
 	</scm>
 	
@@ -197,16 +197,4 @@
 		</plugins>
 	</build>
 	
-	<!--
-	<repositories>
-		<repository>
-			<id>https://github.com</id>
-			<url>https://ssh.github.com</url>
-		</repository>
-		<repository>
-			<id>GITDEVCONNECT</id>
-			<url>https://ssh.github.com</url>
-		</repository>
-	</repositories>
-		-->
 </project>
