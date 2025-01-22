@@ -35,7 +35,7 @@
 	<scm>
 		<url>https://github.com/gregorydgraham/Regexi</url>
 		<connection>scm:git:https://github.com/gregorydgraham/Regexi.git</connection>
-		<developerConnection>scm:git:https://github.com/gregorydgraham/Regexi.git</developerConnection>
+		<developerConnection>scm:git:https://ssh.github.com/gregorydgraham/Regexi.git</developerConnection>
 		<tag>regexi-1.4.5</tag>
 	</scm>
 	
