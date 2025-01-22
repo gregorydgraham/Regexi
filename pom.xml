@@ -34,8 +34,8 @@
 
 	<scm>
 		<url>https://github.com/gregorydgraham/Regexi</url>
-		<connection>scm:git:GITCONNECT/gregorydgraham/Regexi.git</connection>
-		<developerConnection>scm:git:GITDEVCONNECT/gregorydgraham/Regexi.git</developerConnection>
+		<connection>scm:git:https://github.com/gregorydgraham/Regexi.git</connection>
+		<developerConnection>scm:git:https://github.com/gregorydgraham/Regexi.git</developerConnection>
 		<tag>regexi-1.4.5</tag>
 	</scm>
 	
@@ -196,9 +196,11 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	<!--
 	<repositories>
 		<repository>
-			<id>GITCONNECT</id>
+			<id>https://github.com</id>
 			<url>https://ssh.github.com</url>
 		</repository>
 		<repository>
@@ -206,4 +208,5 @@
 			<url>https://ssh.github.com</url>
 		</repository>
 	</repositories>
+		-->
 </project>
