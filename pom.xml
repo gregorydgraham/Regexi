@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nz.co.gregs</groupId>
 	<artifactId>regexi</artifactId>
-	<version>4.8</version>
+	<version>4.8-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>RegeXI</name>
 	<description>A fluent API to generate and use regular expressions</description>
