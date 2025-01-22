@@ -7,7 +7,7 @@
 	<packaging>jar</packaging>
 	<name>RegeXI</name>
 	<description>A fluent API to generate and use regular expressions</description>
-	<url>https://github.com/gregorydgraham/Regexi</url>
+	<url>http://ssh.github.com/gregorydgraham/Regexi</url>
 	<licenses>
 		<license>
 			<name>Commercial License</name>
