@@ -132,37 +132,6 @@
               <failOnBuildFailure>true</failOnBuildFailure>
             </configuration>
           </plugin>
-          <!--<plugin>-->
-          <!-- check out the maven-release-plugin plugin below first -->
-          <!-- 
-              if it's not a SNAPSHOT, use 
-            
-              "mvn clean deploy -P release"
-              
-              otherwise "mvn versions:set -DnewVersion=1.1" then deploy as above
-          -->
-          <!-- 
-              With the property autoReleaseAfterClose set to 
-              false you can manually inspect the staging repository
-              in the Nexus Repository Manager and trigger a release 
-              of the staging repository later with
-          
-              "mvn nexus-staging:release"
-              
-              If you find something went wrong you can drop the staging repository with
-  
-              "mvn nexus-staging:drop"
-          -->
-          <!--						<groupId>org.sonatype.plugins</groupId>
-            <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.7.0</version>
-            <extensions>true</extensions>
-            <configuration>
-              <serverId>ossrh</serverId>
-              <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-              <autoReleaseAfterClose>true</autoReleaseAfterClose>
-            </configuration>
-          </plugin>-->
         </plugins>
       </build>
     </profile>
