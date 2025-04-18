@@ -119,7 +119,7 @@
 							</execution>
 						</executions>
 					</plugin>
-					<plugin>
+					<!--<plugin>-->
 						<!-- check out the maven-release-plugin plugin below first -->
 						<!-- 
 								if it's not a SNAPSHOT, use 
@@ -140,7 +140,7 @@
 		
 								"mvn nexus-staging:drop"
 						-->
-						<groupId>org.sonatype.plugins</groupId>
+<!--						<groupId>org.sonatype.plugins</groupId>
 						<artifactId>nexus-staging-maven-plugin</artifactId>
 						<version>1.7.0</version>
 						<extensions>true</extensions>
@@ -149,7 +149,7 @@
 							<nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
 							<autoReleaseAfterClose>true</autoReleaseAfterClose>
 						</configuration>
-					</plugin>
+					</plugin>-->
 				</plugins>
 			</build>
 		</profile>
