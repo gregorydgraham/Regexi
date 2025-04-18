@@ -125,8 +125,8 @@
             <version>0.7.0</version>
             <extensions>true</extensions>
             <configuration>
+              <publishingServerId>sonatype-central</publishingServerId>
               <centralBaseUrl>https://central.sonatype.com</centralBaseUrl>
-              <publishingServerId>central</publishingServerId>
               <autoPublish>true</autoPublish>
               <waitUntil>published</waitUntil>
               <failOnBuildFailure>true</failOnBuildFailure>
