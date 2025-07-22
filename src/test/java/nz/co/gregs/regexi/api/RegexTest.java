@@ -1377,6 +1377,38 @@ public class RegexTest {
 	}
 
 	@Test
+	public void testExcludingWhitespace() {
+		final PartialRegex empty = Regex.empty();
+		final RegexReplacement replacer = empty
+				.beginSetExcluding()
+				.excludeWhitespace()
+				.endSet().oneOrMoreGreedy()
+				.replaceWith().nothing();
+
+		assertThat(replacer.replaceAll("-.012345678   9PMYDhns"), is("   "));
+		assertThat(replacer.replaceAll("-.0 123456789PMYDhnsWORKS"), is(" "));
+		assertThat(replacer.replaceAll("-.0123456789  PMYDHNS"), is("  "));
+		assertThat(replacer.replaceAll("WORKS-.012345\t\r\n6789PMYDhns"), is("\t\r\n"));
+		assertThat(replacer.replaceAll("-.0123456789WORKSPMYDhns"), is(""));
+	}
+
+	@Test
+	public void testIncludingWhitespace() {
+		final PartialRegex empty = Regex.empty();
+		final RegexReplacement replacer = empty
+				.beginSetIncluding()
+				.includeWhitespace()
+				.endSet().oneOrMoreGreedy()
+				.replaceWith().nothing();
+
+		assertThat(replacer.replaceAll("-.012345678   9PMYDhns"), is("-.0123456789PMYDhns"));
+		assertThat(replacer.replaceAll("-.0 123456789PMYDhns"), is("-.0123456789PMYDhns"));
+		assertThat(replacer.replaceAll("-.0123456789  PMYDhns"), is("-.0123456789PMYDhns"));
+		assertThat(replacer.replaceAll("-.012345\t\r\n6789PMYDhns"), is("-.0123456789PMYDhns"));
+		assertThat(replacer.replaceAll("-.0123456789PMYDhns"), is("-.0123456789PMYDhns"));
+	}
+
+	@Test
 	public void testReplacementWithNothing() {
 		String s = "find all the backslashes (\\) and replace them with \\ also watch out for = \" , NULL and {} ";
 		Regex find = Regex.empty().namedCapture("special").orGroup()
