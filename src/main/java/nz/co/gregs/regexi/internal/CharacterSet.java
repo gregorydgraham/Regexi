@@ -63,6 +63,11 @@ public abstract class CharacterSet<REGEX extends AbstractHasRegexFunctions<REGEX
 		return this;
 	}
 
+	protected CharacterSet<REGEX> extendWithCharacterClass(Character literal) {
+    this.literals += "\\"+literal;
+    return this;
+	}
+
 	protected CharacterSet<REGEX> extendWithBackslash() {
 		includeBackslash = true;
 		return this;
