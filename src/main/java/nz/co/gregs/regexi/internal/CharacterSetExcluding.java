@@ -12,55 +12,81 @@ package nz.co.gregs.regexi.internal;
  */
 public class CharacterSetExcluding<REGEX extends AbstractHasRegexFunctions<REGEX>> extends CharacterSet<REGEX> {
 
-	public CharacterSetExcluding(REGEX regex) {
-		super(regex, true);
-	}
+  public CharacterSetExcluding(REGEX regex) {
+    super(regex, true);
+  }
 
-	public final CharacterSetExcluding<REGEX> excludeRange(Character lowest, Character highest) {
-		return (CharacterSetExcluding<REGEX>) extendWithRange(lowest, highest);
-	}
+  public final CharacterSetExcluding<REGEX> excludeRange(Character lowest, Character highest) {
+    return (CharacterSetExcluding<REGEX>) extendWithRange(lowest, highest);
+  }
 
-	public final CharacterSetExcluding<REGEX> excludeLiterals(String literals) {
-		return (CharacterSetExcluding<REGEX>) extendWithLiterals(literals);
-	}
+  public final CharacterSetExcluding<REGEX> excludeLiterals(String literals) {
+    return (CharacterSetExcluding<REGEX>) extendWithLiterals(literals);
+  }
 
-	public final CharacterSetExcluding<REGEX> excludeLiteral(Character literal) {
-		return (CharacterSetExcluding<REGEX>) extendWithLiteral(literal);
-	}
+  public final CharacterSetExcluding<REGEX> excludeLiteral(Character literal) {
+    return (CharacterSetExcluding<REGEX>) extendWithLiteral(literal);
+  }
 
-	public CharacterSetExcluding<REGEX> excludeMinus() {
-		return (CharacterSetExcluding<REGEX>) extendWithHyphen();
-	}
+  public CharacterSetExcluding<REGEX> excludeMinus() {
+    return (CharacterSetExcluding<REGEX>) extendWithHyphen();
+  }
 
-	public CharacterSetExcluding<REGEX> excludeBackslah() {
-		return (CharacterSetExcluding<REGEX>) extendWithBackslash();
-	}
+  /** excludes backslash characters.
+   *
+   * @return the extended regexi 
+   * @deprecated use {@link #excludeBackslash() }
+   */
+  @Deprecated
+  public CharacterSetExcluding<REGEX> excludeBackslah() {
+    return (CharacterSetExcluding<REGEX>) extendWithBackslash();
+  }
 
-	public CharacterSetExcluding<REGEX> excludeCaret() {
-		return (CharacterSetExcluding<REGEX>) extendWithCaret();
-	}
+  public CharacterSetExcluding<REGEX> excludeBackslash() {
+    return (CharacterSetExcluding<REGEX>) extendWithBackslash();
+  }
 
-	public CharacterSetExcluding<REGEX> excludeCloseBracket() {
-		return (CharacterSetExcluding<REGEX>) extendWithCloseBracket();
-	}
+  public CharacterSetExcluding<REGEX> excludeCaret() {
+    return (CharacterSetExcluding<REGEX>) extendWithCaret();
+  }
 
-	public CharacterSetExcluding<REGEX> excludeDigits() {
-		return excludeRange('0', '9');
-	}
+  public CharacterSetExcluding<REGEX> excludeCloseBracket() {
+    return (CharacterSetExcluding<REGEX>) extendWithCloseBracket();
+  }
 
-	public CharacterSetExcluding<REGEX> excludeUppercase() {
-		return excludeRange('A', 'Z');
-	}
+  public CharacterSetExcluding<REGEX> excludeDigits() {
+    return excludeRange('0', '9');
+  }
 
-	public CharacterSetExcluding<REGEX> excludeLowercase() {
-		return excludeRange('a', 'z');
-	}
+  public CharacterSetExcluding<REGEX> excludeUppercase() {
+    return excludeRange('A', 'Z');
+  }
 
-	public CharacterSetExcluding<REGEX> excludeLetters() {
-		return excludeUppercase().excludeLowercase();
-	}
+  public CharacterSetExcluding<REGEX> excludeWhitespace() {
+    return (CharacterSetExcluding<REGEX>) extendWithCharacterClass('s');
+  }
 
-	public CharacterSetExcluding<REGEX> excludeDot() {
-		return excludeLiterals(".");
-	}
+  public CharacterSetExcluding<REGEX> excludeWordcharacters() {
+    return (CharacterSetExcluding<REGEX>) extendWithCharacterClass('w');
+  }
+
+  public CharacterSetExcluding<REGEX> excludeNonwhitespace() {
+    return (CharacterSetExcluding<REGEX>) extendWithCharacterClass('S');
+  }
+
+  public CharacterSetExcluding<REGEX> excludeNonwordcharacters() {
+    return (CharacterSetExcluding<REGEX>) extendWithCharacterClass('W');
+  }
+
+  public CharacterSetExcluding<REGEX> excludeLowercase() {
+    return excludeRange('a', 'z');
+  }
+
+  public CharacterSetExcluding<REGEX> excludeLetters() {
+    return excludeUppercase().excludeLowercase();
+  }
+
+  public CharacterSetExcluding<REGEX> excludeDot() {
+    return excludeLiterals(".");
+  }
 }
