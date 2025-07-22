@@ -1845,7 +1845,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	}
 
 	/**
-	 * Adds a check for a whitespace character(\w) to the regular expression
+	 * Adds a check for a whitespace character(\s) to the regular expression
 	 * without grouping.
 	 *
 	 * <p>
