@@ -59,4 +59,20 @@ public class CharacterSetIncluding<REGEX extends AbstractHasRegexFunctions<REGEX
 	public CharacterSetIncluding<REGEX> includeDot() {
 		return includeLiterals(".");
 	}
+
+  public CharacterSetIncluding<REGEX> includeWhitespace() {
+    return (CharacterSetIncluding<REGEX>) extendWithCharacterClass('s');
+  }
+
+  public CharacterSetIncluding<REGEX> includeWordcharacters() {
+    return (CharacterSetIncluding<REGEX>) extendWithCharacterClass('w');
+  }
+
+  public CharacterSetIncluding<REGEX> includeNonwhitespace() {
+    return (CharacterSetIncluding<REGEX>) extendWithCharacterClass('S');
+  }
+
+  public CharacterSetIncluding<REGEX> includeNonwordcharacters() {
+    return (CharacterSetIncluding<REGEX>) extendWithCharacterClass('W');
+  }
 }
