@@ -34,6 +34,8 @@ import nz.co.gregs.regexi.internal.PartialRegex;
 import nz.co.gregs.regexi.MatchedGroup;
 import nz.co.gregs.regexi.Match;
 import java.util.*;
+import java.util.function.Function;
+import java.util.regex.MatchResult;
 import java.util.stream.Collectors;
 import nz.co.gregs.regexi.*;
 import org.junit.Assert;
@@ -1339,7 +1341,7 @@ public class RegexTest {
 	}
 
 	@Test
-	public void testIncludingCharacterClasses() {
+	public void testReplaceAllIncludingCharacterClasses() {
 		final PartialRegex empty = Regex.empty();
 		final var replacer = empty
 				.beginSetIncluding()
@@ -1355,6 +1357,47 @@ public class RegexTest {
 		assertThat(replacer.replaceAll("-.0123456789PMYDHNS"), is("HNS"));
 		assertThat(replacer.replaceAll("WORKS-.0123456789PMYDhns"), is("WORKS"));
 		assertThat(replacer.replaceAll("-.0123456789WORKSPMYDhns"), is("WORKS"));
+	}
+
+	@Test
+	public void testReplaceFirstIncludingCharacterClasses() {
+		final PartialRegex empty = Regex.empty();
+		final var replacer = empty
+				.beginSetIncluding()
+				.includeDigits()
+				.includeLiterals("PYMDhns")
+				.includeDot()
+				.includeMinus()
+				.endSet().oneOrMoreGreedy()
+				.remove();
+
+		assertThat(replacer.replaceFirst("-.0123456789PMYDhns"), is(""));
+		assertThat(replacer.replaceFirst("-.0123456789PMYDhnsWORKS"), is("WORKS"));
+		assertThat(replacer.replaceFirst("-.0123456789PMYDHNS"), is("HNS"));
+		assertThat(replacer.replaceFirst("WORKS-.0123456789PMYDhns"), is("WORKS"));
+		assertThat(replacer.replaceFirst("-.0123456789WORKSPMYDhns"), is("WORKSPMYDhns"));
+	}
+
+	@Test
+	public void testReplaceFirstFNIncludingCharacterClasses() {
+		final PartialRegex empty = Regex.empty();
+    final var replacer = empty
+            .beginSetIncluding()
+            .includeDigits()
+            .includeLiterals("PYMDhns")
+            .includeDot()
+            .includeMinus()
+            .endSet().oneOrMoreGreedy()
+            .replaceWith().literal("NOT RIGHT")
+            .getReplacer();
+    
+    final Function<MatchResult, String> fn = (m)->{return "";};
+    
+		assertThat(replacer.replaceFirst("-.0123456789PMYDhns", fn), is(""));
+		assertThat(replacer.replaceFirst("-.0123456789PMYDhnsWORKS",fn), is("WORKS"));
+		assertThat(replacer.replaceFirst("-.0123456789PMYDHNS",fn), is("HNS"));
+		assertThat(replacer.replaceFirst("WORKS-.0123456789PMYDhns",fn), is("WORKS"));
+		assertThat(replacer.replaceFirst("-.0123456789WORKSPMYDhns",fn), is("WORKSPMYDhns"));
 	}
 
 	@Test
