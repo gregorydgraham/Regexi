@@ -1307,7 +1307,7 @@ public class RegexTest {
 				.or().literal("{").endOrGroup().once().endNamedCapture().toRegex();
 		assertThat(find.matchesWithinString(s), is(true));
 
-		String result = find.replaceWith().literal("\\").namedReference("special").replaceAll(s);
+		String result = find.replaceWith().literal("\\").namedReference("special").getReplacer().replaceAll(s);
 
 		assertThat(result, is("find all the backslashes (\\\\) and replace them with \\\\ also watch out for \\= \\\" \\, \\NULL and \\{\\} "));
 	}
@@ -1318,30 +1318,30 @@ public class RegexTest {
 		final String doubleBackslashVersion = "find all the backslashes (\\\\) and replace them with \\\\ and don't worry about = \" , NULL and {} ";
 
 		/* Check that replacing with a single back slash produces the same thing*/
-		String replaced = Regex.empty().backslash().replaceWith().backslash().replaceAll(singleBackslashVersion);
+		String replaced = Regex.empty().backslash().replaceWith().backslash().getReplacer().replaceAll(singleBackslashVersion);
 		assertThat(replaced, is(singleBackslashVersion));
 
-		replaced = Regex.empty().backslash().replaceWith().literal("\\").replaceAll(singleBackslashVersion);
+		replaced = Regex.empty().backslash().replaceWith().literal("\\").getReplacer().replaceAll(singleBackslashVersion);
 		assertThat(replaced, is(singleBackslashVersion));
 
 		/* Check that double backslash works in all cases */
-		replaced = Regex.empty().backslash().replaceWith().backslash().backslash().replaceAll(singleBackslashVersion);
+		replaced = Regex.empty().backslash().replaceWith().backslash().backslash().getReplacer().replaceAll(singleBackslashVersion);
 		assertThat(replaced, is(doubleBackslashVersion));
 
-		replaced = Regex.empty().backslash().replaceWith().literal("\\").backslash().replaceAll(singleBackslashVersion);
+		replaced = Regex.empty().backslash().replaceWith().literal("\\").backslash().getReplacer().replaceAll(singleBackslashVersion);
 		assertThat(replaced, is(doubleBackslashVersion));
 
-		replaced = Regex.empty().backslash().replaceWith().literal("\\\\").replaceAll(singleBackslashVersion);
+		replaced = Regex.empty().backslash().replaceWith().literal("\\\\").getReplacer().replaceAll(singleBackslashVersion);
 		assertThat(replaced, is(doubleBackslashVersion));
 
-		replaced = Regex.empty().backslash().replaceWith().literal("\\").literal("\\").replaceAll(singleBackslashVersion);
+		replaced = Regex.empty().backslash().replaceWith().literal("\\").literal("\\").getReplacer().replaceAll(singleBackslashVersion);
 		assertThat(replaced, is(doubleBackslashVersion));
 	}
 
 	@Test
 	public void testIncludingCharacterClasses() {
 		final PartialRegex empty = Regex.empty();
-		final RegexReplacement replacer = empty
+		final var replacer = empty
 				.beginSetIncluding()
 				.includeDigits()
 				.includeLiterals("PYMDhns")
@@ -1360,14 +1360,14 @@ public class RegexTest {
 	@Test
 	public void testExcludingCharacterClasses() {
 		final PartialRegex empty = Regex.empty();
-		final RegexReplacement replacer = empty
-				.beginSetExcluding()
-				.excludeDigits()
-				.excludeLiterals("PYMDhns")
-				.excludeDot()
-				.excludeMinus()
-				.endSet().oneOrMoreGreedy()
-				.replaceWith().nothing();
+		final RegexReplacer replacer = empty
+            .beginSetExcluding()
+            .excludeDigits()
+            .excludeLiterals("PYMDhns")
+            .excludeDot()
+            .excludeMinus()
+            .endSet().oneOrMoreGreedy()
+            .replaceWith().nothing();
 
 		assertThat(replacer.replaceAll("-.0123456789PMYDhns"), is("-.0123456789PMYDhns"));
 		assertThat(replacer.replaceAll("-.0123456789PMYDhnsWORKS"), is("-.0123456789PMYDhns"));
@@ -1376,35 +1376,35 @@ public class RegexTest {
 		assertThat(replacer.replaceAll("-.0123456789WORKSPMYDhns"), is("-.0123456789PMYDhns"));
 	}
 
-	@Test
-	public void testExcludingWhitespace() {
-		final PartialRegex empty = Regex.empty();
-		final RegexReplacement replacer = empty
-				.beginSetExcluding()
-				.excludeWhitespace()
-				.endSet().oneOrMoreGreedy()
-				.replaceWith().nothing();
+  @Test
+  public void testExcludingWhitespace() {
+    final PartialRegex empty = Regex.empty();
+    final var replacer
+            = empty.beginSetExcluding()
+                    .excludeWhitespace()
+                    .endSet().oneOrMoreGreedy()
+                    .replaceWith().nothing();
 
-		assertThat(replacer.replaceAll("-.012345678   9PMYDhns"), is("   "));
-		assertThat(replacer.replaceAll("-.0 123456789PMYDhnsWORKS"), is(" "));
-		assertThat(replacer.replaceAll("-.0123456789  PMYDHNS"), is("  "));
-		assertThat(replacer.replaceAll("WORKS-.012345\t\r\n6789PMYDhns"), is("\t\r\n"));
-		assertThat(replacer.replaceAll("-.0123456789WORKSPMYDhns"), is(""));
-	}
+    assertThat(replacer.replaceAll("-.012345678   9PMYDhns"), is("   "));
+    assertThat(replacer.replaceAll("-.0 123456789PMYDhnsWORKS"), is(" "));
+    assertThat(replacer.replaceAll("-.0123456789  PMYDHNS"), is("  "));
+    assertThat(replacer.replaceAll("WORKS-.012345\t\r\n6789PMYDhns"), is("\t\r\n"));
+    assertThat(replacer.replaceAll("-.0123456789WORKSPMYDhns"), is(""));
+  }
 
 	@Test
 	public void testIncludingWhitespace() {
-		final PartialRegex empty = Regex.empty();
-		final RegexReplacement replacer = empty
-				.beginSetIncluding()
-				.includeWhitespace()
-				.endSet().oneOrMoreGreedy()
-				.replaceWith().nothing();
+    final PartialRegex empty = Regex.empty();
+    final var replacer
+            = empty.beginSetIncluding()
+                    .includeWhitespace()
+                    .endSet().oneOrMoreGreedy()
+                    .replaceWith().nothing();
 
-		assertThat(replacer.replaceAll("-.012345678   9PMYDhns"), is("-.0123456789PMYDhns"));
-		assertThat(replacer.replaceAll("-.0 123456789PMYDhns"), is("-.0123456789PMYDhns"));
-		assertThat(replacer.replaceAll("-.0123456789  PMYDhns"), is("-.0123456789PMYDhns"));
-		assertThat(replacer.replaceAll("-.012345\t\r\n6789PMYDhns"), is("-.0123456789PMYDhns"));
+    assertThat(replacer.replaceAll("-.012345678   9PMYDhns"), is("-.0123456789PMYDhns"));
+    assertThat(replacer.replaceAll("-.0 123456789PMYDhns"), is("-.0123456789PMYDhns"));
+    assertThat(replacer.replaceAll("-.0123456789  PMYDhns"), is("-.0123456789PMYDhns"));
+    assertThat(replacer.replaceAll("-.012345\t\r\n6789PMYDhns"), is("-.0123456789PMYDhns"));
 		assertThat(replacer.replaceAll("-.0123456789PMYDhns"), is("-.0123456789PMYDhns"));
 	}
 
@@ -1429,21 +1429,26 @@ public class RegexTest {
 
 	@Test
 	public void testReplacementWithNothingUsingReplaceWith() {
-		String s = "find all the backslashes (\\) and replace them with \\ also watch out for = \" , NULL and {} ";
-		RegexReplacement find = Regex.empty().namedCapture("special").orGroup()
-				.literal("\\")
-				.or().literal("=")
-				.or().literal("\"")
-				.or().literal(",")
-				.or().literal("\"")
-				.or().literal("NULL")
-				.or().literal("}")
-				.or().literal("{").endOrGroup().once().endNamedCapture()
-				.replaceWith().nothing();
-		String result = find.replaceAll(s);
+    String s = "find all the backslashes (\\) and replace them with \\ also watch out for = \" , NULL and {} ";
+    var find = Regex
+            .empty()
+            .namedCapture("special")
+            .orGroup().literal("\\")
+            .or().literal("=")
+            .or().literal("\"")
+            .or().literal(",")
+            .or().literal("\"")
+            .or().literal("NULL")
+            .or().literal("}")
+            .or().literal("{")
+            .endOrGroup().once()
+            .endNamedCapture()
+            .replaceWith()
+            .nothing();
+    String result = find.replaceAll(s);
 
-		assertThat(result, is("find all the backslashes () and replace them with  also watch out for     and  "));
-	}
+    assertThat(result, is("find all the backslashes () and replace them with  also watch out for     and  "));
+  }
 
 	@Test
 	public void testShouldMatch() {

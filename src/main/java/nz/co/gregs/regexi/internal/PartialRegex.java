@@ -81,15 +81,20 @@ public abstract class PartialRegex extends AbstractHasRegexFunctions<PartialRege
 	}
 
 	/**
-	 * Transforms the PartialRegex into a RegexReplacement
+	 * Transforms the PartialRegex into a PartialRegexReplacement
 	 *
-	 * @return a RegexReplacement
+	 * @return a PartialRegexReplacement
 	 */
-	public RegexReplacement replaceWith() {
+	public PartialRegexReplacement replaceWith() {
 		return toRegex().replaceWith();
 	}
 
-	public RegexReplacement remove() {
+  /**
+   * Create a RegexReplacer from this regex to remove matches.
+   *
+   * @return a RegexReplacer
+   */
+	public RegexReplacer remove() {
 		return toRegex().replaceWith().nothing();
 	}
 

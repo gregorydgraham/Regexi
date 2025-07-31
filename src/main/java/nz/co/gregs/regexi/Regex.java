@@ -5,6 +5,7 @@
  */
 package nz.co.gregs.regexi;
 
+import nz.co.gregs.regexi.internal.PartialRegexReplacement;
 import java.io.Serializable;
 import nz.co.gregs.regexi.internal.UntestableSequence;
 import nz.co.gregs.regexi.internal.UnescapedSequence;
@@ -385,12 +386,12 @@ public class Regex implements Serializable {
 	}
 
 	/**
-	 * Create a RegexReplacement from this Regex.
+	 * Create a PartialRegexReplacement from this Regex.
 	 *
-	 * @return a RegexReplacement
+	 * @return a PartialRegexReplacement
 	 */
-	public RegexReplacement replaceWith() {
-		return new RegexReplacement(this);
+	public PartialRegexReplacement replaceWith() {
+		return new PartialRegexReplacement(this);
 	}
 
 	/**
