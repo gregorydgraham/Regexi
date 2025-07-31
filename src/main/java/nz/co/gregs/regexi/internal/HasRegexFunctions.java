@@ -1427,7 +1427,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 
 	/**
 	 * Alters the previous element in the regexp so that it only matches if the
-	 * element appears in that position exactly once or not at all.
+	 * element appears in that position one or more times.
 	 *
    * <p>
    * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
@@ -1457,7 +1457,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 
 	/**
 	 * Alters the previous element in the regexp so that it only matches if the
-	 * element appears in that position exactly once or not at all.
+	 * element appears in that position exactly one or more times grabbing as many as possible while still allowing other quantifiers to match.
 	 *
    * <p>
    * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
@@ -1484,7 +1484,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 
 	/**
 	 * Alters the previous element in the regexp so that it only matches if the
-	 * element appears in that position exactly once or not at all.
+	 * element appears in that position exactly one or more times but as few times as possible.
 	 *
    * <p>
    * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
@@ -1511,7 +1511,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 
 	/**
 	 * Alters the previous element in the regexp so that it only matches if the
-	 * element appears in that position exactly once or not at all.
+	 * element appears in that position one or more times matching as many characters as possible without regard for following quantifiers.
 	 *
    * <p>
    * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
