@@ -394,6 +394,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	/**
 	 * Adds a match for zero or more characters to the regexp without grouping it.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * <p>
 	 * This is the equivalent of adding ".*" to the Pattern.</p>
 	 *
@@ -461,37 +474,66 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 		return atLeastOnceGreedy();
 	}
 
-	/**
-	 * Alters the previous element in the regexp so that it only matches if the
-	 * element appears in that position exactly once or not at all.
-	 *
-	 * <p>
-	 * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but
-	 * not "a"
-	 *
-	 * @return a new regexp
-	 */
-	default REGEX atLeastOnceGreedy() {
-		return unescaped("+");
-	}
+  /**
+   * Alters the previous element in the regexp so that it only matches if the element appears in that position one or more times.
+   *
+   * <p>
+   * Implements the "+" operator. This is the original behaviour of the at-least-once operator.
+   *
+   * <p>
+   * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but not "a"
+   *
+   * @return a new regexp
+   */
+  default REGEX atLeastOnceGreedy() {
+    return unescaped("+");
+  }
+
+  /**
+   * Alters the previous element in the regexp so that it only matches if the element appears in that position one or more times.
+   *
+   * <p>
+   * Implements the "+?" operator. This is the newer lazy behaviour of the at-least-once operator. The regex will match the smallest possible match.
+   *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
+   * <p>
+   * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but not "a"
+   *
+   * @return a new regexp
+   */
+  default REGEX atLeastOnceReluctant() {
+    return unescaped("+?");
+  }
 
 	/**
 	 * Alters the previous element in the regexp so that it only matches if the
-	 * element appears in that position exactly once or not at all.
-	 *
-	 * <p>
-	 * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but
-	 * not "a"
-	 *
-	 * @return a new regexp
-	 */
-	default REGEX atLeastOnceReluctant() {
-		return unescaped("+?");
-	}
-
-	/**
-	 * Alters the previous element in the regexp so that it only matches if the
-	 * element appears in that position exactly once or not at all.
+	 * element appears in that position one or more times.
+   * 
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 *
 	 * <p>
 	 * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but
@@ -507,6 +549,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position exactly X times.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * @param x the exact number of times the previous match must occur
 	 * @return a new regexp
 	 */
@@ -518,6 +573,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position exactly X times.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * @param x the exact number of times the previous match must occur
 	 * @return a new regexp
 	 */
@@ -529,6 +597,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position exactly X times.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * @param x the exact number of times the previous match must occur
 	 * @return a new regexp
 	 */
@@ -540,6 +621,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position X times or more.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * @param x the minimum number of times the previous match must occur
 	 * @return a new regexp
 	 */
@@ -551,6 +645,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position X times or more.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * @param x the minimum number of times the previous match must occur
 	 * @return a new regexp
 	 */
@@ -562,6 +669,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position X times or more.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * @param x the minimum number of times the previous match must occur
 	 * @return a new regexp
 	 */
@@ -573,6 +693,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position X or more times but no more than Y times.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * <p>
 	 * literal('a').atLeastXAndNoMoreThanYTimes(2,3) will match "aa" and "aaa" but
 	 * not "aa" nor "aaaa".
@@ -589,6 +722,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position X or more times but no more than Y times.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * <p>
 	 * literal('a').atLeastXAndNoMoreThanYTimes(2,3) will match "aa" and "aaa" but
 	 * not "aa" nor "aaaa".
@@ -605,6 +751,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position X or more times but no more than Y times.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * <p>
 	 * literal('a').atLeastXAndNoMoreThanYTimes(2,3) will match "aa" and "aaa" but
 	 * not "aa" nor "aaaa".
@@ -1180,6 +1339,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position exactly once or not at all.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * <p>
 	 * literal('a').literal('b)'.onceOrNotAtAll() will match "a" or "ab", but not
 	 * "abb"
@@ -1197,6 +1369,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position exactly once or not at all.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * <p>
 	 * literal('a').literal('b)'.onceOrNotAtAll() will match "a" or "ab", but not
 	 * "abb"
@@ -1218,6 +1403,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * literal('a').literal('b)'.onceOrNotAtAll() will match "a" or "ab", but not
 	 * "abb"
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * <p>
 	 * Equivalent to "?+"
 	 *
@@ -1231,6 +1429,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position exactly once or not at all.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * <p>
 	 * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but
 	 * not "a"
@@ -1248,6 +1459,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position exactly once or not at all.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * <p>
 	 * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but
 	 * not "a"
@@ -1262,6 +1486,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position exactly once or not at all.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * <p>
 	 * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but
 	 * not "a"
@@ -1276,6 +1513,19 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it only matches if the
 	 * element appears in that position exactly once or not at all.
 	 *
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   * 
 	 * <p>
 	 * literal('a').literal('b)'.atLeastOnceGreedy() will match "ab" or "abb", but
 	 * not "a"
@@ -1477,43 +1727,79 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it matches if the element
 	 * appears in that position or not.
 	 *
-	 * <p>
- literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac" or
- "abc".</p>
-	 *
-	 * @return a new regexp
-	 */
-	default REGEX optionalManyGreedy() {
-		return zeroOrMoreGreedy();
-	}
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   *
+   * <p>
+   * literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac" or "abc".</p>
+   *
+   * @return a new regexp
+   */
+  default REGEX optionalManyGreedy() {
+    return zeroOrMoreGreedy();
+  }
 
 	/**
 	 * Alters the previous element in the regexp so that it matches if the element
 	 * appears in that position or not.
 	 *
-	 * <p>
- literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac" or
- "abc".</p>
-	 *
-	 * @return a new regexp
-	 */
-	default REGEX optionalManyReluctant() {
-		return zeroOrMoreReluctant();
-	}
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   *
+   * <p>
+   * literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac" or "abc".</p>
+   *
+   * @return a new regexp
+   */
+  default REGEX optionalManyReluctant() {
+    return zeroOrMoreReluctant();
+  }
 
 	/**
 	 * Alters the previous element in the regexp so that it matches if the element
 	 * appears in that position or not.
 	 *
-	 * <p>
- literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac" or
- "abc".</p>
-	 *
-	 * @return a new regexp
-	 */
-	default REGEX optionalManyPossessive() {
-		return zeroOrMorePossessive();
-	}
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   *
+   * <p>
+   * literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac" or "abc".</p>
+   *
+   * @return a new regexp
+   */
+  default REGEX optionalManyPossessive() {
+    return zeroOrMorePossessive();
+  }
 
 	/**
 	 * Alters the previous element in the regexp so that it matches if the element
@@ -1522,29 +1808,53 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * <p>
 	 * Adds a "*" to regular expression.</p>
 	 *
-	 * <p>
- literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac", "abc",
- or "abbbc".</p>
-	 *
-	 * @return a new regexp
-	 */
-	default REGEX zeroOrMoreGreedy() {
-		return add(new UntestableSequence("*"));
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   *
+   * <p>
+   * literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac", "abc", or "abbbc".</p>
+   *
+   * @return a new regexp
+   */
+  default REGEX zeroOrMoreGreedy() {
+    return add(new UntestableSequence("*"));
 	}
 
 	/**
 	 * Alters the previous element in the regexp so that it matches if the element
 	 * appears in that position or not.
 	 *
-	 * <p>
-	 * Adds a "*" to regular expression.</p>
-	 *
-	 * <p>
- literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac", "abc",
- or "abbbc".</p>
-	 *
-	 * @return a new regexp
-	 */
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   *
+   * <p>
+   * Adds a "*" to regular expression.</p>
+   *
+   * <p>
+   * literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac", "abc", or "abbbc".</p>
+   *
+   * @return a new regexp
+   */
 	default REGEX zeroOrMoreReluctant() {
 		return add(new UntestableSequence("*?"));
 	}
@@ -1553,18 +1863,30 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * Alters the previous element in the regexp so that it matches if the element
 	 * appears in that position or not.
 	 *
-	 * <p>
-	 * Adds a "*" to regular expression.</p>
-	 *
-	 * <p>
- literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac", "abc",
- or "abbbc".</p>
-	 *
-	 * @return a new regexp
-	 */
-	default REGEX zeroOrMorePossessive() {
-		return add(new UntestableSequence("*+"));
-	}
+   * <p>
+   * To understand greedy, reluctant, and possessive matching consider matching the string "1234a5678" with the regex "/\d*./". This uses the original, greedy
+   * behaviour to find 2 matches: "1234a" and "5678". You should note that in the first match, the "\d" grabs "1234", leaving "a" for the "."; but in the second
+   * match it backs off the "8", only holding "567", allowing the "." quantifier to match the last digit "8".
+   *
+   * <p>
+   * Compare that to matching "1234a5678" with the lazy version "/\d*?./". Suddenly there are 9 matches: "1", "2", "3", "4", "a", "5", "6", "7", "8". This
+   * because the lazy quantifier will match zero characters whenever it can like in this case so the "." is doing all the work.
+   *
+   * <p>
+   * Finally consider "1234a5678" with the possessive regex "/\d*+./". Now there is only one match: "1234a". Because "*+" is possessive, it won't release the
+   * "8" for the "." quantifier to match and thus there is no second match.
+   *
+   * <p>
+   * Adds a "*" to regular expression.</p>
+   *
+   * <p>
+   * literal('a').literal('b)'.zeroOrMoreGreedy().literal('c') will match "ac", "abc", or "abbbc".</p>
+   *
+   * @return a new regexp
+   */
+  default REGEX zeroOrMorePossessive() {
+    return add(new UntestableSequence("*+"));
+  }
 
 	/**
 	 * Adds a check for a positive integer to the regular expression without
@@ -2019,7 +2341,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 */
 	@SuppressWarnings("unchecked")
 	public default NegativeLookahead<REGEX> negativeLookAhead() {
-		return new NegativeLookahead<REGEX>((REGEX) this);
+		return new NegativeLookahead<>((REGEX) this);
 	}
 
 	public default REGEX negativeLookAhead(String ender) {
@@ -2074,7 +2396,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 */
 	@SuppressWarnings("unchecked")
 	default PositiveLookahead<REGEX> positiveLookAhead() {
-		return new PositiveLookahead<REGEX>((REGEX) this);
+		return new PositiveLookahead<>((REGEX) this);
 	}
 
 	/**
