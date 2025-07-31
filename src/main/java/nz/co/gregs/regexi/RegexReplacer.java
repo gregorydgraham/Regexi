@@ -62,7 +62,7 @@ public class RegexReplacer implements Serializable {
 	}
 
 	public String replaceFirst(String s, Function<MatchResult, String> fn) {
-		return getMatcher(s).replaceFirst(pattern);
+		return getMatcher(s).replaceFirst(fn);
 	}
 
 	private Matcher getMatcher(String s) {
