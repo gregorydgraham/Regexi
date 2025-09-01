@@ -2356,7 +2356,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * }
 	 * </p>
 	 *
-   * @param ender
+   * @param ender the literal that must not follow the match
 	 * @return the start of a negative lookahead.
 	 */
 	public default REGEX negativeLookAhead(String ender) {
@@ -2375,7 +2375,7 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * }, an example using a PartialRegex is left as an exercise for the reader.
 	 * </p>
 	 *
-   * @param ender
+   * @param ender the regular expression that must not match after the match
 	 * @return the start of a negative lookahead.
 	 */
 	@SuppressWarnings("unchecked")
@@ -2387,10 +2387,10 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
    * A simple way to avoid matching the literal provided.
    * 
    * <p>
-   * </p>
+   * a simple way to introduction to negative lookaheads.
    * 
-   * @param ender
-   * @return
+   * @param ender the literal to void the match if it follows the match
+   * @return a regex that will exclude matching the provided literal
    */
   public default REGEX anythingButThis(String ender) {
 		return anythingButThis(Regex.empty().literal(ender));
