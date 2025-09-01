@@ -2333,7 +2333,8 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 	 * <p>
 	 * This is similar to adding an excluding expression, @{code "[^~].} for
 	 * instance, but doesn't include the excluded expression in the match. Used
-	 * with named captures, this is very useful to strip delimiters. For example {@code literal("{").beginNamedCapture("cap").anyCharacter().xeroOrMore().negativeLookAhead().literal("}").endLookAhead().endNamedCapture()
+	 * with named captures, this is very useful to strip delimiters. For example
+   * {@code literal("{").beginNamedCapture("cap").anyCharacter().xeroOrMore().negativeLookAhead().literal("}").endLookAhead().endNamedCapture()
 	 * }
 	 * </p>
 	 *
@@ -2344,32 +2345,81 @@ public interface HasRegexFunctions<REGEX extends AbstractHasRegexFunctions<REGEX
 		return new NegativeLookahead<>((REGEX) this);
 	}
 
+	/**
+	 * Negative lookahead looks past the current match to check that it is NOT
+	 * followed by the lookahead expression.
+	 *
+	 * <p>
+	 * This is similar to adding an excluding expression, @{code "[^~].} for
+	 * instance, but doesn't include the excluded expression in the match. Used
+	 * with named captures, this is very useful to strip delimiters. For example {@code literal("{").beginNamedCapture("cap").anyCharacter().xeroOrMore().negativeLookAhead("}").endNamedCapture()
+	 * }
+	 * </p>
+	 *
+   * @param ender
+	 * @return the start of a negative lookahead.
+	 */
 	public default REGEX negativeLookAhead(String ender) {
 		return this.negativeLookAhead().literal(ender).endLookahead();
 	}
 
+	/**
+	 * Negative lookahead looks past the current match to check that it is NOT
+	 * followed by the lookahead expression.
+	 *
+	 * <p>
+	 * This is similar to adding an excluding expression, @{code "[^~].} for
+	 * instance, but doesn't include the excluded expression in the match. Used
+	 * with named captures, this is very useful to strip delimiters. For example
+   * {@code literal("{").beginNamedCapture("cap").anyCharacter().xeroOrMore().negativeLookAhead().literal("}").endLookAhead().endNamedCapture()
+	 * }, an example using a PartialRegex is left as an exercise for the reader.
+	 * </p>
+	 *
+   * @param ender
+	 * @return the start of a negative lookahead.
+	 */
 	@SuppressWarnings("unchecked")
 	public default REGEX negativeLookAhead(PartialRegex ender) {
 		return negativeLookAhead().add(ender).endLookahead();
 	}
 
-	public default REGEX anythingButThis(String ender) {
+  /**
+   * A simple way to avoid matching the literal provided.
+   * 
+   * <p>
+   * </p>
+   * 
+   * @param ender
+   * @return
+   */
+  public default REGEX anythingButThis(String ender) {
 		return anythingButThis(Regex.empty().literal(ender));
 	}
 
-	public default REGEX anythingButThis(PartialRegex ender) {
-		return this.addGroup(
-				Regex.empty().addGroup(
-						Regex.empty().negativeLookAhead().add(ender).endGroup().anyCharacter()
-				).optionalManyGreedy()
-		);
-	}
+  public default REGEX anythingButThis(PartialRegex ender) {
+    return this.addGroup(
+            Regex.empty().addGroup(
+                    Regex.empty().negativeLookAhead().add(ender).endGroup().anyCharacter()
+            ).optionalManyGreedy()
+    );
+  }
 
-	public default REGEX positiveLookAhead(String ender) {
-		return this.positiveLookAhead().literal(ender).endLookahead();
-	}
+  /**
+   * Implements positive lookahead, only matches if the previous pattern 
+   * is followed by the lookahead pattern.
+   *
+   * <p>
+   * Note that the positive lookahead pattern is not included in the match.</p>
+   *
+   * @param ender the literal that needs to follow the previous pattern.
+   * @return a new regular expression based on the current regex extended 
+   * with the positive lookahead
+   */
+  public default REGEX positiveLookAhead(String ender) {
+    return this.positiveLookAhead().literal(ender).endLookahead();
+  }
 
-	/**
+  /**
 	 * Implements positive lookahead, only matches if the previous pattern is
 	 * followed by the lookahead pattern.
 	 *
